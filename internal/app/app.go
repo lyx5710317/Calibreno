@@ -29,7 +29,7 @@ import (
 // App is the state the window shows. Every widgets.Field is read and written on
 // the main thread; work on disk runs in goroutines that hand their results
 // back through post.
-const Name = "calibreno"
+const Name = "Calibreno"
 
 type App struct {
 	errorDetails     string

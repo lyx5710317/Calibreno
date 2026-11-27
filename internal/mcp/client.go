@@ -11,7 +11,7 @@ import (
 
 // ErrNotRunning is Dial's error when nothing serves the endpoint: Dalibre
 // isn't running, or its MCP server is off.
-var ErrNotRunning = errors.New("Dalibre’s MCP server isn’t running")
+var ErrNotRunning = errors.New("Calibreno’s MCP server isn’t running")
 
 // Dial connects to the app's MCP server at endpoint with token, as the
 // client name, for tools such as dalibre-plugin that drive the running

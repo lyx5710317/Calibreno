@@ -13,7 +13,7 @@ import (
 	"dalibre/internal/settings"
 )
 
-// serveMCP is "Dalibre mcp": MCP on stdin and stdout, for agents that only
+// serveMCP is "Calibreno mcp": MCP on stdin and stdout, for agents that only
 // start stdio servers. It passes everything on to the running app, or
 // serves the last library read-only when the app isn't running.
 func serveMCP() {

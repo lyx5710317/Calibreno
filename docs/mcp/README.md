@@ -1,11 +1,11 @@
-# Using Dalibre with your agents (MCP)
+# Using Calibreno with your agents (MCP)
 
-Dalibre serves the open library to AI agents on your computer, such as
+Calibreno serves the open library to AI agents on your computer, such as
 Claude Code, Claude Desktop and Cursor, over the
 [Model Context Protocol](https://modelcontextprotocol.io). An agent can
 search your books, read their details and files, edit metadata, add
 books and formats, get books from Get books' sources, and write
-plugins and try them, while Dalibre is open.
+plugins and try them, while Calibreno is open.
 
 How it is built is in [design.md](design.md).
 
@@ -35,21 +35,21 @@ claude mcp add --transport http dalibre http://127.0.0.1:8765/mcp --header "Auth
 ```
 
 **Claude Desktop** starts servers on stdin and stdout only, so it runs
-Dalibre's own bridge, `Dalibre mcp`, which needs no token. Add it to
+Calibreno's own bridge, `Calibreno mcp`, which needs no token. Add it to
 `claude_desktop_config.json`, then restart Claude Desktop:
 
 ```json
 {
   "mcpServers": {
     "dalibre": {
-      "command": "/Applications/Dalibre.app/Contents/MacOS/Dalibre",
+      "command": "/Applications/Calibreno.app/Contents/MacOS/Calibreno",
       "args": ["mcp"]
     }
   }
 }
 ```
 
-When Dalibre isn't running, the bridge still answers the read tools from
+When Calibreno isn't running, the bridge still answers the read tools from
 the last library, read-only.
 
 **Cursor**: add it to `~/.cursor/mcp.json`.
@@ -120,7 +120,7 @@ then `update_books` with the values the agent trusts:
 
 ### Convert formats
 
-Dalibre doesn't convert; your agent does, with the tools it has, then
+Calibreno doesn't convert; your agent does, with the tools it has, then
 adds the result to the book.
 
 > Make an AZW3 of Dune for my Kindle with ebook-convert.
@@ -162,13 +162,13 @@ Bin on Windows), so you can get them back.
 
 ### Write a plugin
 
-> Write a Dalibre plugin that gets books from Standard Ebooks, and try
+> Write a Calibreno plugin that gets books from Standard Ebooks, and try
 > it.
 
 The agent reads the [plugin docs](../plugins/README.md), then
 `create_plugin {"path": "/Users/me/standard-ebooks", "id": "io.github.me.standardebooks"}`,
 writes `plugin.json` and `main.js` there, and
-`add_plugin {"path": "/Users/me/standard-ebooks"}`. Dalibre asks you to
+`add_plugin {"path": "/Users/me/standard-ebooks"}`. Calibreno asks you to
 allow the hosts the plugin reaches; the agent can't allow them for you.
 Then it tries it,
 `test_plugin {"id": "io.github.me.standardebooks", "call": "search", "text": "dune"}`,
@@ -215,4 +215,4 @@ MCP popover then says "Running · read only", with **Allow changes**.
 While an agent works, the MCP button shows it: its icon (or initials)
 and name. Its popover lists the agents and their latest calls in words,
 as "Searched “Dune” · 1 book"; click a call for its arguments. The list
-holds the last 500 calls while Dalibre runs.
+holds the last 500 calls while Calibreno runs.

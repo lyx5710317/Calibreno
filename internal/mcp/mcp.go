@@ -116,8 +116,8 @@ const clientMeta = "dalibre/client"
 // New makes the server. With allowChanges it has the write tools too.
 func New(h Host, version string, allowChanges bool) *Server {
 	s := &Server{host: h, found: map[string]plugin.Result{}, agents: map[string]*Agent{}}
-	s.srv = sdk.NewServer(&sdk.Implementation{Name: "dalibre", Title: "Dalibre", Version: version}, &sdk.ServerOptions{
-		Instructions: "Dalibre is the user's e-book library, a calibre library. Book ids come from search_books. " +
+	s.srv = sdk.NewServer(&sdk.Implementation{Name: "dalibre", Title: "Calibreno", Version: version}, &sdk.ServerOptions{
+		Instructions: "Calibreno is the user's e-book library, a calibre library. Book ids come from search_books. " +
 			"To convert a book, convert the file get_book gives to a file outside the library, then add it with add_format. " +
 			"To write a plugin for Dalibre (a book source, a metadata source, or one that works on books' files), read " + PluginDocs +
 			" first, then use create_plugin, add_plugin and test_plugin; reload_plugins after an edit. " +

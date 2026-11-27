@@ -91,7 +91,7 @@ func (s *Server) addPluginTools() {
 	sdk.AddTool(s.srv, writeTool("create_plugin", "Starts a new plugin in an empty folder from Dalibre's template: plugin.json, main.js, and dalibre.d.ts, which describes the API. "+
 		"Read "+PluginDocs+" before writing one. Then edit the files, add the folder with add_plugin and try it with test_plugin.", false, false), s.createPlugin)
 	sdk.AddTool(s.srv, writeTool("add_plugin", "Adds the plugin in a folder to Dalibre, which loads it from there and reloads it when its files change. "+
-		"Dalibre asks the user to allow what plugin.json's permissions ask for; this waits for their answer.", false, true), s.addPlugin)
+		"Calibreno asks the user to allow what plugin.json's permissions ask for; this waits for their answer.", false, true), s.addPlugin)
 	sdk.AddTool(s.srv, writeTool("reload_plugins", "Loads the plugins again, as after editing one, and lists them. An edit that asks for new permissions waits for the user.", false, true), s.reloadPlugins)
 	sdk.AddTool(s.srv, &sdk.Tool{Name: "test_plugin", Description: "Calls a function of a loaded plugin as Dalibre does, with the user's settings, and returns what it returned, what it logged, and its error with the script's stack. " +
 		"Nothing is added to the library.", Annotations: &sdk.ToolAnnotations{DestructiveHint: boolp(false), OpenWorldHint: boolp(true)}}, s.testPlugin)
@@ -211,7 +211,7 @@ func (s *Server) addPlugin(ctx context.Context, _ *sdk.CallToolRequest, in addPl
 	out := addPluginOut{Plugin: info}
 	switch info.State {
 	case PluginNeedsApproval:
-		out.Note = "Dalibre is asking the user to allow it. Once they have, list_plugins shows it loaded."
+		out.Note = "Calibreno is asking the user to allow it. Once they have, list_plugins shows it loaded."
 	case PluginFailed:
 		out.Errors = pl.Plugins(ctx).Errors
 		out.Note = "Fix it and call reload_plugins."

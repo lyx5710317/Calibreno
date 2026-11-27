@@ -25,7 +25,7 @@ import (
 
 var (
 	errNoLibrary = errors.New("no library is open in Dalibre")
-	errReadOnly  = errors.New("Dalibre allows reading only; the user can allow changes in Settings")
+	errReadOnly  = errors.New("Calibreno allows reading only; the user can allow changes in Settings")
 )
 
 // MaxFileSize is the largest e-book add_books and add_format take.

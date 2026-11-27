@@ -166,7 +166,7 @@ func (a *App) mcpSnippets() []mcpSnippet {
 	url, token := a.mcpEndpoint(), a.mcpToken()
 	exe, err := os.Executable()
 	if err != nil {
-		exe = "Dalibre"
+		exe = Name
 	}
 	indent := func(v any) string {
 		b, _ := json.MarshalIndent(v, "", "  ")
@@ -259,7 +259,7 @@ func (h mcpHost) MetadataSources(ctx context.Context) []*plugin.Plugin {
 func (h mcpHost) Download(ctx context.Context, p *plugin.Plugin, r plugin.Result, format string) (int64, error) {
 	lib := h.Library()
 	if lib == nil {
-		return 0, errors.New("no library is open in Dalibre")
+		return 0, errors.New("no library is open in " + Name)
 	}
 	dir, err := os.MkdirTemp("", "dalibre-download-")
 	if err != nil {
@@ -399,11 +399,11 @@ func (h mcpHost) AddPlugin(ctx context.Context, folder string) (mcp.PluginInfo, 
 		// Another plugin's id would get that plugin's grant and settings,
 		// its secrets among them.
 		if a.knownManifest(m.ID) != nil && (st == nil || st.Path != folder) {
-			refused = fmt.Errorf("Dalibre has another plugin with the id %s; give this one its own id", m.ID)
+			refused = fmt.Errorf("%s has another plugin with the id %s; give this one its own id", Name, m.ID)
 			return
 		}
 		if a.consent != nil {
-			refused = errors.New("Dalibre is asking the user about another plugin; try again once they answered")
+			refused = errors.New(Name + " is asking the user about another plugin; try again once they answered")
 			return
 		}
 		link := func() <-chan struct{} {
@@ -490,7 +490,7 @@ func (h mcpHost) RemovePlugin(ctx context.Context, id string) error {
 			return
 		}
 		if k.linked == "" {
-			err = fmt.Errorf("%s wasn’t added from a folder; the user removes it in Dalibre’s Plugins", k.manifest.Name)
+			err = fmt.Errorf("%s wasn’t added from a folder; the user removes it in %s’s Plugins", k.manifest.Name, Name)
 			return
 		}
 		wait = h.a.afterPluginLoad()

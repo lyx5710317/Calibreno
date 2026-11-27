@@ -174,7 +174,7 @@ func matches(b *calibre.Book, terms string) bool {
 
 func (s *Server) title() string {
 	if s.Title == "" {
-		return "Dalibre"
+		return "Calibreno"
 	}
 	return s.Title
 }
@@ -241,7 +241,7 @@ func (s *Server) feed(id, title string, self, kind string) *outFeed {
 	return &outFeed{
 		Xmlns: "http://www.w3.org/2005/Atom", XmlnsDC: "http://purl.org/dc/terms/", XmlnsOPDS: "http://opds-spec.org/2010/catalog",
 		XmlnsOS: "http://a9.com/-/spec/opensearch/1.1/",
-		ID:      "urn:dalibre:" + id, Title: title, Updated: time.Now().UTC().Format(time.RFC3339), Author: &outAuthor{Name: "Dalibre"},
+		ID:      "urn:dalibre:" + id, Title: title, Updated: time.Now().UTC().Format(time.RFC3339), Author: &outAuthor{Name: "Calibreno"},
 		Links: []outLink{
 			{Rel: "self", Href: self, Type: kind},
 			{Rel: "start", Href: s.prefix(), Type: navType, Title: s.title()},

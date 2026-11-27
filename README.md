@@ -1,8 +1,8 @@
-# calibreno
+# Calibreno
 
-calibreno 是面向个人书库的开源电子书管理桌面应用。它基于 [Dalibre](https://github.com/djyde/dalibre)，使用 Go 和 [MyGo](https://github.com/egoist/mygo) 开发，可以直接打开已有的 Calibre 书库。首版在 Windows x64 上验收。
+Calibreno 是面向个人书库的开源电子书管理桌面应用。它基于 [Dalibre](https://github.com/djyde/dalibre)，使用 Go 和 [MyGo](https://github.com/egoist/mygo) 开发，可以直接打开已有的 Calibre 书库。首版在 Windows x64 上验收。
 
-![calibreno 待整理页面，显示导入批次、待查重与待补资料的书籍](docs/images/calibreno-inbox.png)
+![Calibreno 待整理页面，显示导入批次、待查重与待补资料的书籍](docs/images/calibreno-inbox.png)
 
 ## 功能
 
@@ -53,7 +53,7 @@ go tool mygo build ./cmd/dalibre
 
 ## 开源许可
 
-calibreno 是 [djyde/dalibre](https://github.com/djyde/dalibre) 的公开派生项目，沿用 [GPL-3.0-or-later](LICENSE)，保留上游历史、版权和许可证声明。修改记录见 [CHANGELOG.md](CHANGELOG.md)。
+Calibreno 是 [djyde/dalibre](https://github.com/djyde/dalibre) 的公开派生项目，沿用 [GPL-3.0-or-later](LICENSE)，保留上游历史、版权和许可证声明。修改记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 Calibre 数据库结构来自 Calibre，适用 GPL-3.0。Inter 和 Geist Mono 字体适用 SIL Open Font License，Lucide 图标适用 ISC，Radix Colors 色彩适用 MIT。
 
@@ -61,4 +61,4 @@ Calibre 数据库结构来自 Calibre，适用 GPL-3.0。Inter 和 Geist Mono �
 
 发布安装包时，同步提供用于构建安装包的公开 Git 标签和完整对应源码，并在 GitHub Release 中提供源码下载入口与构建说明。项目源码继续以 GPL-3.0-or-later 公开。
 
-当前源码关闭了上游签名更新配置。正式发布 calibreno 安装包和自动更新前，需要配置本仓库的发布流程与签名密钥。
+当前源码关闭了上游签名更新配置。正式发布 Calibreno 安装包和自动更新前，需要配置本仓库的发布流程与签名密钥。

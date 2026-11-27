@@ -1,14 +1,14 @@
-# calibreno 首版开发文档
+# Calibreno 首版开发文档
 
-calibreno 首版面向在 Windows 上整理个人 Calibre 书库的用户。一次导入形成一个批次，用户在「待整理」中复核重复文件、批量补元数据并查看结果。处理可以中断和恢复。简体中文覆盖桌面程序现有入口与本次新增流程，使用日常功能时无需依赖英文提示。
+Calibreno 首版面向在 Windows 上整理个人 Calibre 书库的用户。一次导入形成一个批次，用户在「待整理」中复核重复文件、批量补元数据并查看结果。处理可以中断和恢复。简体中文覆盖桌面程序现有入口与本次新增流程，使用日常功能时无需依赖英文提示。
 
-[calibreno 可点击原型](https://www.figma.com/proto/0trjwCnFvsrLybQSvRATvd/calibreno?page-id=0%3A1&node-id=2-7&starting-point-node-id=2%3A7&scaling=contain) · [Figma 设计文件](https://www.figma.com/design/0trjwCnFvsrLybQSvRATvd?node-id=2-7)
+[Calibreno 可点击原型](https://www.figma.com/proto/0trjwCnFvsrLybQSvRATvd/calibreno?page-id=0%3A1&node-id=2-7&starting-point-node-id=2%3A7&scaling=contain) · [Figma 设计文件](https://www.figma.com/design/0trjwCnFvsrLybQSvRATvd?node-id=2-7)
 
 ## 范围与开发基线
 
 | 项目 | 首版要求 |
 | --- | --- |
-| 产品名称 | 对用户显示 `calibreno`。核对窗口标题、欢迎页、关于、版本更新页和应用包显示名。 |
+| 产品名称 | 对用户显示 `Calibreno`。核对窗口标题、欢迎页、关于、版本更新页和应用包显示名。 |
 | 运行环境 | Windows AMD64 为首轮验收环境。沿用 Go 1.27.3、MyGo 及当前桌面工程结构。 |
 | 书库 | 直接打开现有 Calibre 书库。原有书目、格式文件、封面、OPF 及文件命名继续由书库层管理。 |
 | 新功能 | 书库侧栏新增「待整理」。围绕导入批次提供查重对照、批量补元数据、恢复处理和结果查看。 |
@@ -112,7 +112,7 @@ calibreno 首版面向在 Windows 上整理个人 Calibre 书库的用户。一�
 | 漏译入口 | 已确认示例 | 处理要求 |
 | --- | --- | --- |
 | 导入和查重 | 拖放提示 `Drop to add books`、复核按钮 `Skip all`、进度 `Adding books`、重复处理选项及导入统计。 | 把文案移入语言目录，状态和计数用格式化参数，消除拼接英语单复数的提示。 [导入界面](../internal/app/view_import.go) · [导入状态](../internal/app/importbooks.go) |
-| 已登记但仍显示英文 | MCP 设置中的 `Tools`、`Token`，窗口标题和更新界面仍使用原品牌。 | 在简体中文中使用「工具」、「访问令牌」和产品名 `calibreno`。保留 EPUB、ISBN、MCP、OPDS 等常用技术缩写。 [简体中文目录](../cmd/dalibre/locales/zh-Hans.json) |
+| 已登记但仍显示英文 | MCP 设置中的 `Tools`、`Token`，窗口标题和更新界面仍使用原品牌。 | 在简体中文中使用「工具」、「访问令牌」和产品名 `Calibreno`。保留 EPUB、ISBN、MCP、OPDS 等常用技术缩写。 [简体中文目录](../cmd/dalibre/locales/zh-Hans.json) |
 | 底层错误直接呈现 | 通用提示直接显示 `err.Error()`。书库、EPUB、OPDS 和插件存在英文原始错误。 | 按错误类别做中文摘要及可采取的操作。原始系统错误、插件堆栈和外部返回文本可放在可展开的「技术详情」。 [错误提示入口](../internal/app/app.go) · [OPDS 错误](../internal/opds/feed.go) |
 | 插件可见文案 | 市场和已安装页直接显示清单描述、动作标题及设置说明。Project Gutenberg 的筛选、Google Books 的 API 密钥说明等来自英文清单。 | 覆盖内置插件、首版市场清单和其设置、权限、动作、表单、进度与结果。给固定插件文案配套中文显示值，按插件 ID 与字段取本地化内容。 [市场界面](../internal/app/view_marketplace.go) · [插件界面](../internal/app/view_plugins.go) · [内置插件](../plugins) |
 
@@ -160,4 +160,4 @@ go test ./...
 
 ## 发布
 
-源码发布沿用 GPL-3.0-or-later。安装包与用于生成它的公开标签和完整对应源码一起提供，并保留许可证、版权声明和构建安装脚本。发布 calibreno 更新前配置自己的发布仓库和签名密钥。程序标识或链接协议如需改名，应在可运行版本上验证与原 Dalibre 并存、设置迁移和旧链接的打开行为。 [Fork 的开源发布规则](../README.md#releases-from-this-fork)
+源码发布沿用 GPL-3.0-or-later。安装包与用于生成它的公开标签和完整对应源码一起提供，并保留许可证、版权声明和构建安装脚本。发布 Calibreno 更新前配置自己的发布仓库和签名密钥。程序标识或链接协议如需改名，应在可运行版本上验证与原 Dalibre 并存、设置迁移和旧链接的打开行为。 [Fork 的开源发布规则](../README.md#releases-from-this-fork)

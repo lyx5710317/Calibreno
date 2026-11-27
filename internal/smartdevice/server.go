@@ -126,7 +126,7 @@ func (s *Server) discoveryAnswer() []byte {
 		return r
 	}, s.cfg.Name)
 	if name == "" {
-		name = "Dalibre"
+		name = "Calibreno"
 	}
 	return []byte(discoveryPrefix + " (on " + name + ");" + strconv.Itoa(max(s.cfg.ContentPort, 0)) + "," + strconv.Itoa(s.Port()))
 }

@@ -44,7 +44,7 @@ func TestAppUpdateCheckInSettings(t *testing.T) {
 
 	a.openSettings(sectionGeneral)
 	tt.Frame()
-	for _, s := range []string{"calibreno 0.1.0", "Not checked yet", "Check for updates automatically", "Include beta versions"} {
+	for _, s := range []string{"Calibreno 0.1.0", "Not checked yet", "Check for updates automatically", "Include beta versions"} {
 		if !tt.HasText(s) {
 			t.Fatalf("misses %q: %q", s, tt.Texts())
 		}
@@ -67,7 +67,7 @@ func TestAppUpdateCheckInSettings(t *testing.T) {
 	f.err = mygo.ErrUpdatesDisabled
 	a.checkAppUpdate(true)
 	tt.Frame()
-	if !tt.HasText("This copy of calibreno can’t update itself") {
+	if !tt.HasText("This copy of Calibreno can’t update itself") {
 		t.Fatalf("disabled: %q", tt.Texts())
 	}
 
@@ -76,7 +76,7 @@ func TestAppUpdateCheckInSettings(t *testing.T) {
 	a.au.relaunch = func() { relaunched++ }
 	a.checkAppUpdate(true)
 	tt.Frame()
-	if a.au.dialog || !tt.HasText("calibreno 0.2.0 is available") || !tt.HasText("Install and restart") {
+	if a.au.dialog || !tt.HasText("Calibreno 0.2.0 is available") || !tt.HasText("Install and restart") {
 		t.Fatalf("available: dialog %v, %q", a.au.dialog, tt.Texts())
 	}
 	shot(t, tt, "app-update-available")
@@ -84,7 +84,7 @@ func TestAppUpdateCheckInSettings(t *testing.T) {
 		t.Fatal(err)
 	}
 	tt.Frame()
-	if a.au.status != auReady || relaunched != 1 || !tt.HasText("calibreno 0.2.0 is ready") || !tt.HasText("Restart now") {
+	if a.au.status != auReady || relaunched != 1 || !tt.HasText("Calibreno 0.2.0 is ready") || !tt.HasText("Restart now") {
 		t.Fatalf("ready: status %v, relaunched %d, %q", a.au.status, relaunched, tt.Texts())
 	}
 	// Checking again does nothing once an update waits for the restart.
@@ -108,7 +108,7 @@ func TestAppUpdateDialog(t *testing.T) {
 	if !f.beta || !a.au.dialog {
 		t.Fatalf("beta %v, dialog %v", f.beta, a.au.dialog)
 	}
-	for _, s := range []string{"calibreno 0.2.0 is available", "WHAT’S NEW", "Series shelves: books in a series stand together", "Faster import of large folders", "Skip this version", "Later"} {
+	for _, s := range []string{"Calibreno 0.2.0 is available", "WHAT’S NEW", "Series shelves: books in a series stand together", "Faster import of large folders", "Skip this version", "Later"} {
 		if !tt.HasText(s) {
 			t.Fatalf("dialog misses %q: %q", s, tt.Texts())
 		}

@@ -1,5 +1,7 @@
 # Writing Dalibre plugins
 
+Calibreno uses the Dalibre plugin SDK. The examples here apply to Calibreno with the same manifest fields, CLI commands, and JavaScript API.
+
 A Dalibre plugin is a folder with a `plugin.json` and a JavaScript (or
 TypeScript) module.
 Plugin API 1 has four capabilities; a plugin may have any of them:

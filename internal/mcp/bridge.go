@@ -125,7 +125,7 @@ func proxy(ctx context.Context, endpoint, token, version string) (srv *sdk.Serve
 		opts.Instructions = r.Instructions
 	}
 	mu.Lock()
-	srv = sdk.NewServer(&sdk.Implementation{Name: "dalibre", Title: "Dalibre", Version: version}, opts)
+	srv = sdk.NewServer(&sdk.Implementation{Name: "dalibre", Title: "Calibreno", Version: version}, opts)
 	mu.Unlock()
 	refresh(ctx)
 	return srv, func() { cs.Close() }, nil

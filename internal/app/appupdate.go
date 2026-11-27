@@ -21,7 +21,7 @@ import (
 const appUpdateEvery = time.Hour
 
 // releasesURL is where Dalibre's versions are published (mygo.json).
-const releasesURL = "https://github.com/lyx5710317/dalibre/releases"
+const releasesURL = "https://github.com/lyx5710317/Calibreno/releases"
 
 type appUpdateStatus int
 

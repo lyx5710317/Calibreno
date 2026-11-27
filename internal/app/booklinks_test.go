@@ -73,7 +73,7 @@ func TestOpenBookLink(t *testing.T) {
 
 	cases := []struct{ link, toast string }{
 		{bookRef{library: otherID, book: 999}.String(), "Other has no book with id 999"},
-		{bookRef{library: "unknown", book: 1}.String(), "isn’t one calibreno has opened"},
+		{bookRef{library: "unknown", book: 1}.String(), "isn’t one Calibreno has opened"},
 		{"dalibre://bok/x/1", "dalibre://bok/x/1 isn’t a book link"},
 	}
 	for _, c := range cases {

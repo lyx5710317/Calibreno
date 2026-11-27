@@ -217,23 +217,23 @@ func (msgs Messages) BatchUnknownAuthor() string {
 	return Catalog.Format(msgs.locale, "batchUnknownAuthor", nil)
 }
 
-// FeedbackBugTemplate says "**What happened?**\n\n\n**Steps to reproduce**\n\n1. \n\n**What did you expect?**\n\n\n---\ncalibreno {version} · {system}"
+// FeedbackBugTemplate says "**What happened?**\n\n\n**Steps to reproduce**\n\n1. \n\n**What did you expect?**\n\n\n---\nCalibreno {version} · {system}"
 // in the language the app shows.
 func FeedbackBugTemplate(version string, system string) string {
 	return In(i18n.Locale()).FeedbackBugTemplate(version, system)
 }
 
-// FeedbackBugTemplate says "**What happened?**\n\n\n**Steps to reproduce**\n\n1. \n\n**What did you expect?**\n\n\n---\ncalibreno {version} · {system}"
+// FeedbackBugTemplate says "**What happened?**\n\n\n**Steps to reproduce**\n\n1. \n\n**What did you expect?**\n\n\n---\nCalibreno {version} · {system}"
 // in the language of msgs.
 func (msgs Messages) FeedbackBugTemplate(version string, system string) string {
 	return Catalog.Format(msgs.locale, "feedbackBugTemplate", map[string]any{"version": version, "system": system})
 }
 
-// FeedbackFeatureTemplate says "**What would you like calibreno to do?**\n\n\n**Why would it help you?**\n\n"
+// FeedbackFeatureTemplate says "**What would you like Calibreno to do?**\n\n\n**Why would it help you?**\n\n"
 // in the language the app shows.
 func FeedbackFeatureTemplate() string { return In(i18n.Locale()).FeedbackFeatureTemplate() }
 
-// FeedbackFeatureTemplate says "**What would you like calibreno to do?**\n\n\n**Why would it help you?**\n\n"
+// FeedbackFeatureTemplate says "**What would you like Calibreno to do?**\n\n\n**Why would it help you?**\n\n"
 // in the language of msgs.
 func (msgs Messages) FeedbackFeatureTemplate() string {
 	return Catalog.Format(msgs.locale, "feedbackFeatureTemplate", nil)
@@ -2985,21 +2985,21 @@ func (msgs Messages) GetBooksAbout() string {
 	return Catalog.Format(msgs.locale, "getBooksAbout", nil)
 }
 
-// GetBooksFromPlugin says "From the {name} plugin. calibreno downloads the file and adds it to your library."
+// GetBooksFromPlugin says "From the {name} plugin. Calibreno downloads the file and adds it to your library."
 // in the language the app shows.
 func GetBooksFromPlugin(name string) string { return In(i18n.Locale()).GetBooksFromPlugin(name) }
 
-// GetBooksFromPlugin says "From the {name} plugin. calibreno downloads the file and adds it to your library."
+// GetBooksFromPlugin says "From the {name} plugin. Calibreno downloads the file and adds it to your library."
 // in the language of msgs.
 func (msgs Messages) GetBooksFromPlugin(name string) string {
 	return Catalog.Format(msgs.locale, "getBooksFromPlugin", map[string]any{"name": name})
 }
 
-// GetBooksFromCatalog says "From {name}, an OPDS catalog. calibreno downloads the file and adds it to your library."
+// GetBooksFromCatalog says "From {name}, an OPDS catalog. Calibreno downloads the file and adds it to your library."
 // in the language the app shows.
 func GetBooksFromCatalog(name string) string { return In(i18n.Locale()).GetBooksFromCatalog(name) }
 
-// GetBooksFromCatalog says "From {name}, an OPDS catalog. calibreno downloads the file and adds it to your library."
+// GetBooksFromCatalog says "From {name}, an OPDS catalog. Calibreno downloads the file and adds it to your library."
 // in the language of msgs.
 func (msgs Messages) GetBooksFromCatalog(name string) string {
 	return Catalog.Format(msgs.locale, "getBooksFromCatalog", map[string]any{"name": name})
@@ -3251,11 +3251,11 @@ func (msgs Messages) CatalogSignInBody() string {
 	return Catalog.Format(msgs.locale, "catalogSignInBody", nil)
 }
 
-// CatalogCantRead says "calibreno can’t read this part of {name}"
+// CatalogCantRead says "Calibreno can’t read this part of {name}"
 // in the language the app shows.
 func CatalogCantRead(name string) string { return In(i18n.Locale()).CatalogCantRead(name) }
 
-// CatalogCantRead says "calibreno can’t read this part of {name}"
+// CatalogCantRead says "Calibreno can’t read this part of {name}"
 // in the language of msgs.
 func (msgs Messages) CatalogCantRead(name string) string {
 	return Catalog.Format(msgs.locale, "catalogCantRead", map[string]any{"name": name})
@@ -3997,11 +3997,11 @@ func (msgs Messages) AppLibraryGone(path string) string {
 	return Catalog.Format(msgs.locale, "appLibraryGone", map[string]any{"path": path})
 }
 
-// AppWindowTitle says "calibreno — {name}"
+// AppWindowTitle says "Calibreno — {name}"
 // in the language the app shows.
 func AppWindowTitle(name string) string { return In(i18n.Locale()).AppWindowTitle(name) }
 
-// AppWindowTitle says "calibreno — {name}"
+// AppWindowTitle says "Calibreno — {name}"
 // in the language of msgs.
 func (msgs Messages) AppWindowTitle(name string) string {
 	return Catalog.Format(msgs.locale, "appWindowTitle", map[string]any{"name": name})
@@ -4299,11 +4299,11 @@ func (msgs Messages) PluginsRemoveTitle(name string) string {
 	return Catalog.Format(msgs.locale, "pluginsRemoveTitle", map[string]any{"name": name})
 }
 
-// PluginsRemoveMessage says "calibreno stops loading it and forgets its settings. Its folder stays as it is."
+// PluginsRemoveMessage says "Calibreno stops loading it and forgets its settings. Its folder stays as it is."
 // in the language the app shows.
 func PluginsRemoveMessage() string { return In(i18n.Locale()).PluginsRemoveMessage() }
 
-// PluginsRemoveMessage says "calibreno stops loading it and forgets its settings. Its folder stays as it is."
+// PluginsRemoveMessage says "Calibreno stops loading it and forgets its settings. Its folder stays as it is."
 // in the language of msgs.
 func (msgs Messages) PluginsRemoveMessage() string {
 	return Catalog.Format(msgs.locale, "pluginsRemoveMessage", nil)
@@ -4429,11 +4429,11 @@ func (msgs Messages) PluginsInstallDialogTitle() string {
 	return Catalog.Format(msgs.locale, "pluginsInstallDialogTitle", nil)
 }
 
-// PluginsPackageFilter says "calibreno plugins"
+// PluginsPackageFilter says "Calibreno plugins"
 // in the language the app shows.
 func PluginsPackageFilter() string { return In(i18n.Locale()).PluginsPackageFilter() }
 
-// PluginsPackageFilter says "calibreno plugins"
+// PluginsPackageFilter says "Calibreno plugins"
 // in the language of msgs.
 func (msgs Messages) PluginsPackageFilter() string {
 	return Catalog.Format(msgs.locale, "pluginsPackageFilter", nil)
@@ -4469,11 +4469,11 @@ func (msgs Messages) PluginsByAuthor(author string) string {
 	return Catalog.Format(msgs.locale, "pluginsByAuthor", map[string]any{"author": author})
 }
 
-// PluginsAddsToTitle says "ADDS TO calibreno"
+// PluginsAddsToTitle says "ADDS TO Calibreno"
 // in the language the app shows.
 func PluginsAddsToTitle() string { return In(i18n.Locale()).PluginsAddsToTitle() }
 
-// PluginsAddsToTitle says "ADDS TO calibreno"
+// PluginsAddsToTitle says "ADDS TO Calibreno"
 // in the language of msgs.
 func (msgs Messages) PluginsAddsToTitle() string {
 	return Catalog.Format(msgs.locale, "pluginsAddsToTitle", nil)
@@ -4561,11 +4561,11 @@ func (msgs Messages) PluginsNoteAllowed() string {
 	return Catalog.Format(msgs.locale, "pluginsNoteAllowed", nil)
 }
 
-// PluginsNoteBuiltIn says "Ships with calibreno."
+// PluginsNoteBuiltIn says "Ships with Calibreno."
 // in the language the app shows.
 func PluginsNoteBuiltIn() string { return In(i18n.Locale()).PluginsNoteBuiltIn() }
 
-// PluginsNoteBuiltIn says "Ships with calibreno."
+// PluginsNoteBuiltIn says "Ships with Calibreno."
 // in the language of msgs.
 func (msgs Messages) PluginsNoteBuiltIn() string {
 	return Catalog.Format(msgs.locale, "pluginsNoteBuiltIn", nil)
@@ -4831,13 +4831,13 @@ func (msgs Messages) PluginsErrIDMismatch(path string, id string, linked string)
 	return Catalog.Format(msgs.locale, "pluginsErrIDMismatch", map[string]any{"path": path, "id": id, "linked": linked})
 }
 
-// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with calibreno"
+// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with Calibreno"
 // in the language the app shows.
 func PluginsErrIDReserved(path string, id string) string {
 	return In(i18n.Locale()).PluginsErrIDReserved(path, id)
 }
 
-// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with calibreno"
+// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with Calibreno"
 // in the language of msgs.
 func (msgs Messages) PluginsErrIDReserved(path string, id string) string {
 	return Catalog.Format(msgs.locale, "pluginsErrIDReserved", map[string]any{"path": path, "id": id})
@@ -5035,11 +5035,11 @@ func (msgs Messages) PluginsDetailReleaseAsset(tag string, when string, asset st
 	return Catalog.Format(msgs.locale, "pluginsDetailReleaseAsset", map[string]any{"tag": tag, "when": when, "asset": asset, "size": size})
 }
 
-// PluginsNotAPlugin says "This isn’t a calibreno plugin: {error}"
+// PluginsNotAPlugin says "This isn’t a Calibreno plugin: {error}"
 // in the language the app shows.
 func PluginsNotAPlugin(error string) string { return In(i18n.Locale()).PluginsNotAPlugin(error) }
 
-// PluginsNotAPlugin says "This isn’t a calibreno plugin: {error}"
+// PluginsNotAPlugin says "This isn’t a Calibreno plugin: {error}"
 // in the language of msgs.
 func (msgs Messages) PluginsNotAPlugin(error string) string {
 	return Catalog.Format(msgs.locale, "pluginsNotAPlugin", map[string]any{"error": error})
@@ -5275,11 +5275,11 @@ func (msgs Messages) SettingsShowDetailsBody() string {
 	return Catalog.Format(msgs.locale, "settingsShowDetailsBody", nil)
 }
 
-// SettingsLibraryBody says "calibreno reads and writes calibre libraries: calibre can open the same folder."
+// SettingsLibraryBody says "Calibreno reads and writes calibre libraries: calibre can open the same folder."
 // in the language the app shows.
 func SettingsLibraryBody() string { return In(i18n.Locale()).SettingsLibraryBody() }
 
-// SettingsLibraryBody says "calibreno reads and writes calibre libraries: calibre can open the same folder."
+// SettingsLibraryBody says "Calibreno reads and writes calibre libraries: calibre can open the same folder."
 // in the language of msgs.
 func (msgs Messages) SettingsLibraryBody() string {
 	return Catalog.Format(msgs.locale, "settingsLibraryBody", nil)
@@ -5487,11 +5487,11 @@ func (msgs Messages) SettingsLocalNetworkTitle() string {
 	return Catalog.Format(msgs.locale, "settingsLocalNetworkTitle", nil)
 }
 
-// SettingsLocalNetworkBody says "This address is on your network, so calibreno will reach it only for this catalog. Passwords are kept in the system…"
+// SettingsLocalNetworkBody says "This address is on your network, so Calibreno will reach it only for this catalog. Passwords are kept in the system…"
 // in the language the app shows.
 func SettingsLocalNetworkBody() string { return In(i18n.Locale()).SettingsLocalNetworkBody() }
 
-// SettingsLocalNetworkBody says "This address is on your network, so calibreno will reach it only for this catalog. Passwords are kept in the system…"
+// SettingsLocalNetworkBody says "This address is on your network, so Calibreno will reach it only for this catalog. Passwords are kept in the system…"
 // in the language of msgs.
 func (msgs Messages) SettingsLocalNetworkBody() string {
 	return Catalog.Format(msgs.locale, "settingsLocalNetworkBody", nil)
@@ -5589,11 +5589,11 @@ func (msgs Messages) SettingsSignInBody() string {
 	return Catalog.Format(msgs.locale, "settingsSignInBody", nil)
 }
 
-// SettingsNotCatalogTitle says "That isn’t a catalog calibreno can read"
+// SettingsNotCatalogTitle says "That isn’t a catalog Calibreno can read"
 // in the language the app shows.
 func SettingsNotCatalogTitle() string { return In(i18n.Locale()).SettingsNotCatalogTitle() }
 
-// SettingsNotCatalogTitle says "That isn’t a catalog calibreno can read"
+// SettingsNotCatalogTitle says "That isn’t a catalog Calibreno can read"
 // in the language of msgs.
 func (msgs Messages) SettingsNotCatalogTitle() string {
 	return Catalog.Format(msgs.locale, "settingsNotCatalogTitle", nil)
@@ -5881,11 +5881,11 @@ func (msgs Messages) SettingsInstallGitHubTitle() string {
 	return Catalog.Format(msgs.locale, "settingsInstallGitHubTitle", nil)
 }
 
-// SettingsInstallGitHubBody says "Install from a release or a branch. calibreno can keep it up to date from the same place."
+// SettingsInstallGitHubBody says "Install from a release or a branch. Calibreno can keep it up to date from the same place."
 // in the language the app shows.
 func SettingsInstallGitHubBody() string { return In(i18n.Locale()).SettingsInstallGitHubBody() }
 
-// SettingsInstallGitHubBody says "Install from a release or a branch. calibreno can keep it up to date from the same place."
+// SettingsInstallGitHubBody says "Install from a release or a branch. Calibreno can keep it up to date from the same place."
 // in the language of msgs.
 func (msgs Messages) SettingsInstallGitHubBody() string {
 	return Catalog.Format(msgs.locale, "settingsInstallGitHubBody", nil)
@@ -6243,11 +6243,11 @@ func (msgs Messages) WelcomeHeadline() string {
 	return Catalog.Format(msgs.locale, "welcomeHeadline", nil)
 }
 
-// WelcomeSubtitleFirstRun says "calibreno reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
+// WelcomeSubtitleFirstRun says "Calibreno reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
 // in the language the app shows.
 func WelcomeSubtitleFirstRun() string { return In(i18n.Locale()).WelcomeSubtitleFirstRun() }
 
-// WelcomeSubtitleFirstRun says "calibreno reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
+// WelcomeSubtitleFirstRun says "Calibreno reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
 // in the language of msgs.
 func (msgs Messages) WelcomeSubtitleFirstRun() string {
 	return Catalog.Format(msgs.locale, "welcomeSubtitleFirstRun", nil)
@@ -6377,11 +6377,11 @@ func (msgs Messages) WelcomeOpening(name string) string {
 	return Catalog.Format(msgs.locale, "welcomeOpening", map[string]any{"name": name})
 }
 
-// WelcomeCreateIntro says "calibreno makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
+// WelcomeCreateIntro says "Calibreno makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
 // in the language the app shows.
 func WelcomeCreateIntro() string { return In(i18n.Locale()).WelcomeCreateIntro() }
 
-// WelcomeCreateIntro says "calibreno makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
+// WelcomeCreateIntro says "Calibreno makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
 // in the language of msgs.
 func (msgs Messages) WelcomeCreateIntro() string {
 	return Catalog.Format(msgs.locale, "welcomeCreateIntro", nil)
@@ -6489,11 +6489,11 @@ func (msgs Messages) WelcomeNotLibraryTitle(name string) string {
 	return Catalog.Format(msgs.locale, "welcomeNotLibraryTitle", map[string]any{"name": name})
 }
 
-// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. calibreno can make it a new library, or you can pick another folder."
+// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. Calibreno can make it a new library, or you can pick another folder."
 // in the language the app shows.
 func WelcomeNotLibraryBody() string { return In(i18n.Locale()).WelcomeNotLibraryBody() }
 
-// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. calibreno can make it a new library, or you can pick another folder."
+// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. Calibreno can make it a new library, or you can pick another folder."
 // in the language of msgs.
 func (msgs Messages) WelcomeNotLibraryBody() string {
 	return Catalog.Format(msgs.locale, "welcomeNotLibraryBody", nil)
@@ -6571,11 +6571,11 @@ func (msgs Messages) AppUpdatesMenu() string {
 	return Catalog.Format(msgs.locale, "appUpdatesMenu", nil)
 }
 
-// AppUpdatesVersion says "calibreno {version}"
+// AppUpdatesVersion says "Calibreno {version}"
 // in the language the app shows.
 func AppUpdatesVersion(version string) string { return In(i18n.Locale()).AppUpdatesVersion(version) }
 
-// AppUpdatesVersion says "calibreno {version}"
+// AppUpdatesVersion says "Calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesVersion(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesVersion", map[string]any{"version": version})
@@ -6651,11 +6651,11 @@ func (msgs Messages) AppUpdatesCheckFailed() string {
 	return Catalog.Format(msgs.locale, "appUpdatesCheckFailed", nil)
 }
 
-// AppUpdatesDisabled says "This copy of calibreno can’t update itself"
+// AppUpdatesDisabled says "This copy of Calibreno can’t update itself"
 // in the language the app shows.
 func AppUpdatesDisabled() string { return In(i18n.Locale()).AppUpdatesDisabled() }
 
-// AppUpdatesDisabled says "This copy of calibreno can’t update itself"
+// AppUpdatesDisabled says "This copy of Calibreno can’t update itself"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesDisabled() string {
 	return Catalog.Format(msgs.locale, "appUpdatesDisabled", nil)
@@ -6681,13 +6681,13 @@ func (msgs Messages) AppUpdatesBeta() string {
 	return Catalog.Format(msgs.locale, "appUpdatesBeta", nil)
 }
 
-// AppUpdatesAvailable says "calibreno {version} is available"
+// AppUpdatesAvailable says "Calibreno {version} is available"
 // in the language the app shows.
 func AppUpdatesAvailable(version string) string {
 	return In(i18n.Locale()).AppUpdatesAvailable(version)
 }
 
-// AppUpdatesAvailable says "calibreno {version} is available"
+// AppUpdatesAvailable says "Calibreno {version} is available"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesAvailable(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesAvailable", map[string]any{"version": version})
@@ -6743,13 +6743,13 @@ func (msgs Messages) AppUpdatesFullNotes() string {
 	return Catalog.Format(msgs.locale, "appUpdatesFullNotes", nil)
 }
 
-// AppUpdatesDownloading says "Downloading calibreno {version}"
+// AppUpdatesDownloading says "Downloading Calibreno {version}"
 // in the language the app shows.
 func AppUpdatesDownloading(version string) string {
 	return In(i18n.Locale()).AppUpdatesDownloading(version)
 }
 
-// AppUpdatesDownloading says "Downloading calibreno {version}"
+// AppUpdatesDownloading says "Downloading Calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesDownloading(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesDownloading", map[string]any{"version": version})
@@ -6779,21 +6779,21 @@ func (msgs Messages) AppUpdatesDownloadingProgress(progress string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesDownloadingProgress", map[string]any{"progress": progress})
 }
 
-// AppUpdatesReady says "calibreno {version} is ready"
+// AppUpdatesReady says "Calibreno {version} is ready"
 // in the language the app shows.
 func AppUpdatesReady(version string) string { return In(i18n.Locale()).AppUpdatesReady(version) }
 
-// AppUpdatesReady says "calibreno {version} is ready"
+// AppUpdatesReady says "Calibreno {version} is ready"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesReady(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesReady", map[string]any{"version": version})
 }
 
-// AppUpdatesReadyBody says "It installs when calibreno restarts."
+// AppUpdatesReadyBody says "It installs when Calibreno restarts."
 // in the language the app shows.
 func AppUpdatesReadyBody() string { return In(i18n.Locale()).AppUpdatesReadyBody() }
 
-// AppUpdatesReadyBody says "It installs when calibreno restarts."
+// AppUpdatesReadyBody says "It installs when Calibreno restarts."
 // in the language of msgs.
 func (msgs Messages) AppUpdatesReadyBody() string {
 	return Catalog.Format(msgs.locale, "appUpdatesReadyBody", nil)
@@ -6819,13 +6819,13 @@ func (msgs Messages) AppUpdatesLater() string {
 	return Catalog.Format(msgs.locale, "appUpdatesLater", nil)
 }
 
-// AppUpdatesInstallFailed says "Couldn’t install calibreno {version}"
+// AppUpdatesInstallFailed says "Couldn’t install Calibreno {version}"
 // in the language the app shows.
 func AppUpdatesInstallFailed(version string) string {
 	return In(i18n.Locale()).AppUpdatesInstallFailed(version)
 }
 
-// AppUpdatesInstallFailed says "Couldn’t install calibreno {version}"
+// AppUpdatesInstallFailed says "Couldn’t install Calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesInstallFailed(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesInstallFailed", map[string]any{"version": version})
@@ -6955,11 +6955,11 @@ func (msgs Messages) SharingOff() string {
 	return Catalog.Format(msgs.locale, "sharingOff", nil)
 }
 
-// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while calibreno is…"
+// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while Calibreno is…"
 // in the language the app shows.
 func McpBody() string { return In(i18n.Locale()).McpBody() }
 
-// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while calibreno is…"
+// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while Calibreno is…"
 // in the language of msgs.
 func (msgs Messages) McpBody() string {
 	return Catalog.Format(msgs.locale, "mcpBody", nil)
@@ -7937,11 +7937,11 @@ func (msgs Messages) WirelessLost(device string) string {
 	return Catalog.Format(msgs.locale, "wirelessLost", map[string]any{"device": device})
 }
 
-// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to calibreno the same way: in KOReader, …"
+// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to Calibreno the same way: in KOReader, …"
 // in the language the app shows.
 func WirelessBody() string { return In(i18n.Locale()).WirelessBody() }
 
-// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to calibreno the same way: in KOReader, …"
+// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to Calibreno the same way: in KOReader, …"
 // in the language of msgs.
 func (msgs Messages) WirelessBody() string {
 	return Catalog.Format(msgs.locale, "wirelessBody", nil)
@@ -8295,11 +8295,11 @@ func (msgs Messages) PluginsBookFilesAccess() string {
 	return Catalog.Format(msgs.locale, "pluginsBookFilesAccess", nil)
 }
 
-// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through calibreno, never your other files."
+// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through Calibreno, never your other files."
 // in the language the app shows.
 func PluginsBookFilesAccessDetail() string { return In(i18n.Locale()).PluginsBookFilesAccessDetail() }
 
-// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through calibreno, never your other files."
+// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through Calibreno, never your other files."
 // in the language of msgs.
 func (msgs Messages) PluginsBookFilesAccessDetail() string {
 	return Catalog.Format(msgs.locale, "pluginsBookFilesAccessDetail", nil)
@@ -8947,23 +8947,23 @@ func (msgs Messages) PluginsNotANumber(name string) string {
 	return Catalog.Format(msgs.locale, "pluginsNotANumber", map[string]any{"name": name})
 }
 
-// MarketNeedsDalibre says "Needs calibreno {version}"
+// MarketNeedsDalibre says "Needs Calibreno {version}"
 // in the language the app shows.
 func MarketNeedsDalibre(version string) string { return In(i18n.Locale()).MarketNeedsDalibre(version) }
 
-// MarketNeedsDalibre says "Needs calibreno {version}"
+// MarketNeedsDalibre says "Needs Calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) MarketNeedsDalibre(version string) string {
 	return Catalog.Format(msgs.locale, "marketNeedsDalibre", map[string]any{"version": version})
 }
 
-// MarketNeedsDalibreNote says "It needs calibreno {version} or newer: update calibreno to install it."
+// MarketNeedsDalibreNote says "It needs Calibreno {version} or newer: update Calibreno to install it."
 // in the language the app shows.
 func MarketNeedsDalibreNote(version string) string {
 	return In(i18n.Locale()).MarketNeedsDalibreNote(version)
 }
 
-// MarketNeedsDalibreNote says "It needs calibreno {version} or newer: update calibreno to install it."
+// MarketNeedsDalibreNote says "It needs Calibreno {version} or newer: update Calibreno to install it."
 // in the language of msgs.
 func (msgs Messages) MarketNeedsDalibreNote(version string) string {
 	return Catalog.Format(msgs.locale, "marketNeedsDalibreNote", map[string]any{"version": version})
@@ -9029,11 +9029,11 @@ func (msgs Messages) ToolsNotSandboxed() string {
 	return Catalog.Format(msgs.locale, "toolsNotSandboxed", nil)
 }
 
-// ToolsInstallsWith says "calibreno installs it with {command}."
+// ToolsInstallsWith says "Calibreno installs it with {command}."
 // in the language the app shows.
 func ToolsInstallsWith(command string) string { return In(i18n.Locale()).ToolsInstallsWith(command) }
 
-// ToolsInstallsWith says "calibreno installs it with {command}."
+// ToolsInstallsWith says "Calibreno installs it with {command}."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallsWith(command string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallsWith", map[string]any{"command": command})
@@ -9115,21 +9115,21 @@ func (msgs Messages) ToolsChooseFileTitle(tool string) string {
 	return Catalog.Format(msgs.locale, "toolsChooseFileTitle", map[string]any{"tool": tool})
 }
 
-// ToolsDownloadTitle says "Download with calibreno"
+// ToolsDownloadTitle says "Download with Calibreno"
 // in the language the app shows.
 func ToolsDownloadTitle() string { return In(i18n.Locale()).ToolsDownloadTitle() }
 
-// ToolsDownloadTitle says "Download with calibreno"
+// ToolsDownloadTitle says "Download with Calibreno"
 // in the language of msgs.
 func (msgs Messages) ToolsDownloadTitle() string {
 	return Catalog.Format(msgs.locale, "toolsDownloadTitle", nil)
 }
 
-// ToolsDownloadDetail says "From {host}. Only calibreno uses it, and it goes with the plugin."
+// ToolsDownloadDetail says "From {host}. Only Calibreno uses it, and it goes with the plugin."
 // in the language the app shows.
 func ToolsDownloadDetail(host string) string { return In(i18n.Locale()).ToolsDownloadDetail(host) }
 
-// ToolsDownloadDetail says "From {host}. Only calibreno uses it, and it goes with the plugin."
+// ToolsDownloadDetail says "From {host}. Only Calibreno uses it, and it goes with the plugin."
 // in the language of msgs.
 func (msgs Messages) ToolsDownloadDetail(host string) string {
 	return Catalog.Format(msgs.locale, "toolsDownloadDetail", map[string]any{"host": host})
@@ -9145,23 +9145,23 @@ func (msgs Messages) ToolsInstallWith(manager string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallWith", map[string]any{"manager": manager})
 }
 
-// ToolsInstallWithDetail says "calibreno runs {command}. You can use it in Terminal too, and it updates with the others."
+// ToolsInstallWithDetail says "Calibreno runs {command}. You can use it in Terminal too, and it updates with the others."
 // in the language the app shows.
 func ToolsInstallWithDetail(command string) string {
 	return In(i18n.Locale()).ToolsInstallWithDetail(command)
 }
 
-// ToolsInstallWithDetail says "calibreno runs {command}. You can use it in Terminal too, and it updates with the others."
+// ToolsInstallWithDetail says "Calibreno runs {command}. You can use it in Terminal too, and it updates with the others."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallWithDetail(command string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallWithDetail", map[string]any{"command": command})
 }
 
-// ToolsInstallWithWingetDetail says "calibreno runs winget for you, accepting the package’s license. You can use it in Terminal too."
+// ToolsInstallWithWingetDetail says "Calibreno runs winget for you, accepting the package’s license. You can use it in Terminal too."
 // in the language the app shows.
 func ToolsInstallWithWingetDetail() string { return In(i18n.Locale()).ToolsInstallWithWingetDetail() }
 
-// ToolsInstallWithWingetDetail says "calibreno runs winget for you, accepting the package’s license. You can use it in Terminal too."
+// ToolsInstallWithWingetDetail says "Calibreno runs winget for you, accepting the package’s license. You can use it in Terminal too."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallWithWingetDetail() string {
 	return Catalog.Format(msgs.locale, "toolsInstallWithWingetDetail", nil)
@@ -9209,11 +9209,11 @@ func (msgs Messages) ToolsSandboxNote(tools string) string {
 	return Catalog.Format(msgs.locale, "toolsSandboxNote", map[string]any{"tools": tools})
 }
 
-// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what calibreno downloaded."
+// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what Calibreno downloaded."
 // in the language the app shows.
 func ToolsSectionNote(tools string) string { return In(i18n.Locale()).ToolsSectionNote(tools) }
 
-// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what calibreno downloaded."
+// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what Calibreno downloaded."
 // in the language of msgs.
 func (msgs Messages) ToolsSectionNote(tools string) string {
 	return Catalog.Format(msgs.locale, "toolsSectionNote", map[string]any{"tools": tools})
@@ -9253,11 +9253,11 @@ func (msgs Messages) ToolsFailed(error string) string {
 	return Catalog.Format(msgs.locale, "toolsFailed", map[string]any{"error": error})
 }
 
-// ToolsFromDownload says "Downloaded by calibreno · {size}"
+// ToolsFromDownload says "Downloaded by Calibreno · {size}"
 // in the language the app shows.
 func ToolsFromDownload(size string) string { return In(i18n.Locale()).ToolsFromDownload(size) }
 
-// ToolsFromDownload says "Downloaded by calibreno · {size}"
+// ToolsFromDownload says "Downloaded by Calibreno · {size}"
 // in the language of msgs.
 func (msgs Messages) ToolsFromDownload(size string) string {
 	return Catalog.Format(msgs.locale, "toolsFromDownload", map[string]any{"size": size})
@@ -9421,13 +9421,13 @@ func (msgs Messages) ToolsInstallFailedTitle(manager string, tool string) string
 	return Catalog.Format(msgs.locale, "toolsInstallFailedTitle", map[string]any{"manager": manager, "tool": tool})
 }
 
-// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. calibreno can download it itself instead."
+// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. Calibreno can download it itself instead."
 // in the language the app shows.
 func ToolsInstallFailedBody(plugin string) string {
 	return In(i18n.Locale()).ToolsInstallFailedBody(plugin)
 }
 
-// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. calibreno can download it itself instead."
+// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. Calibreno can download it itself instead."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallFailedBody(plugin string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallFailedBody", map[string]any{"plugin": plugin})
@@ -9453,11 +9453,11 @@ func (msgs Messages) ToolsCopyLog() string {
 	return Catalog.Format(msgs.locale, "toolsCopyLog", nil)
 }
 
-// ToolsDownloadInstead says "Download with calibreno · {size}"
+// ToolsDownloadInstead says "Download with Calibreno · {size}"
 // in the language the app shows.
 func ToolsDownloadInstead(size string) string { return In(i18n.Locale()).ToolsDownloadInstead(size) }
 
-// ToolsDownloadInstead says "Download with calibreno · {size}"
+// ToolsDownloadInstead says "Download with Calibreno · {size}"
 // in the language of msgs.
 func (msgs Messages) ToolsDownloadInstead(size string) string {
 	return Catalog.Format(msgs.locale, "toolsDownloadInstead", map[string]any{"size": size})
@@ -9513,13 +9513,13 @@ func (msgs Messages) ToolsNoBuild(tool string) string {
 	return Catalog.Format(msgs.locale, "toolsNoBuild", map[string]any{"tool": tool})
 }
 
-// ToolsInstalledNotFound says "{manager} finished, but calibreno can’t find {tool} {min} or later from it"
+// ToolsInstalledNotFound says "{manager} finished, but Calibreno can’t find {tool} {min} or later from it"
 // in the language the app shows.
 func ToolsInstalledNotFound(manager string, tool string, min string) string {
 	return In(i18n.Locale()).ToolsInstalledNotFound(manager, tool, min)
 }
 
-// ToolsInstalledNotFound says "{manager} finished, but calibreno can’t find {tool} {min} or later from it"
+// ToolsInstalledNotFound says "{manager} finished, but Calibreno can’t find {tool} {min} or later from it"
 // in the language of msgs.
 func (msgs Messages) ToolsInstalledNotFound(manager string, tool string, min string) string {
 	return Catalog.Format(msgs.locale, "toolsInstalledNotFound", map[string]any{"manager": manager, "tool": tool, "min": min})
@@ -10155,11 +10155,11 @@ func (msgs Messages) EmailSenderTitle() string {
 	return Catalog.Format(msgs.locale, "emailSenderTitle", nil)
 }
 
-// EmailSenderBody says "The mail account calibreno sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud …"
+// EmailSenderBody says "The mail account Calibreno sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud …"
 // in the language the app shows.
 func EmailSenderBody() string { return In(i18n.Locale()).EmailSenderBody() }
 
-// EmailSenderBody says "The mail account calibreno sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud …"
+// EmailSenderBody says "The mail account Calibreno sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud …"
 // in the language of msgs.
 func (msgs Messages) EmailSenderBody() string {
 	return Catalog.Format(msgs.locale, "emailSenderBody", nil)
@@ -10247,21 +10247,21 @@ func (msgs Messages) EmailTestSent(address string, time_ string) string {
 	return Catalog.Format(msgs.locale, "emailTestSent", map[string]any{"address": address, "time": time_})
 }
 
-// EmailTestSubject says "calibreno test email"
+// EmailTestSubject says "Calibreno test email"
 // in the language the app shows.
 func EmailTestSubject() string { return In(i18n.Locale()).EmailTestSubject() }
 
-// EmailTestSubject says "calibreno test email"
+// EmailTestSubject says "Calibreno test email"
 // in the language of msgs.
 func (msgs Messages) EmailTestSubject() string {
 	return Catalog.Format(msgs.locale, "emailTestSubject", nil)
 }
 
-// EmailTestBody says "calibreno can send mail from this address. Books emailed to your Kindles come from it the same way."
+// EmailTestBody says "Calibreno can send mail from this address. Books emailed to your Kindles come from it the same way."
 // in the language the app shows.
 func EmailTestBody() string { return In(i18n.Locale()).EmailTestBody() }
 
-// EmailTestBody says "calibreno can send mail from this address. Books emailed to your Kindles come from it the same way."
+// EmailTestBody says "Calibreno can send mail from this address. Books emailed to your Kindles come from it the same way."
 // in the language of msgs.
 func (msgs Messages) EmailTestBody() string {
 	return Catalog.Format(msgs.locale, "emailTestBody", nil)
@@ -10359,11 +10359,11 @@ func (msgs Messages) LinkCopied(title string) string {
 	return Catalog.Format(msgs.locale, "linkCopied", map[string]any{"title": title})
 }
 
-// LinkNoLibrary says "Couldn’t open the link: its library isn’t one calibreno has opened"
+// LinkNoLibrary says "Couldn’t open the link: its library isn’t one Calibreno has opened"
 // in the language the app shows.
 func LinkNoLibrary() string { return In(i18n.Locale()).LinkNoLibrary() }
 
-// LinkNoLibrary says "Couldn’t open the link: its library isn’t one calibreno has opened"
+// LinkNoLibrary says "Couldn’t open the link: its library isn’t one Calibreno has opened"
 // in the language of msgs.
 func (msgs Messages) LinkNoLibrary() string {
 	return Catalog.Format(msgs.locale, "linkNoLibrary", nil)

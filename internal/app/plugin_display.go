@@ -144,7 +144,7 @@ var pluginMessagePatterns = []struct {
 	{regexp.MustCompile("^(\\d+) of (\\d+) ePubs updated\\. Skipped most options for DRM-encrypted books\\.$"), "已更新 ${2} 个 EPUB 中的 ${1} 个。受 DRM 保护的书已跳过大部分选项。"},
 	{regexp.MustCompile("^(\\d+) of (\\d+) ePubs updated\\.$"), "已更新 ${2} 个 EPUB 中的 ${1} 个。"},
 	{regexp.MustCompile("^#([^ ]+) · no date$"), "#${1} · 无出版日期"},
-	{regexp.MustCompile("^That makes (\\d+) books; Dalibre adds at most 200 at a time\\.$"), "这次会生成 ${1} 本书，calibreno 一次最多添加 200 本。"},
+	{regexp.MustCompile("^That makes (\\d+) books; Dalibre adds at most 200 at a time\\.$"), "这次会生成 ${1} 本书，Calibreno 一次最多添加 200 本。"},
 	{regexp.MustCompile("^Google Books answered (\\d{3})(?: [^.]*)?\\.$"), "Google 图书返回了 HTTP ${1}。"},
 	{regexp.MustCompile("^Apple's search answered (\\d{3})\\.$"), "Apple Books 返回了 HTTP ${1}。"},
 	{regexp.MustCompile("^([\\d.]+) / ([\\d.]+) \\(([\\d,]+) ratings?\\)$"), "${1} / ${2}（${3} 人评分）"},

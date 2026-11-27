@@ -39,17 +39,17 @@ since 2024) and other readers (Kobo) without changing the app.
 ## calibre compatibility
 
 The reader's library is kept exactly as calibre keeps it, so a reader
-goes from calibre to Dalibre and back with its library:
+goes from calibre to Calibreno and back with its library:
 
 - `metadata.calibre`, at the reader's root, is calibre's record of the
-  books: Dalibre reads it, adds the books it finds that calibre didn't
+  books: Calibreno reads it, adds the books it finds that calibre didn't
   record (reading their metadata and cover from the file), drops those
   whose file is gone, and adds the books it sends, all in calibre's JSON
   (its json_codec: every field it writes, dates in its format, "None" for
   an unknown date, thumbnails as `[width, height, base64]`). Entries are
-  rewritten with the fields Dalibre doesn't know as they were.
+  rewritten with the fields Calibreno doesn't know as they were.
 - `driveinfo.calibre` keeps the reader's id (`device_store_uuid`), which
-  Dalibre uses too; it records the connection and the library sending
+  Calibreno uses too; it records the connection and the library sending
   (`last_library_uuid`), as calibre does, keeping calibre's other fields.
 - Books go where calibre puts them: its device save template
   `{author_sort}/{title} - {authors}` under `documents/`, each part an
@@ -62,7 +62,7 @@ goes from calibre to Dalibre and back with its library:
   its cover to `system/thumbnails/thumbnail_<asin>_<cdetype>_portrait.jpg`
   for the home screen, as calibre does. calibre also writes the ASIN and
   cdetype into files that lack them, so that the Kindle shows their
-  covers; Dalibre doesn't modify book files yet.
+  covers; Calibreno doesn't modify book files yet.
 
 As in calibre, opening a reader writes these two files: `driveinfo.calibre`
 on every connection, `metadata.calibre` when the files changed since it

@@ -31,10 +31,10 @@ func TestFeedback(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if u.Path != "/lyx5710317/dalibre/issues/new" || u.Query().Get("labels") != "bug" {
+	if u.Path != "/lyx5710317/Calibreno/issues/new" || u.Query().Get("labels") != "bug" {
 		t.Errorf("bug report URL %s", u)
 	}
-	if body := u.Query().Get("body"); !strings.Contains(body, "calibreno 1.2.3 · ") {
+	if body := u.Query().Get("body"); !strings.Contains(body, "Calibreno 1.2.3 · ") {
 		t.Errorf("bug report body has no version: %q", body)
 	}
 	if u, _ := url.Parse(featureRequestURL()); u.Query().Get("labels") != "enhancement" {

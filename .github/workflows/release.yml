@@ -1,4 +1,4 @@
-# Builds Dalibre for every platform when a version tag such as v0.2.0 is
+# Builds Calibreno for every platform when a version tag such as v0.2.0 is
 # pushed, signs the updates, and uploads everything to a draft release.
 # Publishing the draft makes it the latest release, which installed apps
 # update to. See docs/github-actions.md of github.com/egoist/mygo.
@@ -53,7 +53,7 @@ jobs:
         run: |
           if ! gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
             gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
-              --draft --verify-tag --title "Dalibre $GITHUB_REF_NAME" --generate-notes
+              --draft --verify-tag --title "Calibreno $GITHUB_REF_NAME" --generate-notes
           fi
 
   build:
