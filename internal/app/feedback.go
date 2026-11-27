@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"net/url"
 	"runtime"
 
@@ -17,17 +16,17 @@ import (
 // menu opens a new GitHub issue, a bug report or a feature request, or the
 // list of issues.
 
-const issuesURL = "https://github.com/djyde/dalibre/issues"
+const issuesURL = "https://github.com/lyx5710317/dalibre/issues"
 
 // bugReportURL opens a new issue with the version and system filled in.
 func bugReportURL(version string) string {
-	body := fmt.Sprintf("**What happened?**\n\n\n**Steps to reproduce**\n\n1. \n\n**What did you expect?**\n\n\n---\nDalibre %s · %s/%s\n", version, runtime.GOOS, runtime.GOARCH)
+	body := locales.FeedbackBugTemplate(version, runtime.GOOS+"/"+runtime.GOARCH)
 	return issuesURL + "/new?" + url.Values{"labels": {"bug"}, "body": {body}}.Encode()
 }
 
 // featureRequestURL opens a new issue for an idea.
 func featureRequestURL() string {
-	body := "**What would you like Dalibre to do?**\n\n\n**Why would it help you?**\n\n"
+	body := locales.FeedbackFeatureTemplate()
 	return issuesURL + "/new?" + url.Values{"labels": {"enhancement"}, "body": {body}}.Encode()
 }
 

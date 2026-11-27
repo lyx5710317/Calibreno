@@ -33,16 +33,16 @@ func (a *App) fetchDialog(c *ui.Context, b *calibre.Book) {
 				if len(srcs) > 1 {
 					names := []string{locales.CommonAllSources()}
 					for _, p := range srcs {
-						names = append(names, p.Manifest.Name)
+						names = append(names, pluginDisplayName(p.Manifest.ID, p.Manifest.Name))
 					}
 					cur := locales.CommonAllSources()
 					if p := a.pluginByID(f.source); p != nil {
-						cur = p.Manifest.Name
+						cur = pluginDisplayName(p.Manifest.ID, p.Manifest.Name)
 					}
 					if ui.Select(c, &cur, names).Width(160).Label(locales.FetchMetaSource()).Changed() {
 						f.source = ""
 						for _, p := range srcs {
-							if p.Manifest.Name == cur {
+							if pluginDisplayName(p.Manifest.ID, p.Manifest.Name) == cur {
 								f.source = p.Manifest.ID
 							}
 						}
@@ -71,7 +71,7 @@ func (a *App) fetchDialog(c *ui.Context, b *calibre.Book) {
 				return
 			}
 			ui.Icon(c, icons.Globe).FontSize(12).TextColor(pal().IconMuted)
-			ui.Text(c, locales.FetchMetaFromSource(sel.plugin.Manifest.Name)).FontSize(12).TextColor(pal().TextTertiary)
+			ui.Text(c, locales.FetchMetaFromSource(pluginDisplayName(sel.plugin.Manifest.ID, sel.plugin.Manifest.Name))).FontSize(12).TextColor(pal().TextTertiary)
 			link := sel.r.URL
 			if link == "" {
 				link = sel.plugin.Manifest.Homepage
@@ -94,7 +94,7 @@ func (a *App) fetchCandidatesColumn(c *ui.Context, srcs []*plugin.Plugin, cands 
 	f := &a.fetch
 	name := locales.FetchMetaYourSources()
 	if ps := a.fetchSources(); len(ps) == 1 {
-		name = ps[0].Manifest.Name
+		name = pluginDisplayName(ps[0].Manifest.ID, ps[0].Manifest.Name)
 	}
 	if len(srcs) == 0 {
 		fetchEmpty(c, icons.Puzzle, false, locales.FetchMetaNoPluginTitle(), locales.FetchMetaNoPluginBody(),
@@ -123,10 +123,10 @@ func (a *App) fetchCandidatesColumn(c *ui.Context, srcs []*plugin.Plugin, cands 
 		case setup != nil:
 			body := errText(failed)
 			if errKind(failed) == plugin.KindSettings {
-				body = locales.GetBooksFillInSettings(strings.Join(setup.MissingSettings(), ", "))
+				body = locales.GetBooksFillInSettings(strings.Join(pluginDisplayMissing(setup), ", "))
 			}
 			id := setup.Manifest.ID
-			fetchEmpty(c, icons.Key, false, locales.GetBooksSourceNeedsSetup(setup.Manifest.Name), body,
+			fetchEmpty(c, icons.Key, false, locales.GetBooksSourceNeedsSetup(pluginDisplayName(setup.Manifest.ID, setup.Manifest.Name)), body,
 				icons.Settings, locales.GetBooksOpenPluginSettings(), func() { a.openPlugins(id) })
 		case failed != nil:
 			body := locales.FetchMetaCheckConnection()
@@ -195,7 +195,8 @@ func (a *App) fetchComparison(c *ui.Context, b *calibre.Book, cd candidate) {
 	line(func() {
 		widgets.Overline(c, locales.FetchMetaFieldHeader()).Width(128)
 		widgets.Overline(c, locales.FetchMetaCurrentHeader()).Grow(1).Basis(0)
-		widgets.Overline(c, locales.FetchMetaFromHeader(strings.ToUpper(cd.plugin.Manifest.Name))).Grow(1).Basis(0)
+		name := pluginDisplayName(cd.plugin.Manifest.ID, cd.plugin.Manifest.Name)
+		widgets.Overline(c, locales.FetchMetaFromHeader(name)).Grow(1).Basis(0)
 	})
 	for _, fd := range a.fetchFields(cd) {
 		on := f.use[fd.key] && fd.changes
@@ -251,6 +252,16 @@ func (a *App) fetchComparison(c *ui.Context, b *calibre.Book, cd candidate) {
 		})
 		if fd.key == "cover" {
 			row.AlignItems(ui.Center)
+		}
+	}
+	if len(cd.r.Fields) > 0 {
+		widgets.Overline(c, locales.FetchMetaPluginDetails()).Margin(theme.Space16, 0, theme.Space4, 0)
+		for _, raw := range cd.r.Fields {
+			field := pluginDisplayField(cd.plugin.Manifest.ID, raw)
+			line(func() {
+				ui.Text(c, field.Label).Width(128).FontSize(13).TextColor(pal().TextSecondary)
+				ui.Text(c, field.Value).Grow(1).MinWidth(0).FontSize(13).Selectable()
+			})
 		}
 	}
 }

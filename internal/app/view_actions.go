@@ -13,22 +13,20 @@ import (
 	"dalibre/internal/plugin"
 )
 
-// toolsNav is the sidebar's Tools: the plugins' actions on the whole
-// library, as their plugins name them.
+// toolsNav is the sidebar's actions on the whole library.
 func (a *App) toolsNav(c *ui.Context) {
 	tools := a.toolActions()
-	if len(tools) == 0 {
-		return
-	}
 	title := locales.MainNavTools()
 	ui.Column(c.Key("tools")).Gap(theme.Space2).AlignItems(ui.Stretch).Children(func() {
 		ui.Row(c).Height(24).Padding(0, theme.Space8).AlignItems(ui.Center).Children(func() {
 			widgets.Overline(c, strings.ToUpper(title))
 		})
+		r := a.act.results
+		a.navItem(c, "tool:library-duplicates", icons.Copy, locales.LibraryDuplicateScan(), 0,
+			r != nil && r.duplicates != nil, nil, a.runLibraryDuplicateScan)
 		for _, t := range tools {
-			r := a.act.results
 			showing := r != nil && r.plugin == t.p.Manifest.ID && r.action == t.act.ID
-			a.navItem(c, "tool:"+t.p.Manifest.ID+":"+t.act.ID, actionIcon(t.act), t.act.Title, 0, showing, nil, func() {
+			a.navItem(c, "tool:"+t.p.Manifest.ID+":"+t.act.ID, actionIcon(t.act), pluginDisplayText(t.p.Manifest.ID, t.act.Title), 0, showing, nil, func() {
 				a.runAction(t.p, t.act, nil)
 			})
 		}
@@ -49,7 +47,7 @@ func (a *App) selectionActions(c *ui.Context, ids []int64) {
 		if i == 0 {
 			v = widgets.Primary
 		}
-		b := widgets.Button(c.Key("act:"+pa.p.Manifest.ID+":"+pa.act.ID), v, actionIcon(pa.act), pa.act.Title).
+		b := widgets.Button(c.Key("act:"+pa.p.Manifest.ID+":"+pa.act.ID), v, actionIcon(pa.act), pluginDisplayText(pa.p.Manifest.ID, pa.act.Title)).
 			Disabled(a.busy != "" || !a.takes(pa.act, ids))
 		if b.Clicked() {
 			a.runAction(pa.p, pa.act, ids)
@@ -68,7 +66,7 @@ func (a *App) selectionActions(c *ui.Context, ids []int64) {
 			a.actionItem(m, pa, ids)
 		}
 		for _, p := range ps {
-			if m.Item(p.Manifest.ActionTitle()).ID("run:" + p.Manifest.ID).Icon(icons.Menu(icons.Sparkle)).Disabled(a.busy != "").Chosen() {
+			if m.Item(pluginDisplayActionTitle(p.Manifest)).ID("run:" + p.Manifest.ID).Icon(icons.Menu(icons.Sparkle)).Disabled(a.busy != "").Chosen() {
 				a.runPlugin(p, ids)
 			}
 		}
@@ -88,13 +86,13 @@ func (a *App) formDialog(c *ui.Context) {
 	open := true
 	submit := fa.form.Submit
 	if submit == "" {
-		submit = fa.act.Label()
+		submit = pluginDisplayText(fa.p.Manifest.ID, fa.act.Label())
 	}
 	widgets.DialogFrame(c, &open, 480, func() {
 		pluginTile(c, fa.p.Manifest, 32)
 		ui.Column(c).Grow(1).MinWidth(0).Children(func() {
-			ui.Text(c, fa.act.Label()).FontSize(16).FontWeight(600).SingleLine()
-			ui.Text(c, fa.p.Manifest.Name).FontSize(12).TextColor(pal().TextTertiary).SingleLine()
+			ui.Text(c, pluginDisplayText(fa.p.Manifest.ID, fa.act.Label())).FontSize(16).FontWeight(600).SingleLine()
+			ui.Text(c, pluginDisplayName(fa.p.Manifest.ID, fa.p.Manifest.Name)).FontSize(12).TextColor(pal().TextTertiary).SingleLine()
 		})
 	}, func() {
 		ui.Column(c).Padding(theme.Space24).Gap(theme.Space16).AlignItems(ui.Stretch).Children(func() {
@@ -322,12 +320,14 @@ func (a *App) reviewDialog(c *ui.Context) {
 func (a *App) resultsView(c *ui.Context) {
 	r := a.act.results
 	shown := a.visible() // makes the rows
-	if len(shown) == 0 {
+	if len(shown) == 0 && r.duplicates == nil {
 		a.closeResults() // every book it found is gone
 		return
 	}
 	ui.Row(c).Padding(0, theme.Space32, theme.Space12, theme.Space32).Gap(theme.Space8).AlignItems(ui.Center).Children(func() {
-		if r.message != "" {
+		if r.duplicates != nil {
+			a.duplicateResultSummary(c, r.duplicates)
+		} else if r.message != "" {
 			ui.Text(c, r.message).FontSize(12).TextColor(pal().TextSecondary).SingleLine().Shrink(1)
 		}
 		again := ui.ButtonBase(c).Padding(theme.Space2, theme.Space4).Radius(theme.RadiusXS).Label(locales.ActionRunAgain()).Disabled(a.busy != "")
@@ -338,13 +338,20 @@ func (a *App) resultsView(c *ui.Context) {
 			}
 		})
 	})
+	if len(shown) == 0 {
+		a.duplicateResultsEmpty(c, r.duplicates)
+		return
+	}
 
 	a.syncCur(shown)
 	rows := r.rows
-	r.cur = -1
-	for i, row := range rows {
-		if row.book != nil && row.book.ID == a.curID {
-			r.cur = i
+	if r.cur < 0 || r.cur >= len(rows) || rows[r.cur].book == nil || rows[r.cur].book.ID != a.curID {
+		r.cur = -1
+		for i, row := range rows {
+			if row.book != nil && row.book.ID == a.curID {
+				r.cur = i
+				break
+			}
 		}
 	}
 	was := r.cur
@@ -352,19 +359,30 @@ func (a *App) resultsView(c *ui.Context) {
 	// A header's key is no book's: headers are never chosen.
 	t.Key = func(i int) any {
 		if b := rows[i].book; b != nil {
+			if r.duplicates != nil {
+				return struct {
+					group int
+					book  int64
+				}{rows[i].duplicateGroup, b.ID}
+			}
 			return b.ID
 		}
 		return int64(-i - 1)
 	}
 	t.Header = func(i int) bool { return rows[i].book == nil }
 	t.Selection = &a.chosen
+	if r.duplicates != nil {
+		// A single book can appear in multiple format groups. Use one
+		// current book, with its ordinary detail pane and book menu.
+		t.Selection = nil
+	}
 	t.Selected = &r.cur
 	t.RoundRows = true
 	t.Label = func(i int) string {
 		if b := rows[i].book; b != nil {
 			return b.Title
 		}
-		return rows[i].header
+		return rows[i].groupLabel()
 	}
 	t.CellMenu = func(m *ui.Menu, row, col int) {
 		if b := rows[row].book; b != nil {
@@ -385,7 +403,7 @@ func (a *App) resultsView(c *ui.Context) {
 			b := rw.book
 			if b == nil {
 				ui.Row(c).Gap(theme.Space8).AlignItems(ui.Baseline).Children(func() {
-					ui.Text(c, rw.header).FontSize(12).FontWeight(600).SingleLine().Shrink(1)
+					ui.Text(c, rw.groupLabel()).FontSize(12).FontWeight(600).SingleLine().Shrink(1)
 					ui.Text(c, locales.CommonBookCount(rw.count)).FontSize(11).FontWeight(400).TextColor(pal().TextTertiary).NoWrap()
 				})
 				return
@@ -430,7 +448,7 @@ func (a *App) resultsView(c *ui.Context) {
 			case 7:
 				ui.Text(c, isoDate(b.Timestamp)).Font(theme.FontMono).FontSize(12).TextColor(pal().TextSecondary).NoWrap()
 			}
-		}).Grow(1).Label(r.title)
+		}).Grow(1).Label(r.heading())
 	})
 	if r.cur != was {
 		// The table moved its row: that row's book is the current one.

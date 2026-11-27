@@ -65,6 +65,7 @@ func newTestApp(t *testing.T) *App {
 	a.covers.thumbs = nil
 	a.openLibrary(root)
 	t.Cleanup(func() {
+		a.batchStore.Close()
 		if a.lib != nil {
 			a.lib.Close()
 		}

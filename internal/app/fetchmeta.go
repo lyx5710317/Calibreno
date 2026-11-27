@@ -387,6 +387,6 @@ func candidateLines(c candidate) (string, string) {
 	if c.r.Publisher != "" {
 		second = append(second, c.r.Publisher)
 	}
-	second = append(second, c.plugin.Manifest.Name)
+	second = append(second, pluginDisplayName(c.plugin.Manifest.ID, c.plugin.Manifest.Name))
 	return strings.Join(first, " · "), strings.Join(second, " · ")
 }

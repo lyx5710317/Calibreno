@@ -40,6 +40,7 @@ func (a *App) view(c *ui.Context) {
 		return
 	}
 	a.welcome.missing = nil // looked at again when the welcome screen next shows
+	a.drainImports()
 
 	dv := a.deviceView()
 	if a.page == pageDevice && dv == nil {
@@ -62,6 +63,8 @@ func (a *App) view(c *ui.Context) {
 			// What the sidebar chose this frame shows already.
 			dv := a.deviceView()
 			switch {
+			case a.page == pageBatch:
+				a.batchToolbar(c)
 			case a.page == pageGetBooks:
 				a.getBooksToolbar(c)
 			case a.page == pageCatalog:
@@ -73,6 +76,8 @@ func (a *App) view(c *ui.Context) {
 			}
 			ui.Column(c).Grow(1).MinHeight(0).AlignItems(ui.Stretch).Children(func() {
 				switch {
+				case a.page == pageBatch:
+					a.batchContent(c)
 				case a.page == pageGetBooks:
 					a.getBooksContent(c)
 				case a.page == pageCatalog:
@@ -142,7 +147,7 @@ func (a *App) shortcuts(c *ui.Context) {
 }
 
 func (a *App) anyDialog() bool {
-	return a.editOpen || a.deleteOpen || a.welcome.notLib.open || a.welcome.create.open || a.settingsOpen || a.consent != nil ||
+	return a.editOpen || a.deleteOpen || a.welcome.notLib.open || a.welcome.create.open || a.settingsOpen || a.errorDetailsOpen || a.consent != nil ||
 		a.act.form != nil || a.act.review != nil || a.dev != nil && a.dev.remove.open
 }
 
@@ -173,12 +178,13 @@ func (a *App) sidebar(c *ui.Context) {
 			}
 			defer a.getBooksNav(c)
 			ui.Column(c).Gap(theme.Space2).AlignItems(ui.Stretch).Children(func() {
-				a.navItem(c, "all", icons.Library, locales.MainNavAllBooks(), a.counts.All, a.query.Shelf == catalog.AllBooks && a.query.Filter.Kind == catalog.NoFilter, nil, func() {
+				a.navItem(c, "all", icons.Library, locales.MainNavAllBooks(), a.counts.All, a.page == pageLibrary && a.query.Shelf == catalog.AllBooks && a.query.Filter.Kind == catalog.NoFilter, nil, func() {
 					a.setQuery(catalog.AllBooks, catalog.Filter{})
 				})
-				a.navItem(c, "recent", icons.Clock, locales.MainNavRecentlyAdded(), a.counts.Recent, a.query.Shelf == catalog.RecentlyAdded && a.query.Filter.Kind == catalog.NoFilter, nil, func() {
+				a.navItem(c, "recent", icons.Clock, locales.MainNavRecentlyAdded(), a.counts.Recent, a.page == pageLibrary && a.query.Shelf == catalog.RecentlyAdded && a.query.Filter.Kind == catalog.NoFilter, nil, func() {
 					a.setQuery(catalog.RecentlyAdded, catalog.Filter{})
 				})
+				a.navItem(c, "batch", icons.Folder, locales.BatchInbox(), 0, a.page == pageBatch, nil, a.openBatches)
 			})
 			a.navSection(c, "formats", locales.MainNavFormats(), catalog.ByFormat, a.counts.Formats, icons.File, 0)
 			a.toolsNav(c)
@@ -341,7 +347,7 @@ func (a *App) librarySwitcher(c *ui.Context) {
 				ui.Icon(c, icons.Tablet).FontSize(16).TextColor(pal().TextOnInverse)
 				return
 			}
-			ui.Text(c, "D").FontWeight(700).FontSize(16).TextColor(pal().TextOnInverse)
+			ui.Text(c, "C").FontWeight(700).FontSize(16).TextColor(pal().TextOnInverse)
 		})
 		ui.Column(c).Grow(1).MinWidth(0).Children(func() {
 			ui.Text(c, name).FontSize(13).FontWeight(500).SingleLine()
@@ -431,13 +437,13 @@ func (a *App) toolbar(c *ui.Context) {
 		right += c.TitleBar().Right
 	}
 	ui.Row(c).Height(theme.ToolbarHeight).Padding(0, right, 0, theme.Space32).Gap(theme.Space8).AlignItems(ui.Center).DragWindow().Children(func() {
-		title, count := "Dalibre", ""
+		title, count := Name, ""
 		if a.lib != nil {
 			title, count = a.viewTitle(), groupDigits(len(a.visible()))
 		}
 		results := a.act.results
 		if results != nil {
-			title, count = results.title, locales.ActionGroups(results.groupCount())
+			title, count = results.heading(), locales.ActionGroups(results.groupCount())
 		}
 		// In a narrow middle column (a small window with the detail panel
 		// open) the controls come first: the search field gives up width,
@@ -668,10 +674,26 @@ var languageNames = map[string]string{
 }
 
 func languageName(code string) string {
+	if simplifiedChinese() {
+		if n := chineseBookLanguages[code]; n != "" {
+			return n
+		}
+	}
 	if n, ok := languageNames[code]; ok {
 		return n
 	}
 	return code
+}
+
+var chineseBookLanguages = map[string]string{
+	"eng": "英语", "zho": "中文", "chi": "中文", "jpn": "日语", "kor": "韩语", "fra": "法语", "fre": "法语",
+	"deu": "德语", "ger": "德语", "spa": "西班牙语", "ita": "意大利语", "por": "葡萄牙语", "rus": "俄语",
+	"ara": "阿拉伯语", "nld": "荷兰语", "dut": "荷兰语", "swe": "瑞典语",
+	"pol": "波兰语", "tur": "土耳其语", "lat": "拉丁语", "und": "未确定", "dan": "丹麦语", "nor": "挪威语",
+	"nob": "书面挪威语", "fin": "芬兰语", "ell": "希腊语", "gre": "希腊语", "ces": "捷克语", "cze": "捷克语",
+	"heb": "希伯来语", "hin": "印地语", "vie": "越南语", "tha": "泰语", "ind": "印度尼西亚语",
+	"ukr": "乌克兰语", "hun": "匈牙利语", "ron": "罗马尼亚语", "rum": "罗马尼亚语",
+	"epo": "世界语", "cat": "加泰罗尼亚语",
 }
 
 // pal is the palette of the frame being built.

@@ -7,11 +7,14 @@ import (
 	"testing"
 
 	"github.com/egoist/mygo/ui"
+
+	"dalibre/internal/batch"
 )
 
 // TestDropImport drops a new book, a new format of a book the library
 // has, a copy of one and a picture: the new book goes in at once, the
-// two others wait in the review sheet, the picture is listed as skipped.
+// new format waits for review, the exact match is recorded, and the picture
+// is listed as unsupported.
 func TestDropImport(t *testing.T) {
 	a := newTestApp(t)
 	tt := ui.NewTester(a.View, 1440, 900)
@@ -35,22 +38,18 @@ func TestDropImport(t *testing.T) {
 	if len(a.books) != before+1 {
 		t.Fatalf("books = %d, want %d", len(a.books), before+1)
 	}
-	if !a.imp.review || len(a.imp.held) != 2 {
-		t.Fatalf("review %v, held %d", a.imp.review, len(a.imp.held))
+	s := a.batch.active.Summary()
+	if s.Review != 1 || s.Duplicates != 1 || s.Unsupported != 1 {
+		t.Fatalf("summary %+v", s)
 	}
-	for _, s := range []string{"2 books are already in your library", "Add PDF to this book", "Same file as the one you have", "cover.jpg — not an e-book"} {
-		if !tt.HasText(s) {
-			t.Errorf("sheet misses %q; texts %q", s, tt.Texts())
-		}
-	}
+	clickBatch(t, tt, "Start duplicate review")
 	shot(t, tt, "import-review")
-
-	if err := tt.Click("Apply"); err != nil {
-		t.Fatal(err)
-	}
-	tt.Frame()
-	if a.imp.review || len(a.imp.held) != 0 {
-		t.Fatal("sheet still open")
+	clickBatch(t, tt, "Add format")
+	if a.batch.active.Summary().Review != 0 {
+		for _, item := range a.batch.active.Items {
+			t.Log(item.State, item.Format, item.Problem, item.Detail)
+		}
+		t.Fatalf("review still pending: %v", tt.Texts())
 	}
 	if len(a.books) != before+1 {
 		t.Errorf("the same file was added again: %d books", len(a.books))
@@ -62,8 +61,7 @@ func TestDropImport(t *testing.T) {
 	}
 }
 
-// TestDropNothingAddable drops only a picture: nothing is added and the
-// toast names what can be.
+// TestDropNothingAddable drops only a picture, which stays in the batch history.
 func TestDropNothingAddable(t *testing.T) {
 	a := newTestApp(t)
 	tt := ui.NewTester(a.View, 1440, 900)
@@ -73,10 +71,19 @@ func TestDropNothingAddable(t *testing.T) {
 	before := len(a.books)
 	tt.DropFiles(700, 400, pic)
 	tt.Frame()
-	if len(a.books) != before || a.imp.review {
-		t.Fatalf("books %d review %v", len(a.books), a.imp.review)
+	if len(a.books) != before || a.batch.active.Items[0].State != batch.Unsupported {
+		t.Fatalf("books %d batch %+v", len(a.books), a.batch.active.Summary())
 	}
-	if !tt.HasText("None of these are e-books. Dalibre adds " + supportedFormats + ", or folders that hold them.") {
-		t.Errorf("no toast; texts %q", tt.Texts())
+	clickBatch(t, tt, "Batch results")
+	if !tt.HasText("Unsupported file") {
+		t.Errorf("result does not show unsupported file: %q", tt.Texts())
 	}
+}
+
+func clickBatch(t *testing.T, tt *ui.Tester, label string) {
+	t.Helper()
+	if err := tt.Click(label); err != nil {
+		t.Fatalf("click %q: %v. visible: %v", label, err, tt.Texts())
+	}
+	tt.Frame()
 }

@@ -29,7 +29,7 @@ func main() {
 	if err := theme.RegisterFonts(); err != nil {
 		log.Fatal(err)
 	}
-	if runtime.GOOS == "windows" {
+	if runtime.GOOS == "windows" && !mygo.IsDev() {
 		// The portable zip has no installer to register the scheme.
 		_ = mygo.App.RegisterURLScheme(app.LinkScheme)
 	}
@@ -40,7 +40,7 @@ func main() {
 		setMenu(a)
 		mygo.App.OnLocaleChanged(func(string) { setMenu(a) })
 		win := mygo.NewWindow(mygo.WindowOptions{
-			Title:           "Dalibre",
+			Title:           app.Name,
 			Width:           1440,
 			Height:          900,
 			MinWidth:        1040,

@@ -66,7 +66,7 @@ func (a *App) marketplacePane(c *ui.Context) {
 					mk.cat = ""
 				}
 				for _, cat := range mk.index.Categories {
-					if widgets.Tag(c.Key(cat.ID), cat.Title, mk.cat == cat.ID, nil).Clicked() {
+					if widgets.Tag(c.Key(cat.ID), pluginCategoryTitle(cat), mk.cat == cat.ID, nil).Clicked() {
 						mk.cat = cat.ID
 					}
 				}
@@ -119,7 +119,7 @@ func (a *App) marketError(c *ui.Context, msg string) {
 func (a *App) pluginCard(c *ui.Context, l *plugin.Listing, width float32) {
 	sel := a.mk.sel == l.ID
 	state := a.listingState(l)
-	card := ui.ButtonBase(c).Width(width).Padding(theme.Space16).Radius(theme.RadiusLG).AlignItems(ui.Stretch).Label(l.Name)
+	card := ui.ButtonBase(c).Width(width).Padding(theme.Space16).Radius(theme.RadiusLG).AlignItems(ui.Stretch).Label(pluginDisplayName(l.ID, l.Name))
 	switch {
 	case sel:
 		card.Background(pal().Selected).Border(1.5, pal().BorderSelected)
@@ -136,9 +136,9 @@ func (a *App) pluginCard(c *ui.Context, l *plugin.Listing, width float32) {
 				a.listingButton(c, l, state, false)
 			})
 			ui.Column(c).Gap(theme.Space4).AlignItems(ui.Stretch).Children(func() {
-				ui.Text(c, l.Name).FontSize(14).FontWeight(600).SingleLine()
+				ui.Text(c, pluginDisplayName(l.ID, l.Name)).FontSize(14).FontWeight(600).SingleLine()
 				// Two lines, always: the cards of a row line up.
-				desc, tone := l.Description, pal().TextSecondary
+				desc, tone := pluginDisplayDescription(l.ID, l.Description), pal().TextSecondary
 				if state == listingUpdate {
 					desc, tone = locales.MarketUpdateTo(l.Version), pal().TextAccent
 				}
@@ -157,7 +157,7 @@ func (a *App) listingButton(c *ui.Context, l *plugin.Listing, state listingState
 	}
 	switch {
 	case a.mk.installing == l.ID || state == listingUpdate && a.updates[l.ID] != nil && a.updates[l.ID].busy:
-		ui.Spinner(c).Size(16, 16).Label(locales.MarketInstallingLabel(l.Name))
+		ui.Spinner(c).Size(16, 16).Label(locales.MarketInstallingLabel(pluginDisplayName(l.ID, l.Name)))
 	case state == listingNeedsDalibre:
 		ui.Text(c, locales.MarketNeedsDalibre(l.Manifest().NeedsDalibre())).FontSize(12).TextColor(pal().TextTertiary).NoWrap()
 	case state == listingInstalled:
@@ -187,13 +187,13 @@ func (a *App) listingButton(c *ui.Context, l *plugin.Listing, state listingState
 // listingPane is the plugin chosen in the Marketplace: what it is, does
 // and may reach.
 func (a *App) listingPane(c *ui.Context, l *plugin.Listing) {
-	m := l.Manifest()
+	m := pluginDisplayManifest(l.Manifest())
 	state := a.listingState(l)
 	ui.Column(c).Gap(theme.Space16).AlignItems(ui.Stretch).Children(func() {
 		ui.Row(c).Gap(theme.Space12).AlignItems(ui.Center).Children(func() {
 			pluginTile(c, m, 48)
 			ui.Column(c).Grow(1).MinWidth(0).Gap(theme.Space2).Children(func() {
-				ui.Text(c, l.Name).FontSize(18).FontWeight(600).MaxLines(2)
+				ui.Text(c, pluginDisplayName(l.ID, l.Name)).FontSize(18).FontWeight(600).MaxLines(2)
 				meta := locales.PluginsVersion(l.Version)
 				if state == listingUpdate {
 					meta = locales.MarketVersionInstalled(a.installedVersion(l.ID, nil), l.Version)
@@ -203,8 +203,8 @@ func (a *App) listingPane(c *ui.Context, l *plugin.Listing) {
 				ui.Text(c, meta).FontSize(12).TextColor(pal().TextTertiary).SingleLine()
 			})
 		})
-		if l.Description != "" {
-			ui.Text(c, l.Description).FontSize(13).TextColor(pal().TextSecondary)
+		if pluginDisplayDescription(l.ID, l.Description) != "" {
+			ui.Text(c, pluginDisplayDescription(l.ID, l.Description)).FontSize(13).TextColor(pal().TextSecondary)
 		}
 		a.listingAction(c, l, state)
 	})
@@ -280,7 +280,7 @@ func (a *App) listingAction(c *ui.Context, l *plugin.Listing, state listingState
 	case a.mk.installing == l.ID || state == listingUpdate && a.updates[l.ID] != nil && a.updates[l.ID].busy:
 		ui.Row(c).Height(theme.ControlM).Gap(theme.Space8).AlignItems(ui.Center).Children(func() {
 			ui.Spinner(c).Size(16, 16)
-			ui.Text(c, locales.MarketInstallingLabel(l.Name)).FontSize(13).TextColor(pal().TextSecondary)
+			ui.Text(c, locales.MarketInstallingLabel(pluginDisplayName(l.ID, l.Name))).FontSize(13).TextColor(pal().TextSecondary)
 		})
 	case state == listingNeedsDalibre:
 		ui.Text(c, locales.MarketNeedsDalibre(l.Manifest().NeedsDalibre())).FontSize(13).TextColor(pal().TextTertiary)

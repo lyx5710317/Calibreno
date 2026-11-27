@@ -121,7 +121,7 @@ func (a *App) saveEmailPassword(pw string) {
 			err = store.Set(emailSecret, pw)
 		}
 		if err != nil {
-			a.post(func() { a.toastError(errors.New(locales.OpdsKeychainError(err.Error()))) })
+			a.post(func() { a.toastError(errors.New(locales.OpdsKeychainError(presentError(err)))) })
 		}
 	})
 }
@@ -204,7 +204,7 @@ func (a *App) emailBooks(k settings.Kindle, ids []int64) {
 		a.post(func() {
 			a.busy, a.busyStop = "", nil
 			if err != nil && !errors.Is(err, context.Canceled) {
-				a.toastError(errors.New(locales.EmailFailed(name, err.Error())))
+				a.toastError(errors.New(locales.EmailFailed(name, presentError(err))))
 			}
 			if len(noFormat) > 0 {
 				a.toastError(errors.New(locales.EmailNoFormat(strings.Join(noFormat, ", "))))

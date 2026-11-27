@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"io"
 	"os"
+	"slices"
 	"strings"
 	"unicode"
 )
@@ -14,14 +15,15 @@ type Duplicate struct {
 	Book      *Book
 	HasFormat bool // the book has a file in the new file's format
 	SameFile  bool // and that file is byte for byte the new one
+	ByISBN    bool
 }
 
 // Duplicates finds the books a library has already, by title and author
 // or by ISBN, for files about to be added.
 type Duplicates struct {
 	l      *Library
-	byName map[string]int64 // dupKey(title, author) → book
-	byISBN map[string]int64
+	byName map[string][]int64 // dupKey(title, author) → books
+	byISBN map[string][]int64
 }
 
 // Duplicates indexes the library's books for Find.
@@ -30,22 +32,26 @@ func (l *Library) Duplicates() (*Duplicates, error) {
 	if err != nil {
 		return nil, err
 	}
-	ids, err := l.Identifiers()
+	rows, err := l.db.Query("SELECT val, book FROM identifiers WHERE lower(type) = 'isbn' ORDER BY book")
 	if err != nil {
 		return nil, err
 	}
-	d := &Duplicates{l: l, byName: map[string]int64{}, byISBN: map[string]int64{}}
+	defer rows.Close()
+	d := &Duplicates{l: l, byName: map[string][]int64{}, byISBN: map[string][]int64{}}
 	for _, b := range books {
 		d.addNames(b.ID, b.Title, b.Authors)
 	}
-	for k, id := range ids {
-		if t, v, _ := strings.Cut(k, ":"); t == "isbn" {
-			if isbn := digits(v); isbn != "" {
-				d.byISBN[isbn] = id
-			}
+	for rows.Next() {
+		var value string
+		var id int64
+		if err := rows.Scan(&value, &id); err != nil {
+			return nil, err
+		}
+		if isbn := digits(value); isbn != "" {
+			d.byISBN[isbn] = append(d.byISBN[isbn], id)
 		}
 	}
-	return d, nil
+	return d, rows.Err()
 }
 
 // Added records a book added since the index was made, so that a second
@@ -54,7 +60,7 @@ func (d *Duplicates) Added(id int64, m Metadata) {
 	m.normalize()
 	d.addNames(id, m.Title, m.Authors)
 	if isbn := digits(m.Identifiers["isbn"]); isbn != "" {
-		d.byISBN[isbn] = id
+		d.byISBN[isbn] = append(d.byISBN[isbn], id)
 	}
 }
 
@@ -63,43 +69,55 @@ func (d *Duplicates) addNames(id int64, title string, authors []string) {
 		authors = []string{"Unknown"}
 	}
 	for _, a := range authors {
-		d.byName[dupKey(title, a)] = id
+		key := dupKey(title, a)
+		d.byName[key] = append(d.byName[key], id)
 	}
 }
 
 // Find returns the book p duplicates, or nil.
 func (d *Duplicates) Find(p Prepared) (*Duplicate, error) {
+	all, err := d.FindAll(p)
+	if len(all) == 0 || err != nil {
+		return nil, err
+	}
+	return &all[0], nil
+}
+
+// FindAll keeps alternate editions visible even when an ISBN matched.
+func (d *Duplicates) FindAll(p Prepared) ([]Duplicate, error) {
 	m := p.Metadata
 	m.normalize()
-	id := int64(0)
-	if isbn := digits(m.Identifiers["isbn"]); isbn != "" {
-		id = d.byISBN[isbn]
-	}
+	isbnMatches := d.byISBN[digits(m.Identifiers["isbn"])]
+	ids := slices.Clone(isbnMatches)
 	for _, a := range m.Authors {
-		if id != 0 {
-			break
+		ids = append(ids, d.byName[dupKey(m.Title, a)]...)
+	}
+	seen := make(map[int64]bool, len(ids))
+	var matches []Duplicate
+	for _, id := range ids {
+		if seen[id] {
+			continue
 		}
-		id = d.byName[dupKey(m.Title, a)]
-	}
-	if id == 0 {
-		return nil, nil
-	}
-	b, err := d.l.Book(id)
-	if err != nil {
-		return nil, err
-	}
-	dup := &Duplicate{Book: b}
-	det, err := d.l.Details(b)
-	if err != nil {
-		return nil, err
-	}
-	for _, f := range det.Files {
-		if f.Format == p.Format {
-			dup.HasFormat = true
-			dup.SameFile = sameFile(f.Path, p.File)
+		seen[id] = true
+		b, err := d.l.Book(id)
+		if err != nil {
+			return nil, err
 		}
+		det, err := d.l.Details(b)
+		if err != nil {
+			return nil, err
+		}
+		dup := Duplicate{Book: b, ByISBN: slices.Contains(isbnMatches, id)}
+		for _, f := range det.Files {
+			if f.Format == p.Format {
+				dup.HasFormat = true
+				dup.SameFile = sameFile(f.Path, p.File)
+				break
+			}
+		}
+		matches = append(matches, dup)
 	}
-	return dup, nil
+	return matches, nil
 }
 
 // dupKey is a title and an author with case, punctuation and spacing

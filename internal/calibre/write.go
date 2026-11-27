@@ -229,16 +229,31 @@ func removeUnused(tx *sql.Tx) error {
 // UpdateMetadata saves m for the book and, when its title or first author
 // changed, moves its folder and files to the names calibre would give them.
 func (l *Library) UpdateMetadata(id int64, m Metadata) error {
-	m.normalize()
 	old, err := l.Book(id)
 	if err != nil {
 		return err
 	}
+	return l.updateMetadata(old, m, false)
+}
+
+// UpdateMetadataChecked refuses edits based on a stale preview.
+func (l *Library) UpdateMetadataChecked(old *Book, m Metadata) error {
+	return l.updateMetadata(old, m, true)
+}
+
+func (l *Library) updateMetadata(old *Book, m Metadata, check bool) error {
+	m.normalize()
+	id := old.ID
 	tx, err := l.db.Begin()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
+	if check {
+		if err := checkBookVersion(tx, old); err != nil {
+			return err
+		}
+	}
 	now := time.Now()
 	if err := setMetadata(tx, id, &m, now); err != nil {
 		return err
@@ -352,6 +367,7 @@ type NewBook struct {
 	Metadata Metadata
 	File     string // the e-book to copy into the library
 	Cover    []byte // an image in any format image.Decode reads, or nil
+	UUID     string // optional identity reserved for a recoverable import
 }
 
 // AddBook copies the file into the library as a new book.
@@ -377,13 +393,21 @@ func (l *Library) AddBook(nb NewBook) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	if nb.UUID != "" {
+		if _, err := tx.Exec("UPDATE books SET uuid = ? WHERE id = ?", nb.UUID, id); err != nil {
+			return 0, err
+		}
+	}
 	if err := setMetadata(tx, id, &m, now); err != nil {
 		return 0, err
 	}
 	keep := l.keepNames.Load()
 	rel := BookPath(id, m.Title, m.Authors[0], keep)
 	dir := filepath.Join(l.Root, filepath.FromSlash(rel))
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(dir), 0o755); err != nil {
+		return 0, err
+	}
+	if err := os.Mkdir(dir, 0o755); err != nil {
 		return 0, err
 	}
 	ok := false

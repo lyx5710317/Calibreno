@@ -21,7 +21,7 @@ import (
 const appUpdateEvery = time.Hour
 
 // releasesURL is where Dalibre's versions are published (mygo.json).
-const releasesURL = "https://github.com/djyde/dalibre/releases"
+const releasesURL = "https://github.com/lyx5710317/dalibre/releases"
 
 type appUpdateStatus int
 
@@ -167,7 +167,7 @@ func (a *App) installAppUpdate() {
 			case canceled:
 				u.status = auAvailable
 			default:
-				u.status, u.err = auInstallFailed, err.Error()
+				u.status, u.err = auInstallFailed, presentError(err)
 			}
 		})
 	})

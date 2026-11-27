@@ -88,7 +88,7 @@ func (a *App) applyDevice() {
 				if port == 0 {
 					port = smartdevice.DefaultPort
 				}
-				st.err = errors.New(locales.WirelessPortError(strconv.Itoa(port), err.Error()))
+				st.err = errors.New(locales.WirelessPortError(strconv.Itoa(port), presentError(err)))
 				return
 			}
 			st.srv = srv
@@ -281,7 +281,7 @@ func (a *App) sendToDevice(ids []int64) {
 			for _, e := range errs {
 				var refused *smartdevice.RefusedError
 				if errors.As(e, &refused) {
-					e = errors.New(locales.WirelessRefused(refused.Error()))
+					e = errors.New(locales.WirelessRefused(presentError(refused)))
 				}
 				a.toastError(e)
 			}

@@ -10,8 +10,10 @@ import (
 	"testing"
 	"testing/fstest"
 
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
+	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/plugin"
 	"dalibre/internal/settings"
 	builtin "dalibre/plugins"
@@ -121,6 +123,26 @@ func TestDownloadBookFromPlugin(t *testing.T) {
 	}
 	if a.inLibrary(page.Items[0]) != b.ID || a.inLibrary(page.Items[1]) != 0 {
 		t.Error("in library isn’t matched by identifier")
+	}
+}
+
+func TestGetBooksChineseDetails(t *testing.T) {
+	i18n.SetLocaleFunc(func() string { return "zh-Hans" })
+	t.Cleanup(func() { i18n.SetLocaleFunc(nil) })
+	a := gutenbergApp(t)
+	tt := ui.NewTester(a.View, 1440, 900)
+	tt.SetLocale("zh-Hans")
+	tt.Frame()
+	clickBatch(t, tt, locales.CommonGetBooks())
+	a.gbSetSource("dalibre.gutenberg")
+	a.gb.text = "frankenstein"
+	a.gbSearch()
+	tt.Frame()
+	clickBatch(t, tt, "Frankenstein; Or, The Modern Prometheus")
+	for _, label := range []string{"古登堡计划", "上线日期", "下载量", "版权状态", "在美国属于公版", "204,693"} {
+		if !tt.HasText(label) {
+			t.Errorf("missing localized catalog detail %q", label)
+		}
 	}
 }
 

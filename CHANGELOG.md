@@ -4,6 +4,13 @@ Each version's section is the release notes that Dalibre's update window
 shows, so write them for readers of the app. `mygo build` needs a
 `## <version>` section for the version in `cmd/dalibre/mygo.json`.
 
+## Unreleased
+
+- 桌面应用名称更新为 calibreno，并补齐简体中文界面、插件入口和常用提示。
+- 新增「待整理」与批次结果。导入后可以复核重复项、批量补资料，并在重新打开应用后继续处理。
+- 批量元数据支持 NeoDB 查询、字段预览和失败项单独重试。
+- 新增只读「全库查重」，按格式和文件内容找出完全相同的文件。
+
 ## 0.8.0
 
 - Settings › Library can keep the original characters of titles and

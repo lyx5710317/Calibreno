@@ -174,7 +174,7 @@ func TestMarketplaceInstallAndUpdate(t *testing.T) {
 	a.loadMarketplace(true)
 	a.mk.sel = "org.example.wiki"
 	tt.Frame()
-	if a.listingState(a.mk.index.Find("org.example.wiki")) != listingNeedsDalibre || !tt.HasText("Needs Dalibre 9.0.0") {
+	if a.listingState(a.mk.index.Find("org.example.wiki")) != listingNeedsDalibre || !tt.HasText("Needs calibreno 9.0.0") {
 		t.Fatalf("needs Dalibre: %q", tt.Texts())
 	}
 

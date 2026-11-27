@@ -1,13 +1,17 @@
 package app
 
 import (
+	"errors"
+	"io/fs"
 	"slices"
+	"strings"
 	"testing"
 
 	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
 	"dalibre/cmd/dalibre/locales"
+	"dalibre/internal/plugin"
 )
 
 // TestLanguages checks every catalog has every message, and that the
@@ -74,6 +78,39 @@ func TestLanguages(t *testing.T) {
 		if s == locales.In("en").CommonSettings() || !tt.HasText(s) {
 			t.Errorf("no %q in %q", s, tt.Texts())
 		}
+	}
+}
+
+func TestChinesePluginDisplayKeepsStableSettings(t *testing.T) {
+	i18n.SetLocaleFunc(func() string { return "zh-Hans" })
+	t.Cleanup(func() { i18n.SetLocaleFunc(nil) })
+	m := &plugin.Manifest{ID: "dalibre.googlebooks", Name: "Google Books", Description: "Book details from Google Books",
+		Settings: []plugin.Setting{{Key: "apiKey", Title: "API key", Description: "A Google Cloud API key with the Books API enabled."}}}
+	display := pluginDisplayManifest(m)
+	if display.Description != "从 Google 图书获取书目资料" || display.Settings[0].Title != "API 密钥" ||
+		display.Settings[0].Key != "apiKey" || m.Settings[0].Title != "API key" {
+		t.Fatalf("manifest display: %+v, original: %+v", display.Settings, m.Settings)
+	}
+	if summary := presentError(errors.Join(errors.New("access library database"), fs.ErrPermission)); summary != locales.ErrorPermission() {
+		t.Fatalf("file error: %q", summary)
+	}
+	if languageName("zho") != "中文" {
+		t.Fatal("book language is not localized")
+	}
+	err := &plugin.Error{Plugin: "dalibre.googlebooks", Kind: plugin.KindAuth, Msg: "Google refused the API key."}
+	if summary := presentError(err); summary != "Google 拒绝了 API 密钥，请检查插件设置。" {
+		t.Fatalf("authentication hint: %q", summary)
+	}
+	if !strings.Contains(errorDetailsText(err), err.Msg) {
+		t.Fatal("technical details lost the original error")
+	}
+	format := pluginDisplayField("dalibre.neodb", plugin.Field{Label: "Binding", Value: "Kindle Edition"})
+	if format.Label != "装帧" || format.Value != "Kindle 电子版" {
+		t.Fatalf("format: %+v", format)
+	}
+	message := pluginDisplayMessage("org.randynamic.dalibre.kepub", "Converted 2 books to KePub. 1 already KePub.")
+	if message != "已将 2 本书转换为 KePub，另有 1 本已有 KePub 格式。" {
+		t.Fatalf("conversion result: %q", message)
 	}
 }
 

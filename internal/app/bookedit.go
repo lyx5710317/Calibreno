@@ -464,7 +464,7 @@ func (ed *bookEditor) save() bool {
 		if st.Buffer.Modified() {
 			if err := ed.bk.Set(name, []byte(st.Buffer.String())); err != nil {
 				ed.mu.Unlock()
-				ed.toast(err.Error(), true)
+				ed.toast(presentError(err), true)
 				return false
 			}
 			saved = append(saved, st)
@@ -476,7 +476,7 @@ func (ed *bookEditor) save() bool {
 	}
 	size, err := ed.bk.Save()
 	if err != nil {
-		ed.toast(err.Error(), true)
+		ed.toast(presentError(err), true)
 		return false
 	}
 	for _, st := range saved {

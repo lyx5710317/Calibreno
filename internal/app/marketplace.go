@@ -78,7 +78,7 @@ func (a *App) loadMarketplace(force bool) {
 		a.post(func() {
 			mk.loading = false
 			if err != nil {
-				mk.err = err.Error()
+				mk.err = presentError(err)
 				return
 			}
 			mk.index, mk.fetched, mk.err = m, time.Now(), ""
@@ -146,7 +146,7 @@ func (a *App) marketListings() []*plugin.Listing {
 		if mk.cat != "" && l.Category != mk.cat {
 			continue
 		}
-		if q != "" && !strings.Contains(strings.ToLower(l.Name+"\n"+l.Description+"\n"+l.Calibre+"\n"+l.Author), q) {
+		if q != "" && !strings.Contains(strings.ToLower(l.Name+"\n"+l.Description+"\n"+l.Calibre+"\n"+l.Author+"\n"+pluginDisplayName(l.ID, l.Name)+"\n"+pluginDisplayDescription(l.ID, l.Description)), q) {
 			continue
 		}
 		out = append(out, l)
@@ -204,7 +204,7 @@ func (a *App) installListing(l *plugin.Listing) {
 				if archive != "" {
 					os.Remove(archive)
 				}
-				a.toastError(errors.New(locales.PluginsInstallFailed(err.Error())))
+				a.toastError(errors.New(locales.PluginsInstallFailed(presentError(err))))
 				return
 			}
 			src := &settings.PluginSource{Repo: want.Repo, Ref: m.Version, Auto: true, Marketplace: true}

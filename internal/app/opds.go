@@ -219,7 +219,7 @@ func (a *App) saveCatalog(cat settings.Catalog, password string) {
 		}
 		a.post(func() {
 			if err != nil {
-				a.toastError(errors.New(locales.OpdsKeychainError(err.Error())))
+				a.toastError(errors.New(locales.OpdsKeychainError(presentError(err))))
 			}
 			a.loadCatalogs()
 		})
@@ -464,7 +464,7 @@ func (a *App) applyShare() {
 		if user != "" && secrets != nil {
 			pw, _ = secrets.Get(shareSecret)
 		}
-		o := &opds.Server{Library: a.sharedLibrary, Title: "Dalibre", Username: user, Password: pw}
+		o := &opds.Server{Library: a.sharedLibrary, Title: Name, Username: user, Password: pw}
 		if user != "" && pw == "" {
 			// A username with no password would let anyone in; refuse all.
 			o.Password = newCatalogID() + newCatalogID()
@@ -479,7 +479,7 @@ func (a *App) applyShare() {
 				return
 			}
 			if err != nil {
-				st.err = errors.New(locales.OpdsSharePortError(strconv.Itoa(port), err.Error()))
+				st.err = errors.New(locales.OpdsSharePortError(strconv.Itoa(port), presentError(err)))
 				return
 			}
 			st.server, st.opds = srv, o

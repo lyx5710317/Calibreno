@@ -121,7 +121,7 @@ func (a *App) emailPane(c *ui.Context) {
 					ui.Spinner(c).Size(14, 14).Label(locales.EmailTestSending())
 					ui.Text(c, locales.EmailTestSending()).FontSize(12).TextColor(pal().TextSecondary)
 				case t.err != nil:
-					ui.Text(c, t.err.Error()).FontSize(12).TextColor(pal().Danger.FG).MaxLines(2).Grow(1).MinWidth(0)
+					ui.Text(c, presentError(t.err)).FontSize(12).TextColor(pal().Danger.FG).MaxLines(2).Grow(1).MinWidth(0)
 				case !t.at.IsZero():
 					at := i18n.FormatDate(i18n.Locale(), t.at, i18n.DateOptions{Skeleton: "jm"})
 					ui.Text(c, locales.EmailTestSent(t.to, at)).FontSize(12).TextColor(pal().Success.FG)

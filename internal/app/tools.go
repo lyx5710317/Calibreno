@@ -351,7 +351,7 @@ func (a *App) toolJobDone(j *toolJob, err error) {
 			}
 			return
 		}
-		j.err = err.Error()
+		j.err = presentError(err)
 		return
 	}
 	delete(a.tl.jobs, toolKey(j.plugin, j.tool))

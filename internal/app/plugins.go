@@ -254,7 +254,7 @@ func (a *App) loadPlugins() {
 			}
 			a.checkPlugins(plugins)
 			for _, err := range errs {
-				a.toastError(errors.New(locales.PluginsErrToast(err.Error())))
+				a.toastError(errors.New(locales.PluginsErrToast(presentError(err))))
 			}
 			if seq == a.loadSeq {
 				a.pluginsSettled()
@@ -317,7 +317,7 @@ func (a *App) installPlugin(archive string) {
 		m, err := plugin.Inspect(archive)
 		a.post(func() {
 			if err != nil {
-				a.toastError(errors.New(locales.PluginsInstallFailed(err.Error())))
+				a.toastError(errors.New(locales.PluginsInstallFailed(presentError(err))))
 				return
 			}
 			if !granted(a.settings.Plugins[m.ID], m) {
@@ -379,7 +379,7 @@ func (a *App) finishInstallFrom(archive string, src *settings.PluginSource) {
 		}
 		a.post(func() {
 			if err != nil {
-				a.toastError(errors.New(locales.PluginsInstallFailed(err.Error())))
+				a.toastError(errors.New(locales.PluginsInstallFailed(presentError(err))))
 				return
 			}
 			st := a.settings.Plugin(m.ID)
@@ -437,7 +437,7 @@ func (a *App) linkPlugin(folder string) {
 		}
 		a.post(func() {
 			if err != nil {
-				a.toastError(errors.New(locales.PluginsAddFailed(err.Error())))
+				a.toastError(errors.New(locales.PluginsAddFailed(presentError(err))))
 				return
 			}
 			a.link(m, abs)
@@ -555,11 +555,11 @@ func isCanceled(err error) bool {
 func (a *App) pluginName(id string) string {
 	for _, k := range a.pluginsKnown {
 		if k.manifest.ID == id {
-			return k.manifest.Name
+			return pluginDisplayName(id, k.manifest.Name)
 		}
 	}
 	if p := a.pluginByID(id); p != nil {
-		return p.Manifest.Name
+		return pluginDisplayName(id, p.Manifest.Name)
 	}
 	return id
 }
@@ -568,22 +568,22 @@ func (a *App) pluginName(id string) string {
 func pluginErrorText(a *App, title string, err error) string {
 	var pe *plugin.Error
 	if !errors.As(err, &pe) {
-		return locales.PluginsDownloadFailedGeneric(title, err.Error())
+		return locales.PluginsDownloadFailedGeneric(title, presentError(err))
 	}
-	pe = &plugin.Error{Plugin: a.pluginName(pe.Plugin), Call: pe.Call, Kind: pe.Kind, Msg: pe.Msg, Err: pe.Err}
+	name, reason := a.pluginName(pe.Plugin), errText(err)
 	switch pe.Kind {
 	case plugin.KindAuth, plugin.KindSettings:
-		return locales.PluginsDownloadAuth(pe.Plugin, pe.Msg)
+		return locales.PluginsDownloadAuth(name, reason)
 	case plugin.KindRateLimited:
-		return locales.PluginsDownloadBusy(pe.Plugin)
+		return locales.PluginsDownloadBusy(name)
 	case plugin.KindUnavailable:
-		return locales.PluginsDownloadUnavailable(pe.Plugin, pe.Msg)
+		return locales.PluginsDownloadUnavailable(name, reason)
 	case plugin.KindNotFound:
-		return locales.PluginsDownloadNotFound(title, pe.Plugin)
+		return locales.PluginsDownloadNotFound(title, name)
 	case plugin.KindTimeout:
-		return locales.PluginsDownloadTimeout(title, pe.Msg)
+		return locales.PluginsDownloadTimeout(title, reason)
 	}
-	return locales.PluginsDownloadFailed(title, pe.Plugin, pe.Msg)
+	return locales.PluginsDownloadFailed(title, name, reason)
 }
 
 // resultMetadata is the library metadata for a plugin's result.

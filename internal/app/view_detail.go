@@ -22,7 +22,7 @@ import (
 // it on and something is selected to show in it. With nothing selected
 // it is away, not an empty panel.
 func (a *App) detailShown() bool {
-	if a.settings.HideDetail {
+	if a.settings.HideDetail || a.page == pageBatch {
 		return false
 	}
 	if v := a.deviceView(); v != nil {

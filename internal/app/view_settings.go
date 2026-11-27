@@ -541,7 +541,7 @@ func (a *App) sharePane(c *ui.Context) {
 			switch {
 			case st != nil && st.err != nil:
 				ui.Icon(c, icons.Alert).FontSize(16).TextColor(pal().Danger.FG)
-				ui.Text(c, st.err.Error()).FontSize(12).TextColor(pal().Danger.FG).Grow(1)
+				ui.Text(c, presentError(st.err)).FontSize(12).TextColor(pal().Danger.FG).Grow(1)
 			case st == nil || st.server == nil:
 				ui.Spinner(c).Size(14, 14).Label(locales.SettingsStartingLabel())
 				ui.Text(c, locales.SettingsStarting()).FontSize(12).TextColor(pal().TextSecondary).Grow(1)

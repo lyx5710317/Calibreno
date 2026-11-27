@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -73,12 +72,8 @@ func processImport(ctx context.Context, plugins []*plugin.Plugin, file string) (
 
 // processError is what the user is told when plugin p failed on a file.
 func processError(p *plugin.Plugin, name string, err error) error {
-	msg := err.Error()
-	var pe *plugin.Error
-	if errors.As(err, &pe) {
-		msg = pe.Msg
-	}
-	return fmt.Errorf("%s", locales.PluginsProcessFailed(p.Manifest.Name, name, msg))
+	pluginName := pluginDisplayName(p.Manifest.ID, p.Manifest.Name)
+	return fmt.Errorf("%s", locales.PluginsProcessFailed(pluginName, name, errText(err)))
 }
 
 // hookPlugins are the file type plugins with hooks. Main thread.

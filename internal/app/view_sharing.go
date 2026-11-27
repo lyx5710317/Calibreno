@@ -104,7 +104,7 @@ func (a *App) shareBlock(c *ui.Context) {
 	if st := a.share; sh.On {
 		switch {
 		case st != nil && st.err != nil:
-			status, color = st.err.Error(), pal().Danger.FG
+			status, color = presentError(st.err), pal().Danger.FG
 		case st == nil || st.server == nil:
 			status, color = locales.SettingsStarting(), pal().TextSecondary
 		default:
@@ -270,7 +270,7 @@ func (a *App) mcpStatusLine(running bool) (string, ui.Color, string) {
 	case st.PortInUse:
 		return locales.McpPortInUse(strconv.Itoa(st.Port)), pal().Danger.FG, ""
 	case st.Err != nil:
-		return locales.McpCantStart(st.Err.Error()), pal().Danger.FG, ""
+		return locales.McpCantStart(presentError(st.Err)), pal().Danger.FG, ""
 	case !st.Running:
 		return locales.SettingsStarting(), pal().TextSecondary, ""
 	}

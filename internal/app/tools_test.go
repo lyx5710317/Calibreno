@@ -92,7 +92,7 @@ func TestPluginTools(t *testing.T) {
 	}
 	a.openPlugins("com.example.tooly")
 	tt.Frame()
-	if !tt.HasText("Downloaded by Dalibre · 0 MB") && !tt.HasText("Sign in with fake login") {
+	if !tt.HasText("Downloaded by calibreno · 0 MB") && !tt.HasText("Sign in with fake login") {
 		t.Fatalf("plugin page: %q", tt.Texts())
 	}
 	shot(t, tt, "tools-plugin-page")
@@ -204,7 +204,7 @@ func TestToolInstallDialog(t *testing.T) {
 	j.running, j.err = false, "Homebrew stopped with exit code 1"
 	j.lines = append(j.lines, "Error: Another active Homebrew process is already in progress.")
 	tt.Frame()
-	if !tt.HasText("Homebrew couldn’t install fake") || !tt.HasText("Copy log") || !tt.HasText("Download with Dalibre · 1 KB") {
+	if !tt.HasText("Homebrew couldn’t install fake") || !tt.HasText("Copy log") || !tt.HasText("Download with calibreno · 1 KB") {
 		t.Fatalf("failed: %q", tt.Texts())
 	}
 	shot(t, tt, "tools-install-failed")

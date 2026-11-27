@@ -1,17 +1,12 @@
 {
-  "name": "Dalibre",
+  "name": "calibreno",
   "identifier": "org.randynamic.dalibre",
-  "publisher": "Dalibre",
+  "publisher": "calibreno",
   "version": "0.8.0",
   "out": "build",
   "urlSchemes": ["dalibre"],
   "i18n": {
     "dir": "locales",
     "source": "en"
-  },
-  "updates": {
-    "publicKey": "R0fYhda+drhyACoY059Mckirm6+1yHvN0+x0Y2gUHqo=",
-    "github": "djyde/dalibre",
-    "changelog": "../../CHANGELOG.md"
   }
 }

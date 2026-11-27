@@ -46,10 +46,11 @@ func (l *Library) ImportWith(file string, over Metadata, cover []byte) (int64, e
 // Prepared is an e-book file read for adding, before it is added: what
 // the import checks for books the library has already.
 type Prepared struct {
-	File     string
-	Format   string // the file's extension in upper case, as "EPUB"
-	Metadata Metadata
-	Cover    []byte
+	File        string
+	Format      string // the file's extension in upper case, as "EPUB"
+	Metadata    Metadata
+	Cover       []byte
+	Translators []string
 }
 
 // Prepare reads file's metadata and cover, as ImportWith does.
@@ -99,7 +100,7 @@ func Prepare(file string, over Metadata, cover []byte) Prepared {
 	if len(m.Cover) > 0 {
 		cover = m.Cover
 	}
-	return Prepared{File: file, Format: strings.ToUpper(strings.TrimPrefix(filepath.Ext(file), ".")), Metadata: md, Cover: cover}
+	return Prepared{File: file, Format: strings.ToUpper(strings.TrimPrefix(filepath.Ext(file), ".")), Metadata: md, Cover: cover, Translators: m.Translators}
 }
 
 // Add adds a prepared file as a new book.

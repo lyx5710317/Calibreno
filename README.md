@@ -1,142 +1,64 @@
-# Dalibre
+# calibreno
 
-A calm, fast desktop library for e-books that reads and writes **calibre
-libraries**. Written in Go with [MyGo](https://github.com/egoist/mygo)'s native
-UI: no webview, no cgo, one binary.
+calibreno 是面向个人书库的开源电子书管理桌面应用。它基于 [Dalibre](https://github.com/djyde/dalibre)，使用 Go 和 [MyGo](https://github.com/egoist/mygo) 开发，可以直接打开已有的 Calibre 书库。首版在 Windows x64 上验收。
 
-<img width="3038" height="2176" alt="CleanShot 2026-11-09 at 19 18 34@2x" src="https://github.com/user-attachments/assets/6439498c-3d99-4ac8-b446-7c3b2a39d0c1" />
+![calibreno 待整理页面，显示导入批次、待查重与待补资料的书籍](docs/images/calibreno-inbox.png)
 
-Design: [Figma — Dalibre](https://www.figma.com/design/tZg6AMrNXoz9VYoa1xZoCo/Dalibre)
+## 功能
 
-## Develop
+- **待整理**。导入文件或文件夹后按批次查看进度，复核未决项，中途退出后也能继续。
+- **导入查重**。对照新文件和库内书目，可为已有书目补充格式、保留为单独书目、替换已有格式或跳过。内容完全相同的导入副本会记录在批次结果中。
+- **批量补元数据**。可使用内置 NeoDB 查询书目信息，也可统一补充作者、出版社、语言等资料。应用前逐本预览，默认只补空白字段，查询失败的书可以单独重试。
+- **全库查重**。按格式和文件内容分组，找出书名或作者不同的相同文件。桌面程序当前提供只读扫描与结果查看，按组确认移除的流程处于原型阶段。
+- **简体中文**。支持简体中文桌面界面，覆盖批次整理流程和常用内置插件交互。
+
+## 开发与运行
+
+安装 [Go](https://go.dev/dl/) 1.27.3 或更新版本，在仓库根目录运行以下命令。
 
 ```sh
-go tool mygo dev ./cmd/dalibre        # run with live reload
-go test ./...                         # unit + view tests (no window needed)
-go run ./cmd/seed "testdata/Sample Library"   # a sample library to play with
+go tool mygo dev ./cmd/dalibre
 ```
 
-Point the app at a library with `DALIBRE_LIBRARY` (PowerShell:
-`$env:DALIBRE_LIBRARY="C:\path\to\Library"`); otherwise it opens the last one
-used. With neither, the welcome screen offers the one calibre itself uses.
+启动后选择已有的 Calibre 书库文件夹，也可生成一份示例书库。
 
-On macOS, mount network shares in Finder, then choose the library folder
-on the mounted volume (for example, `/Volumes/Shared/Calibre Library`).
-Dalibre uses macOS's system SQLite through purego so Finder volumes use
-their native filesystem locking, including SMB and AFP. No cgo is needed.
+```powershell
+go run ./cmd/seed "testdata/Sample Library"
+$env:DALIBRE_LIBRARY = "testdata/Sample Library"
+go tool mygo dev ./cmd/dalibre
+```
 
-Mounted-volume regression checks are opt-in: `DALIBRE_REAL_LIBRARY` reads
-an existing library without changing it; `DALIBRE_TEST_VOLUME` exercises
-writes and competing-writer locks in a new temporary library that it removes.
-
-View tests can save screenshots: `DALIBRE_SHOTS=<folder> go test ./internal/app`.
-
-Build a release (exe + installer in `cmd/dalibre/build`):
+运行测试和构建桌面程序。
 
 ```sh
+go test ./...
 go tool mygo build ./cmd/dalibre
 ```
 
+`DALIBRE_REAL_LIBRARY` 可用于现有书库的只读回归检查。`DALIBRE_TEST_VOLUME` 可用于指定卷上的临时书库写入与锁测试。可设置 `DALIBRE_SHOTS` 指定界面测试截图目录。
+
+## 书库兼容性
+
+- 直接使用 Calibre 的 `metadata.db` 和书籍目录结构。
+- 编辑书目信息时写入 `metadata.opf`，并标记供 Calibre 刷新。
+- macOS 使用系统 SQLite 访问 Finder 已挂载的 SMB 或 AFP 书库。
+
+## 文档
+
+- [首版开发文档](docs/calibreno-v1-development.md)
+- [变更记录](CHANGELOG.md)
+- [插件开发](docs/plugins/README.md)
+- [MCP 接入](docs/mcp/README.md)
+- [阅读设备](docs/devices.md)
+
+## 开源许可
+
+calibreno 是 [djyde/dalibre](https://github.com/djyde/dalibre) 的公开派生项目，沿用 [GPL-3.0-or-later](LICENSE)，保留上游历史、版权和许可证声明。修改记录见 [CHANGELOG.md](CHANGELOG.md)。
+
+Calibre 数据库结构来自 Calibre，适用 GPL-3.0。Inter 和 Geist Mono 字体适用 SIL Open Font License，Lucide 图标适用 ISC，Radix Colors 色彩适用 MIT。
+
 ### Releases from this fork
 
-This public fork of [djyde/dalibre](https://github.com/djyde/dalibre)
-continues to use [GPL-3.0-or-later](LICENSE). Each release distributed as
-a binary will make the complete corresponding source available at the
-same time. Keep the original copyright and license notices and record
-the fork's changes in [CHANGELOG.md](CHANGELOG.md).
+发布安装包时，同步提供用于构建安装包的公开 Git 标签和完整对应源码，并在 GitHub Release 中提供源码下载入口与构建说明。项目源码继续以 GPL-3.0-or-later 公开。
 
-Publish each release from a public Git tag for the commit used to build
-its binaries. Include a source download link in the GitHub Release and
-provide the build and installation scripts, plus any required source
-that the Git tag does not contain. See
-[GPLv3, sections 5 and 6](https://www.gnu.org/licenses/gpl-3.0.html).
-
-### Upstream release process
-
-The bundled updater currently points to `djyde/dalibre`. Configure the
-fork's release repository and its own signing keys before publishing
-updates from this fork. Upstream releases
-are signed with the update key of `go tool mygo keygen`, which is the
-`MYGO_UPDATER_PRIVATE_KEY` secret of the repository; keep a copy in a
-password manager, as installed apps only accept updates it signs.
-
-1. Bump `version` in `cmd/dalibre/mygo.json`, and add its `## <version>`
-   section to [CHANGELOG.md](CHANGELOG.md): the update window shows it.
-2. Commit, then tag and push: `git tag v0.2.0 && git push origin v0.2.0`.
-3. The [Release workflow](.github/workflows/release.yml) builds every
-   platform into a draft release. Publish the draft, and installed apps
-   update to it.
-
-The workflow signs the macOS app with the Developer ID and notarizes it,
-from the `MACOS_CERTIFICATE` and `MACOS_CERTIFICATE_PASSWORD` secrets, and
-an App Store Connect API key in `APPLE_API_KEY`, `APPLE_API_KEY_ID` and
-`APPLE_API_ISSUER` (see the top of the workflow). `mygo.json`
-leaves signing out, so local builds are signed ad hoc.
-
-## Layout
-
-```
-cmd/
-  dalibre/            the app: main.go, mygo.json, resources/icon.png
-  seed/               creates a sample calibre library for development
-  dalibre-plugin/     CLI for plugin authors (npm: dalibre-plugin): init, check, dev, docs, pack, install
-plugins/
-  gutenberg/          Project Gutenberg, built into the app (dalibre.gutenberg)
-  googlebooks/        Google Books metadata lookup, built into the app (dalibre.googlebooks)
-  neodb/              NeoDB metadata lookup, built into the app (dalibre.neodb)
-sdk/                  for plugin authors: dalibre.d.ts, plugin.schema.json, template
-internal/
-  calibre/            calibre library access: schema, SQL functions its
-                      triggers need, naming rules, CRUD, OPF
-  ebookmeta/          title/authors/cover from EPUB, MOBI/AZW3 and file names
-  catalog/            search, filters, sorting and sidebar counts (no UI)
-  plugin/             plugins: manifest, sandboxed JS runtime, consent, packages
-  mcp/                the MCP server: tools, call log, stdio bridge
-  device/             readers plugged in (docs/devices.md): storages, the
-                      watcher, calibre's on-device library (usbms), Kindle
-  settings/           user settings persisted as JSON
-  thumbs/             on-disk cover thumbnails
-  app/                state, actions and views of the window
-    theme/            design tokens (Radix Colors, spacing, radii) and fonts
-    icons/            Lucide icons
-    widgets/          the Figma library's components
-```
-
-## Plugins
-
-Get books (in the sidebar) searches and browses book sources and adds
-what you pick to your library. Project Gutenberg is built in; anyone can
-add a source as a plugin: a `plugin.json` and a JavaScript file, run
-sandboxed inside Dalibre. See
-[Writing Dalibre plugins](docs/plugins/README.md), also in the CLI
-(`npx dalibre-plugin@latest docs`), and the
-[design](docs/plugins/design.md).
-
-## MCP
-
-Your own agents (Claude Code, Claude Desktop, Cursor…) can use the open
-library over MCP: search it, edit metadata, add books, and convert
-formats with their own tools. See
-[Using Dalibre with your agents](docs/mcp/README.md) and the
-[design](docs/mcp/design.md).
-
-## Compatibility with calibre
-
-- New libraries use calibre's own `metadata.db` schema (user_version 28).
-- Dalibre registers the SQL functions calibre's triggers call (`title_sort`,
-  `uuid4`, …), so writes behave as calibre's do.
-- Book folders and files follow calibre's naming (`Author/Title (id)/Title -
-  Author.ext`, transliterated to ASCII), and move when the title or first
-  author changes.
-- Edits write `metadata.opf` and mark the book in `metadata_dirtied`, so
-  calibre refreshes it next time.
-- Removed books go to the system Recycle Bin.
-
-## Licenses
-
-Dalibre is free software under the [GNU General Public License v3.0 or
-later](LICENSE).
-
-`internal/calibre/metadata_sqlite.sql` comes from calibre (GPL-3.0). Fonts
-(Inter, Geist Mono) are under the SIL Open Font License; icons
-are Lucide (ISC); colors are Radix Colors (MIT).
+当前源码关闭了上游签名更新配置。正式发布 calibreno 安装包和自动更新前，需要配置本仓库的发布流程与签名密钥。

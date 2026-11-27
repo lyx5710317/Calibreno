@@ -205,7 +205,7 @@ func (a *App) devicesChanged() {
 		key := name + "\x00" + err.Error()
 		failed[key] = true
 		if !ds.failed[key] {
-			a.toastError(errors.New(locales.DeviceOpenFailed(name, err.Error())))
+			a.toastError(errors.New(locales.DeviceOpenFailed(name, presentError(err))))
 		}
 	}
 	ds.failed = failed
@@ -274,7 +274,7 @@ func (a *App) connectReader(av device.Available) {
 			ds.connecting = ""
 			ds.list, ds.available, ds.on = w.Devices(), w.Available(), nil
 			if err != nil {
-				a.toastError(errors.New(locales.DeviceMountFailed(name, err.Error())))
+				a.toastError(errors.New(locales.DeviceMountFailed(name, presentError(err))))
 				return
 			}
 			a.openDevice(d)
@@ -746,7 +746,7 @@ func (a *App) addReaderBooksToLibrary(v *deviceView, ids []int64) {
 				done()
 			}
 			if err != nil {
-				errs = append(errs, errors.New(it.Title+": "+err.Error()))
+				errs = append(errs, errors.New(it.Title+" · "+presentError(err)))
 			} else {
 				added++
 			}

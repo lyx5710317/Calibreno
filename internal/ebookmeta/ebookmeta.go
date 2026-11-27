@@ -25,6 +25,7 @@ import (
 type Meta struct {
 	Title       string
 	Authors     []string
+	Translators []string
 	Publisher   string
 	Language    string // as the file gives it, e.g. "en" or "zh-CN"
 	Description string
@@ -170,6 +171,10 @@ func readEPUB(file string) (Meta, error) {
 		if role == "" || role == "aut" {
 			if n := clean(cr.Name); n != "" {
 				m.Authors = append(m.Authors, n)
+			}
+		} else if role == "trl" || strings.HasSuffix(role, "/trl") {
+			if n := clean(cr.Name); n != "" {
+				m.Translators = append(m.Translators, n)
 			}
 		}
 	}

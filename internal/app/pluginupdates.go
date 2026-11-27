@@ -83,7 +83,7 @@ func (a *App) ghFind() {
 	g := &a.ghi
 	repo, err := plugin.ParseRepo(g.text)
 	if err != nil {
-		g.err = err.Error()
+		g.err = presentError(err)
 		return
 	}
 	g.discard()
@@ -106,7 +106,7 @@ func (a *App) ghFind() {
 			}
 			g.finding = false
 			if err != nil {
-				g.err = err.Error()
+				g.err = presentError(err)
 				return
 			}
 			// The default branch first.
@@ -185,7 +185,7 @@ func (a *App) ghChoose(tag, branch string) {
 				if archive != "" {
 					os.Remove(archive)
 				}
-				g.err = locales.PluginsNotAPlugin(err.Error())
+				g.err = locales.PluginsNotAPlugin(presentError(err))
 				return
 			}
 			g.archive, g.manifest, g.ref, g.detail, g.readme = archive, m, ref, detail, readme
@@ -284,7 +284,7 @@ func (a *App) checkUpdates(force bool) {
 		for _, it := range items {
 			u, err := latestUpdate(gh, it.id, it.src, market)
 			if err != nil {
-				errs = append(errs, errors.New(locales.PluginsCheckFailed(it.id, err.Error())))
+				errs = append(errs, errors.New(locales.PluginsCheckFailed(it.id, presentError(err))))
 				continue
 			}
 			if u != nil {
@@ -380,7 +380,7 @@ func (a *App) updatePlugin(id string, auto bool) {
 				if archive != "" {
 					os.Remove(archive)
 				}
-				a.toastError(errors.New(locales.PluginsUpdateFailed(a.pluginName(id), err.Error())))
+				a.toastError(errors.New(locales.PluginsUpdateFailed(a.pluginName(id), presentError(err))))
 				return
 			}
 			if !granted(a.settings.Plugins[id], m) {

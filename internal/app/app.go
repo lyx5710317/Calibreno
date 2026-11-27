@@ -19,6 +19,7 @@ import (
 
 	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/app/icons"
+	"dalibre/internal/batch"
 	"dalibre/internal/calibre"
 	"dalibre/internal/catalog"
 	"dalibre/internal/plugin"
@@ -28,10 +29,14 @@ import (
 // App is the state the window shows. Every widgets.Field is read and written on
 // the main thread; work on disk runs in goroutines that hand their results
 // back through post.
+const Name = "calibreno"
+
 type App struct {
-	win  *mygo.Window
-	post func(func()) // runs fn on the main thread and rebuilds
-	run  func(func()) // runs fn in the background
+	errorDetails     string
+	errorDetailsOpen bool
+	win              *mygo.Window
+	post             func(func()) // runs fn on the main thread and rebuilds
+	run              func(func()) // runs fn in the background
 	// trash takes removed books' folders; nil keeps them in the library's
 	// trash folder, as tests do.
 	trash func(path string) error
@@ -55,7 +60,10 @@ type App struct {
 	// do about it; the welcome screen shows them.
 	loadErr, loadErrDetail func() string
 	welcome                welcomeState
-	imp                    importState // adding dropped or chosen files
+	imports                []importRequest
+	batchKey               string
+	batchStore             *batch.Store
+	batch                  batchView
 	books                  []*calibre.Book
 	byID                   map[int64]*calibre.Book
 	counts                 catalog.Counts
@@ -202,8 +210,9 @@ type App struct {
 	busyDone  int
 	busyTotal int
 	// busyStop stops the long action in progress, when it can be.
-	busyStop func()
-	toasts   []toastMsg
+	busyStop      func()
+	duplicateScan *libraryDuplicateScan
+	toasts        []toastMsg
 	// ex is the Export to folder dialog.
 	ex exportState
 	// editors are the book editor windows open, by book; editorToasts
@@ -231,6 +240,10 @@ type shownKey struct {
 // New returns the app with the settings at settingsPath ("" keeps them
 // in memory, as tests do).
 func New(settingsPath string) *App {
+	batchPath := ""
+	if settingsPath != "" {
+		batchPath = filepath.Join(filepath.Dir(settingsPath), "calibreno")
+	}
 	a := &App{
 		cur:        -1,
 		curAt:      -1,
@@ -240,6 +253,7 @@ func New(settingsPath string) *App {
 		sectionsOn: map[string]bool{"formats": true},
 		covers:     newCoverCache(),
 		settings:   settings.Load(settingsPath),
+		batchStore: batch.NewStore(batchPath),
 		gb:         newGetBooks(),
 	}
 	a.post = func(fn func()) { fn() }
@@ -328,7 +342,17 @@ func (a *App) toast(format string, args ...any) {
 }
 
 func (a *App) toastError(err error) {
-	a.toasts = append(a.toasts, toastMsg{text: err.Error(), error: true})
+	if err == nil {
+		return
+	}
+	summary, raw := presentError(err), err.Error()
+	toast := toastMsg{text: summary, error: true}
+	if summary != raw {
+		details := errorDetailsText(err)
+		toast.action = locales.ErrorDetails()
+		toast.onAction = func() { a.errorDetails, a.errorDetailsOpen = details, true }
+	}
+	a.toasts = append(a.toasts, toast)
 }
 
 // startupLibrary picks the library to open: DALIBRE_LIBRARY, then the
@@ -372,6 +396,13 @@ func (a *App) openLibrary(root string) {
 	if root == "" {
 		return
 	}
+	if a.batch.work || len(a.imports) > 0 {
+		a.toast("%s", locales.BatchSwitchBusy())
+		return
+	}
+	if a.duplicateScan != nil {
+		a.duplicateScan.cancel()
+	}
 	a.loadGen++
 	gen := a.loadGen
 	a.loading, a.loadingRoot, a.loadErr, a.loadErrDetail = true, root, nil, nil
@@ -390,13 +421,14 @@ func (a *App) openLibrary(root string) {
 		lib, err := a.open(root)
 		var books []*calibre.Book
 		var ids map[string]int64
-		var uuid string
+		var uuid, batchKey string
 		if err == nil {
 			books, err = lib.Books()
 		}
 		if err == nil {
 			ids, _ = lib.Identifiers()
 			uuid = lib.UUID()
+			batchKey = batch.LibraryKey(lib)
 		}
 		a.post(func() {
 			if gen != a.loadGen { // cancelled, or another library asked for since
@@ -416,8 +448,7 @@ func (a *App) openLibrary(root string) {
 					return
 				}
 				a.loadErr = func() string { return locales.AppCouldntOpenLibrary(filepath.Base(root)) }
-				detail := err.Error()
-				a.loadErrDetail = func() string { return detail }
+				a.loadErrDetail = func() string { return presentError(err) }
 				return
 			}
 			if a.lib != nil {
@@ -425,6 +456,10 @@ func (a *App) openLibrary(root string) {
 			}
 			lib.SetKeepNames(a.settings.KeepNames)
 			a.lib, a.libID = lib, uuid
+			a.batchKey, a.batch = batchKey, batchView{}
+			if a.page == pageBatch {
+				a.page = pageLibrary
+			}
 			a.libShared.Store(lib)
 			a.idIndex = ids
 			a.details, a.detailsReq = map[int64]*calibre.Details{}, map[int64]bool{}
@@ -598,12 +633,25 @@ func ebookFilter() []mygo.FileFilter {
 
 // chooseBooks asks for files and adds them.
 func (a *App) chooseBooks() {
+	a.chooseImport(false)
+}
+
+func (a *App) chooseImport(folders bool) {
+	lib := a.lib
+	options := mygo.OpenDialogOptions{Parent: a.win, Title: locales.CommonAddBooks(), Multiple: true, Filters: ebookFilter()}
+	if folders {
+		options.Title, options.Directory, options.Filters = locales.BatchAddFolders(), true, nil
+	}
 	a.run(func() {
-		paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: a.win, Title: locales.CommonAddBooks(), Multiple: true, Filters: ebookFilter()})
+		paths, err := mygo.Dialog.Open(options)
 		if err != nil || len(paths) == 0 {
 			return
 		}
-		a.post(func() { a.importFiles(paths) })
+		a.post(func() {
+			if a.lib == lib {
+				a.importFiles(paths)
+			}
+		})
 	})
 }
 

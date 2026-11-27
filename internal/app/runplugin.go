@@ -37,7 +37,7 @@ func (a *App) pluginActions(m *ui.Menu, ids []int64) bool {
 	}
 	add := func(m *ui.Menu) {
 		for _, p := range ps {
-			if m.Item(p.Manifest.ActionTitle()).ID("run:" + p.Manifest.ID).Icon(icons.Menu(icons.Sparkle)).Disabled(a.busy != "").Chosen() {
+			if m.Item(pluginDisplayActionTitle(p.Manifest)).ID("run:" + p.Manifest.ID).Icon(icons.Menu(icons.Sparkle)).Disabled(a.busy != "").Chosen() {
 				a.runPlugin(p, ids)
 			}
 		}
@@ -58,7 +58,7 @@ func (a *App) pluginActions(m *ui.Menu, ids []int64) bool {
 // actionItem is a plugin's action in a menu, to run on books ids: greyed
 // when it doesn't take them.
 func (a *App) actionItem(m *ui.Menu, pa pluginAction, ids []int64) {
-	if m.Item(pa.act.Title).ID("act:" + pa.p.Manifest.ID + ":" + pa.act.ID).Icon(icons.Menu(actionIcon(pa.act))).
+	if m.Item(pluginDisplayText(pa.p.Manifest.ID, pa.act.Title)).ID("act:" + pa.p.Manifest.ID + ":" + pa.act.ID).Icon(icons.Menu(actionIcon(pa.act))).
 		Disabled(a.busy != "" || !a.takes(pa.act, ids)).Chosen() {
 		a.runAction(pa.p, pa.act, ids)
 	}
@@ -116,7 +116,7 @@ func (a *App) runPlugin(p *plugin.Plugin, ids []int64) {
 			books = append(books, b)
 		}
 	}
-	title := p.Manifest.ActionTitle()
+	title := pluginDisplayActionTitle(p.Manifest)
 	a.busy, a.busyDone, a.busyTotal = title, 0, len(books)
 	a.run(func() {
 		out := runBooks(context.Background(), lib, p, books, func(done int) { a.post(func() { a.busyDone = done }) })
@@ -215,10 +215,10 @@ func (a *App) runDone(p *plugin.Plugin, title string, out runOutcome) {
 	case out.setup != nil:
 		reason := errText(out.setup)
 		if errKind(out.setup) == plugin.KindSettings {
-			reason = locales.RunPluginFillIn(strings.Join(p.MissingSettings(), ", "))
+			reason = locales.RunPluginFillIn(strings.Join(pluginDisplayMissing(p), ", "))
 		}
 		id := p.Manifest.ID
-		a.toasts = append(a.toasts, toastMsg{text: locales.RunPluginNeedsSetup(p.Manifest.Name, reason), error: true,
+		a.toasts = append(a.toasts, toastMsg{text: locales.RunPluginNeedsSetup(a.pluginName(p.Manifest.ID), reason), error: true,
 			action: locales.GetBooksOpenPluginSettings(), onAction: func() { a.openPlugins(id) }})
 	case len(out.failed) > 0:
 		a.toasts = append(a.toasts, toastMsg{text: locales.RunPluginFailedOn(title, len(out.failed), errText(out.failed[0])), error: true})

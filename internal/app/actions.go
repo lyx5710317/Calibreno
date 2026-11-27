@@ -180,7 +180,7 @@ func (a *App) runAction(p *plugin.Plugin, act *plugin.Action, ids []int64) {
 		}
 	}
 	ctx, cancel := context.WithCancel(context.Background())
-	a.busy, a.busyDone, a.busyTotal = act.Label(), 0, 0
+	a.busy, a.busyDone, a.busyTotal = pluginDisplayText(p.Manifest.ID, act.Label()), 0, 0
 	a.act.cancel = cancel
 	host := &plugin.ActionHost{
 		Covers: actionCovers(lib, act, books),
@@ -459,7 +459,18 @@ func metadataDiff(old, now calibre.Metadata) []changeLine {
 // actionDone tells how an action went, and shows what it found. Main
 // thread, the library read again.
 func (a *App) actionDone(p *plugin.Plugin, act *plugin.Action, ids []int64, out actionOutcome, err error) {
-	title := act.Label()
+	out.message = pluginDisplayMessage(p.Manifest.ID, out.message)
+	switch p.Manifest.ID {
+	case "org.randynamic.dalibre.quality-check", "org.randynamic.dalibre.count-pages":
+		for i := range out.groups {
+			group := &out.groups[i]
+			group.Title = pluginDisplayText(p.Manifest.ID, group.Title)
+			for j := range group.Books {
+				group.Books[j].Note = pluginDisplayMessage(p.Manifest.ID, group.Books[j].Note)
+			}
+		}
+	}
+	title := pluginDisplayText(p.Manifest.ID, act.Label())
 	switch k := errKind(err); {
 	case err == nil:
 	case k == plugin.KindCancelled || isCanceled(err):
@@ -467,10 +478,10 @@ func (a *App) actionDone(p *plugin.Plugin, act *plugin.Action, ids []int64, out 
 	case k == plugin.KindAuth || k == plugin.KindSettings:
 		reason := errText(err)
 		if k == plugin.KindSettings {
-			reason = locales.RunPluginFillIn(strings.Join(p.MissingSettings(), ", "))
+			reason = locales.RunPluginFillIn(strings.Join(pluginDisplayMissing(p), ", "))
 		}
 		id := p.Manifest.ID
-		a.toasts = append(a.toasts, toastMsg{text: locales.RunPluginNeedsSetup(p.Manifest.Name, reason), error: true,
+		a.toasts = append(a.toasts, toastMsg{text: locales.RunPluginNeedsSetup(a.pluginName(p.Manifest.ID), reason), error: true,
 			action: locales.GetBooksOpenPluginSettings(), onAction: func() { a.openPlugins(id) }})
 		return
 	default:
@@ -581,6 +592,7 @@ type formReply struct {
 }
 
 func newFormAsk(p *plugin.Plugin, act *plugin.Action, f plugin.Form, reply chan formReply, book *formBook) *formAsk {
+	f = pluginDisplayForm(p.Manifest.ID, f)
 	fa := &formAsk{p: p, act: act, form: f, reply: reply, book: book,
 		texts: make([]string, len(f.Fields)), bools: make([]bool, len(f.Fields)), sets: make([][]bool, len(f.Fields)), queries: make([]string, len(f.Fields))}
 	for i, fd := range f.Fields {
@@ -775,6 +787,7 @@ type actionResults struct {
 	title, message string
 	ids            []int64 // the books it ran on, to run it again
 	groups         []plugin.Group
+	duplicates     *libraryDuplicateResult
 
 	version int // of the books rows was made for
 	rows    []resultRow
@@ -785,14 +798,29 @@ type actionResults struct {
 
 // resultRow is a row of the results: a group's header, or a book.
 type resultRow struct {
-	header string // a group's title
-	count  int    // the group's books
-	book   *calibre.Book
-	note   string
+	header         string // a group's title
+	count          int    // the group's books
+	book           *calibre.Book
+	note           string
+	duplicateGroup int
+}
+
+func (r *actionResults) heading() string {
+	if r.duplicates != nil {
+		return locales.LibraryDuplicateScan()
+	}
+	return r.title
+}
+
+func (row resultRow) groupLabel() string {
+	if row.duplicateGroup != 0 {
+		return locales.LibraryDuplicateGroup(row.header, groupDigits(row.duplicateGroup))
+	}
+	return row.header
 }
 
 func (a *App) showResults(p *plugin.Plugin, act *plugin.Action, ids []int64, out actionOutcome) {
-	a.act.results = &actionResults{plugin: p.Manifest.ID, action: act.ID, title: act.Label(), message: out.message,
+	a.act.results = &actionResults{plugin: p.Manifest.ID, action: act.ID, title: pluginDisplayText(p.Manifest.ID, act.Label()), message: out.message,
 		ids: ids, groups: out.groups, version: -1, cur: -1}
 	a.page = pageLibrary
 	a.curID = 0
@@ -810,6 +838,10 @@ func (r *actionResults) build(byID map[int64]*calibre.Book, version int) {
 		return
 	}
 	r.version, r.rows, r.shown = version, []resultRow{}, []*calibre.Book{}
+	if r.duplicates != nil {
+		r.buildDuplicateRows(byID, version)
+		return
+	}
 	at := map[int64]int{}
 	for _, g := range r.groups {
 		head := -1
@@ -853,6 +885,10 @@ func (r *actionResults) groupCount() int {
 func (a *App) rerunResults() {
 	r := a.act.results
 	if r == nil {
+		return
+	}
+	if r.duplicates != nil {
+		a.runLibraryDuplicateScan()
 		return
 	}
 	for _, p := range a.plugins {

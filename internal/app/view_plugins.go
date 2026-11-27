@@ -160,7 +160,7 @@ func (a *App) pluginsPane(c *ui.Context) {
 			for i, err := range a.pluginErrs {
 				ui.Row(c.Key(i)).Padding(theme.Space8, theme.Space10).Gap(theme.Space8).AlignItems(ui.Start).Children(func() {
 					ui.Icon(c, icons.Alert).FontSize(14).TextColor(pal().Danger.FG)
-					ui.Text(c, err.Error()).FontSize(12).TextColor(pal().Danger.FG).MaxLines(3).Grow(1)
+					ui.Text(c, presentError(err)).FontSize(12).TextColor(pal().Danger.FG).MaxLines(3).Grow(1)
 				})
 			}
 		})
@@ -190,7 +190,7 @@ func (a *App) pluginsPane(c *ui.Context) {
 
 // pluginRow is the PluginRow component.
 func (a *App) pluginRow(c *ui.Context, k knownPlugin) {
-	m := k.manifest
+	m := pluginDisplayManifest(k.manifest)
 	sel := a.pl.sel == m.ID
 	status, tone, loaded := a.pluginStatus(k)
 	pending := status == locales.PluginsStatusNeedsReview()
@@ -314,7 +314,7 @@ func (a *App) choosePluginFolder() {
 // pluginPane is the plugin chosen: what it is, adds and may reach, and
 // its settings.
 func (a *App) pluginPane(c *ui.Context, k knownPlugin) {
-	m := k.manifest
+	m := pluginDisplayManifest(k.manifest)
 	_, _, loaded := a.pluginStatus(k)
 	ui.Row(c).Gap(theme.Space12).AlignItems(ui.Center).Children(func() {
 		pluginTile(c, m, 40)
@@ -690,7 +690,7 @@ func (a *App) consentDialog(c *ui.Context) {
 		return
 	}
 	open := true
-	m := ask.manifest
+	m := pluginDisplayManifest(ask.manifest)
 	// For an update, only what is new is asked.
 	var had *plugin.Permissions
 	if st := a.settings.Plugins[m.ID]; st != nil && st.Granted != nil {
@@ -787,11 +787,7 @@ func (a *App) consentDialog(c *ui.Context) {
 
 // checkText is what a plugin's check() said is missing.
 func checkText(err error) string {
-	var pe *plugin.Error
-	if errors.As(err, &pe) {
-		return pe.Msg
-	}
-	return err.Error()
+	return errText(err)
 }
 
 // libraryReadDetail: see locales.PluginsLibraryReadDetail.

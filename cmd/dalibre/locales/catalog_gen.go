@@ -37,6 +37,1200 @@ type Messages struct{ locale string }
 // source language.
 func In(locale string) Messages { return Messages{locale} }
 
+// ErrorDetails says "Technical details"
+// in the language the app shows.
+func ErrorDetails() string { return In(i18n.Locale()).ErrorDetails() }
+
+// ErrorDetails says "Technical details"
+// in the language of msgs.
+func (msgs Messages) ErrorDetails() string {
+	return Catalog.Format(msgs.locale, "errorDetails", nil)
+}
+
+// ErrorUnexpected says "The operation failed. Retry or check the technical details."
+// in the language the app shows.
+func ErrorUnexpected() string { return In(i18n.Locale()).ErrorUnexpected() }
+
+// ErrorUnexpected says "The operation failed. Retry or check the technical details."
+// in the language of msgs.
+func (msgs Messages) ErrorUnexpected() string {
+	return Catalog.Format(msgs.locale, "errorUnexpected", nil)
+}
+
+// ErrorUnavailable says "The service did not respond. Check the connection and retry."
+// in the language the app shows.
+func ErrorUnavailable() string { return In(i18n.Locale()).ErrorUnavailable() }
+
+// ErrorUnavailable says "The service did not respond. Check the connection and retry."
+// in the language of msgs.
+func (msgs Messages) ErrorUnavailable() string {
+	return Catalog.Format(msgs.locale, "errorUnavailable", nil)
+}
+
+// ErrorTimeout says "The operation timed out. Try again."
+// in the language the app shows.
+func ErrorTimeout() string { return In(i18n.Locale()).ErrorTimeout() }
+
+// ErrorTimeout says "The operation timed out. Try again."
+// in the language of msgs.
+func (msgs Messages) ErrorTimeout() string {
+	return Catalog.Format(msgs.locale, "errorTimeout", nil)
+}
+
+// ErrorPermission says "Access was denied. Check the file permissions or plugin authorization."
+// in the language the app shows.
+func ErrorPermission() string { return In(i18n.Locale()).ErrorPermission() }
+
+// ErrorPermission says "Access was denied. Check the file permissions or plugin authorization."
+// in the language of msgs.
+func (msgs Messages) ErrorPermission() string {
+	return Catalog.Format(msgs.locale, "errorPermission", nil)
+}
+
+// ErrorBusy says "The file or library is in use. Close other programs using it and retry."
+// in the language the app shows.
+func ErrorBusy() string { return In(i18n.Locale()).ErrorBusy() }
+
+// ErrorBusy says "The file or library is in use. Close other programs using it and retry."
+// in the language of msgs.
+func (msgs Messages) ErrorBusy() string {
+	return Catalog.Format(msgs.locale, "errorBusy", nil)
+}
+
+// ErrorMissing says "The file or book is missing. Check the path or reconnect its drive."
+// in the language the app shows.
+func ErrorMissing() string { return In(i18n.Locale()).ErrorMissing() }
+
+// ErrorMissing says "The file or book is missing. Check the path or reconnect its drive."
+// in the language of msgs.
+func (msgs Messages) ErrorMissing() string {
+	return Catalog.Format(msgs.locale, "errorMissing", nil)
+}
+
+// ErrorNotLibrary says "This folder has no Calibre metadata.db file. Choose a Calibre library folder."
+// in the language the app shows.
+func ErrorNotLibrary() string { return In(i18n.Locale()).ErrorNotLibrary() }
+
+// ErrorNotLibrary says "This folder has no Calibre metadata.db file. Choose a Calibre library folder."
+// in the language of msgs.
+func (msgs Messages) ErrorNotLibrary() string {
+	return Catalog.Format(msgs.locale, "errorNotLibrary", nil)
+}
+
+// ErrorUnreadable says "The file could not be read. Check whether it is damaged or unsupported."
+// in the language the app shows.
+func ErrorUnreadable() string { return In(i18n.Locale()).ErrorUnreadable() }
+
+// ErrorUnreadable says "The file could not be read. Check whether it is damaged or unsupported."
+// in the language of msgs.
+func (msgs Messages) ErrorUnreadable() string {
+	return Catalog.Format(msgs.locale, "errorUnreadable", nil)
+}
+
+// ErrorDRM says "This book is protected by DRM. Use an authorized reader to open it."
+// in the language the app shows.
+func ErrorDRM() string { return In(i18n.Locale()).ErrorDRM() }
+
+// ErrorDRM says "This book is protected by DRM. Use an authorized reader to open it."
+// in the language of msgs.
+func (msgs Messages) ErrorDRM() string {
+	return Catalog.Format(msgs.locale, "errorDRM", nil)
+}
+
+// ErrorNotOPDS says "This address is not an OPDS catalog. Check the catalog URL."
+// in the language the app shows.
+func ErrorNotOPDS() string { return In(i18n.Locale()).ErrorNotOPDS() }
+
+// ErrorNotOPDS says "This address is not an OPDS catalog. Check the catalog URL."
+// in the language of msgs.
+func (msgs Messages) ErrorNotOPDS() string {
+	return Catalog.Format(msgs.locale, "errorNotOPDS", nil)
+}
+
+// ErrorRateLimit says "The service is limiting requests. Wait a moment and try again."
+// in the language the app shows.
+func ErrorRateLimit() string { return In(i18n.Locale()).ErrorRateLimit() }
+
+// ErrorRateLimit says "The service is limiting requests. Wait a moment and try again."
+// in the language of msgs.
+func (msgs Messages) ErrorRateLimit() string {
+	return Catalog.Format(msgs.locale, "errorRateLimit", nil)
+}
+
+// ErrorInvalid says "The request or the data returned was invalid. Check the input and retry."
+// in the language the app shows.
+func ErrorInvalid() string { return In(i18n.Locale()).ErrorInvalid() }
+
+// ErrorInvalid says "The request or the data returned was invalid. Check the input and retry."
+// in the language of msgs.
+func (msgs Messages) ErrorInvalid() string {
+	return Catalog.Format(msgs.locale, "errorInvalid", nil)
+}
+
+// ErrorPlugin says "The plugin could not finish. Check its settings and technical details."
+// in the language the app shows.
+func ErrorPlugin() string { return In(i18n.Locale()).ErrorPlugin() }
+
+// ErrorPlugin says "The plugin could not finish. Check its settings and technical details."
+// in the language of msgs.
+func (msgs Messages) ErrorPlugin() string {
+	return Catalog.Format(msgs.locale, "errorPlugin", nil)
+}
+
+// ErrorCancelled says "The operation was cancelled."
+// in the language the app shows.
+func ErrorCancelled() string { return In(i18n.Locale()).ErrorCancelled() }
+
+// ErrorCancelled says "The operation was cancelled."
+// in the language of msgs.
+func (msgs Messages) ErrorCancelled() string {
+	return Catalog.Format(msgs.locale, "errorCancelled", nil)
+}
+
+// ErrorWrite says "Could not write to the library. Check the disk space and folder permissions."
+// in the language the app shows.
+func ErrorWrite() string { return In(i18n.Locale()).ErrorWrite() }
+
+// ErrorWrite says "Could not write to the library. Check the disk space and folder permissions."
+// in the language of msgs.
+func (msgs Messages) ErrorWrite() string {
+	return Catalog.Format(msgs.locale, "errorWrite", nil)
+}
+
+// TechnicalCopy says "Copy details"
+// in the language the app shows.
+func TechnicalCopy() string { return In(i18n.Locale()).TechnicalCopy() }
+
+// TechnicalCopy says "Copy details"
+// in the language of msgs.
+func (msgs Messages) TechnicalCopy() string {
+	return Catalog.Format(msgs.locale, "technicalCopy", nil)
+}
+
+// BatchUnknownAuthor says "Unknown author"
+// in the language the app shows.
+func BatchUnknownAuthor() string { return In(i18n.Locale()).BatchUnknownAuthor() }
+
+// BatchUnknownAuthor says "Unknown author"
+// in the language of msgs.
+func (msgs Messages) BatchUnknownAuthor() string {
+	return Catalog.Format(msgs.locale, "batchUnknownAuthor", nil)
+}
+
+// FeedbackBugTemplate says "**What happened?**\n\n\n**Steps to reproduce**\n\n1. \n\n**What did you expect?**\n\n\n---\ncalibreno {version} · {system}"
+// in the language the app shows.
+func FeedbackBugTemplate(version string, system string) string {
+	return In(i18n.Locale()).FeedbackBugTemplate(version, system)
+}
+
+// FeedbackBugTemplate says "**What happened?**\n\n\n**Steps to reproduce**\n\n1. \n\n**What did you expect?**\n\n\n---\ncalibreno {version} · {system}"
+// in the language of msgs.
+func (msgs Messages) FeedbackBugTemplate(version string, system string) string {
+	return Catalog.Format(msgs.locale, "feedbackBugTemplate", map[string]any{"version": version, "system": system})
+}
+
+// FeedbackFeatureTemplate says "**What would you like calibreno to do?**\n\n\n**Why would it help you?**\n\n"
+// in the language the app shows.
+func FeedbackFeatureTemplate() string { return In(i18n.Locale()).FeedbackFeatureTemplate() }
+
+// FeedbackFeatureTemplate says "**What would you like calibreno to do?**\n\n\n**Why would it help you?**\n\n"
+// in the language of msgs.
+func (msgs Messages) FeedbackFeatureTemplate() string {
+	return Catalog.Format(msgs.locale, "feedbackFeatureTemplate", nil)
+}
+
+// BatchInbox says "To organize"
+// in the language the app shows.
+func BatchInbox() string { return In(i18n.Locale()).BatchInbox() }
+
+// BatchInbox says "To organize"
+// in the language of msgs.
+func (msgs Messages) BatchInbox() string {
+	return Catalog.Format(msgs.locale, "batchInbox", nil)
+}
+
+// MarketMetadata says "Metadata"
+// in the language the app shows.
+func MarketMetadata() string { return In(i18n.Locale()).MarketMetadata() }
+
+// MarketMetadata says "Metadata"
+// in the language of msgs.
+func (msgs Messages) MarketMetadata() string {
+	return Catalog.Format(msgs.locale, "marketMetadata", nil)
+}
+
+// MarketEpub says "EPUB tools"
+// in the language the app shows.
+func MarketEpub() string { return In(i18n.Locale()).MarketEpub() }
+
+// MarketEpub says "EPUB tools"
+// in the language of msgs.
+func (msgs Messages) MarketEpub() string {
+	return Catalog.Format(msgs.locale, "marketEpub", nil)
+}
+
+// MarketSources says "Book sources"
+// in the language the app shows.
+func MarketSources() string { return In(i18n.Locale()).MarketSources() }
+
+// MarketSources says "Book sources"
+// in the language of msgs.
+func (msgs Messages) MarketSources() string {
+	return Catalog.Format(msgs.locale, "marketSources", nil)
+}
+
+// BatchSwitchBusy says "Wait for the current batch operation to finish before switching libraries."
+// in the language the app shows.
+func BatchSwitchBusy() string { return In(i18n.Locale()).BatchSwitchBusy() }
+
+// BatchSwitchBusy says "Wait for the current batch operation to finish before switching libraries."
+// in the language of msgs.
+func (msgs Messages) BatchSwitchBusy() string {
+	return Catalog.Format(msgs.locale, "batchSwitchBusy", nil)
+}
+
+// BatchBack says "Back to batch"
+// in the language the app shows.
+func BatchBack() string { return In(i18n.Locale()).BatchBack() }
+
+// BatchBack says "Back to batch"
+// in the language of msgs.
+func (msgs Messages) BatchBack() string {
+	return Catalog.Format(msgs.locale, "batchBack", nil)
+}
+
+// BatchResults says "Batch results"
+// in the language the app shows.
+func BatchResults() string { return In(i18n.Locale()).BatchResults() }
+
+// BatchResults says "Batch results"
+// in the language of msgs.
+func (msgs Messages) BatchResults() string {
+	return Catalog.Format(msgs.locale, "batchResults", nil)
+}
+
+// BatchAddFiles says "Add books"
+// in the language the app shows.
+func BatchAddFiles() string { return In(i18n.Locale()).BatchAddFiles() }
+
+// BatchAddFiles says "Add books"
+// in the language of msgs.
+func (msgs Messages) BatchAddFiles() string {
+	return Catalog.Format(msgs.locale, "batchAddFiles", nil)
+}
+
+// BatchAddFolders says "Add folders"
+// in the language the app shows.
+func BatchAddFolders() string { return In(i18n.Locale()).BatchAddFolders() }
+
+// BatchAddFolders says "Add folders"
+// in the language of msgs.
+func (msgs Messages) BatchAddFolders() string {
+	return Catalog.Format(msgs.locale, "batchAddFolders", nil)
+}
+
+// BatchEmpty says "No import batches yet"
+// in the language the app shows.
+func BatchEmpty() string { return In(i18n.Locale()).BatchEmpty() }
+
+// BatchEmpty says "No import batches yet"
+// in the language of msgs.
+func (msgs Messages) BatchEmpty() string {
+	return Catalog.Format(msgs.locale, "batchEmpty", nil)
+}
+
+// BatchDrop says "Drop to add books"
+// in the language the app shows.
+func BatchDrop() string { return In(i18n.Locale()).BatchDrop() }
+
+// BatchDrop says "Drop to add books"
+// in the language of msgs.
+func (msgs Messages) BatchDrop() string {
+	return Catalog.Format(msgs.locale, "batchDrop", nil)
+}
+
+// BatchDropHint says "Add files or folders. We’ll check for duplicates and prepare a batch for review."
+// in the language the app shows.
+func BatchDropHint() string { return In(i18n.Locale()).BatchDropHint() }
+
+// BatchDropHint says "Add files or folders. We’ll check for duplicates and prepare a batch for review."
+// in the language of msgs.
+func (msgs Messages) BatchDropHint() string {
+	return Catalog.Format(msgs.locale, "batchDropHint", nil)
+}
+
+// BatchDropQueue says "These files will form a new batch after the current task finishes."
+// in the language the app shows.
+func BatchDropQueue() string { return In(i18n.Locale()).BatchDropQueue() }
+
+// BatchDropQueue says "These files will form a new batch after the current task finishes."
+// in the language of msgs.
+func (msgs Messages) BatchDropQueue() string {
+	return Catalog.Format(msgs.locale, "batchDropQueue", nil)
+}
+
+// BatchSelectedFiles says "Selected files"
+// in the language the app shows.
+func BatchSelectedFiles() string { return In(i18n.Locale()).BatchSelectedFiles() }
+
+// BatchSelectedFiles says "Selected files"
+// in the language of msgs.
+func (msgs Messages) BatchSelectedFiles() string {
+	return Catalog.Format(msgs.locale, "batchSelectedFiles", nil)
+}
+
+// BatchFileCount says "{count, plural, one {# file} other {# files}}"
+// in the language the app shows.
+func BatchFileCount(count int) string { return In(i18n.Locale()).BatchFileCount(count) }
+
+// BatchFileCount says "{count, plural, one {# file} other {# files}}"
+// in the language of msgs.
+func (msgs Messages) BatchFileCount(count int) string {
+	return Catalog.Format(msgs.locale, "batchFileCount", map[string]any{"count": count})
+}
+
+// BatchBookReference says "Library book #{id}"
+// in the language the app shows.
+func BatchBookReference(id string) string { return In(i18n.Locale()).BatchBookReference(id) }
+
+// BatchBookReference says "Library book #{id}"
+// in the language of msgs.
+func (msgs Messages) BatchBookReference(id string) string {
+	return Catalog.Format(msgs.locale, "batchBookReference", map[string]any{"id": id})
+}
+
+// BatchHistory says "Switch batch"
+// in the language the app shows.
+func BatchHistory() string { return In(i18n.Locale()).BatchHistory() }
+
+// BatchHistory says "Switch batch"
+// in the language of msgs.
+func (msgs Messages) BatchHistory() string {
+	return Catalog.Format(msgs.locale, "batchHistory", nil)
+}
+
+// BatchReview says "Duplicates to review"
+// in the language the app shows.
+func BatchReview() string { return In(i18n.Locale()).BatchReview() }
+
+// BatchReview says "Duplicates to review"
+// in the language of msgs.
+func (msgs Messages) BatchReview() string {
+	return Catalog.Format(msgs.locale, "batchReview", nil)
+}
+
+// BatchReviewHint says "Compare new files with the books already in your library."
+// in the language the app shows.
+func BatchReviewHint() string { return In(i18n.Locale()).BatchReviewHint() }
+
+// BatchReviewHint says "Compare new files with the books already in your library."
+// in the language of msgs.
+func (msgs Messages) BatchReviewHint() string {
+	return Catalog.Format(msgs.locale, "batchReviewHint", nil)
+}
+
+// BatchStartReview says "Start duplicate review"
+// in the language the app shows.
+func BatchStartReview() string { return In(i18n.Locale()).BatchStartReview() }
+
+// BatchStartReview says "Start duplicate review"
+// in the language of msgs.
+func (msgs Messages) BatchStartReview() string {
+	return Catalog.Format(msgs.locale, "batchStartReview", nil)
+}
+
+// BatchNeedsMetadata says "Missing metadata"
+// in the language the app shows.
+func BatchNeedsMetadata() string { return In(i18n.Locale()).BatchNeedsMetadata() }
+
+// BatchNeedsMetadata says "Missing metadata"
+// in the language of msgs.
+func (msgs Messages) BatchNeedsMetadata() string {
+	return Catalog.Format(msgs.locale, "batchNeedsMetadata", nil)
+}
+
+// BatchMetadataHint says "Fill missing details on books from this batch."
+// in the language the app shows.
+func BatchMetadataHint() string { return In(i18n.Locale()).BatchMetadataHint() }
+
+// BatchMetadataHint says "Fill missing details on books from this batch."
+// in the language of msgs.
+func (msgs Messages) BatchMetadataHint() string {
+	return Catalog.Format(msgs.locale, "batchMetadataHint", nil)
+}
+
+// BatchStartMetadata says "Batch metadata"
+// in the language the app shows.
+func BatchStartMetadata() string { return In(i18n.Locale()).BatchStartMetadata() }
+
+// BatchStartMetadata says "Batch metadata"
+// in the language of msgs.
+func (msgs Messages) BatchStartMetadata() string {
+	return Catalog.Format(msgs.locale, "batchStartMetadata", nil)
+}
+
+// BatchResumeImport says "Resume import"
+// in the language the app shows.
+func BatchResumeImport() string { return In(i18n.Locale()).BatchResumeImport() }
+
+// BatchResumeImport says "Resume import"
+// in the language of msgs.
+func (msgs Messages) BatchResumeImport() string {
+	return Catalog.Format(msgs.locale, "batchResumeImport", nil)
+}
+
+// BatchTasks says "Batch tasks"
+// in the language the app shows.
+func BatchTasks() string { return In(i18n.Locale()).BatchTasks() }
+
+// BatchTasks says "Batch tasks"
+// in the language of msgs.
+func (msgs Messages) BatchTasks() string {
+	return Catalog.Format(msgs.locale, "batchTasks", nil)
+}
+
+// BatchFormats says "Add format"
+// in the language the app shows.
+func BatchFormats() string { return In(i18n.Locale()).BatchFormats() }
+
+// BatchFormats says "Add format"
+// in the language of msgs.
+func (msgs Messages) BatchFormats() string {
+	return Catalog.Format(msgs.locale, "batchFormats", nil)
+}
+
+// BatchReplaced says "Replaced formats"
+// in the language the app shows.
+func BatchReplaced() string { return In(i18n.Locale()).BatchReplaced() }
+
+// BatchReplaced says "Replaced formats"
+// in the language of msgs.
+func (msgs Messages) BatchReplaced() string {
+	return Catalog.Format(msgs.locale, "batchReplaced", nil)
+}
+
+// BatchExact says "Exact duplicate"
+// in the language the app shows.
+func BatchExact() string { return In(i18n.Locale()).BatchExact() }
+
+// BatchExact says "Exact duplicate"
+// in the language of msgs.
+func (msgs Messages) BatchExact() string {
+	return Catalog.Format(msgs.locale, "batchExact", nil)
+}
+
+// BatchSkipped says "Skipped duplicates"
+// in the language the app shows.
+func BatchSkipped() string { return In(i18n.Locale()).BatchSkipped() }
+
+// BatchSkipped says "Skipped duplicates"
+// in the language of msgs.
+func (msgs Messages) BatchSkipped() string {
+	return Catalog.Format(msgs.locale, "batchSkipped", nil)
+}
+
+// BatchUnsupported says "Unsupported file"
+// in the language the app shows.
+func BatchUnsupported() string { return In(i18n.Locale()).BatchUnsupported() }
+
+// BatchUnsupported says "Unsupported file"
+// in the language of msgs.
+func (msgs Messages) BatchUnsupported() string {
+	return Catalog.Format(msgs.locale, "batchUnsupported", nil)
+}
+
+// BatchFailed says "Import failures"
+// in the language the app shows.
+func BatchFailed() string { return In(i18n.Locale()).BatchFailed() }
+
+// BatchFailed says "Import failures"
+// in the language of msgs.
+func (msgs Messages) BatchFailed() string {
+	return Catalog.Format(msgs.locale, "batchFailed", nil)
+}
+
+// BatchEnriched says "Metadata updated"
+// in the language the app shows.
+func BatchEnriched() string { return In(i18n.Locale()).BatchEnriched() }
+
+// BatchEnriched says "Metadata updated"
+// in the language of msgs.
+func (msgs Messages) BatchEnriched() string {
+	return Catalog.Format(msgs.locale, "batchEnriched", nil)
+}
+
+// BatchAdded says "New books"
+// in the language the app shows.
+func BatchAdded() string { return In(i18n.Locale()).BatchAdded() }
+
+// BatchAdded says "New books"
+// in the language of msgs.
+func (msgs Messages) BatchAdded() string {
+	return Catalog.Format(msgs.locale, "batchAdded", nil)
+}
+
+// BatchWaiting says "Waiting for import"
+// in the language the app shows.
+func BatchWaiting() string { return In(i18n.Locale()).BatchWaiting() }
+
+// BatchWaiting says "Waiting for import"
+// in the language of msgs.
+func (msgs Messages) BatchWaiting() string {
+	return Catalog.Format(msgs.locale, "batchWaiting", nil)
+}
+
+// BatchCompare says "Compare"
+// in the language the app shows.
+func BatchCompare() string { return In(i18n.Locale()).BatchCompare() }
+
+// BatchCompare says "Compare"
+// in the language of msgs.
+func (msgs Messages) BatchCompare() string {
+	return Catalog.Format(msgs.locale, "batchCompare", nil)
+}
+
+// BatchNoPending says "Nothing pending"
+// in the language the app shows.
+func BatchNoPending() string { return In(i18n.Locale()).BatchNoPending() }
+
+// BatchNoPending says "Nothing pending"
+// in the language of msgs.
+func (msgs Messages) BatchNoPending() string {
+	return Catalog.Format(msgs.locale, "batchNoPending", nil)
+}
+
+// BatchReadError says "Could not read this file. Check that the source is accessible, then retry."
+// in the language the app shows.
+func BatchReadError() string { return In(i18n.Locale()).BatchReadError() }
+
+// BatchReadError says "Could not read this file. Check that the source is accessible, then retry."
+// in the language of msgs.
+func (msgs Messages) BatchReadError() string {
+	return Catalog.Format(msgs.locale, "batchReadError", nil)
+}
+
+// BatchCompareError says "Could not read the existing book’s files. Check the library and retry."
+// in the language the app shows.
+func BatchCompareError() string { return In(i18n.Locale()).BatchCompareError() }
+
+// BatchCompareError says "Could not read the existing book’s files. Check the library and retry."
+// in the language of msgs.
+func (msgs Messages) BatchCompareError() string {
+	return Catalog.Format(msgs.locale, "batchCompareError", nil)
+}
+
+// BatchChanged says "The book or its files changed. Check again before continuing."
+// in the language the app shows.
+func BatchChanged() string { return In(i18n.Locale()).BatchChanged() }
+
+// BatchChanged says "The book or its files changed. Check again before continuing."
+// in the language of msgs.
+func (msgs Messages) BatchChanged() string {
+	return Catalog.Format(msgs.locale, "batchChanged", nil)
+}
+
+// BatchWriteError says "Could not write to the library. Close any open copy and check that the folder is writable."
+// in the language the app shows.
+func BatchWriteError() string { return In(i18n.Locale()).BatchWriteError() }
+
+// BatchWriteError says "Could not write to the library. Close any open copy and check that the folder is writable."
+// in the language of msgs.
+func (msgs Messages) BatchWriteError() string {
+	return Catalog.Format(msgs.locale, "batchWriteError", nil)
+}
+
+// BatchCompareTitle says "Review a possible duplicate"
+// in the language the app shows.
+func BatchCompareTitle() string { return In(i18n.Locale()).BatchCompareTitle() }
+
+// BatchCompareTitle says "Review a possible duplicate"
+// in the language of msgs.
+func (msgs Messages) BatchCompareTitle() string {
+	return Catalog.Format(msgs.locale, "batchCompareTitle", nil)
+}
+
+// BatchCompareHint says "Check the book and edition before choosing what to do with the new file."
+// in the language the app shows.
+func BatchCompareHint() string { return In(i18n.Locale()).BatchCompareHint() }
+
+// BatchCompareHint says "Check the book and edition before choosing what to do with the new file."
+// in the language of msgs.
+func (msgs Messages) BatchCompareHint() string {
+	return Catalog.Format(msgs.locale, "batchCompareHint", nil)
+}
+
+// BatchPickCandidate says "Choose a matching book"
+// in the language the app shows.
+func BatchPickCandidate() string { return In(i18n.Locale()).BatchPickCandidate() }
+
+// BatchPickCandidate says "Choose a matching book"
+// in the language of msgs.
+func (msgs Messages) BatchPickCandidate() string {
+	return Catalog.Format(msgs.locale, "batchPickCandidate", nil)
+}
+
+// BatchCandidateFor says "Choose a candidate for {title}"
+// in the language the app shows.
+func BatchCandidateFor(title string) string { return In(i18n.Locale()).BatchCandidateFor(title) }
+
+// BatchCandidateFor says "Choose a candidate for {title}"
+// in the language of msgs.
+func (msgs Messages) BatchCandidateFor(title string) string {
+	return Catalog.Format(msgs.locale, "batchCandidateFor", map[string]any{"title": title})
+}
+
+// BatchCandidateCount says "{count, plural, one {# candidate} other {# candidates}}"
+// in the language the app shows.
+func BatchCandidateCount(count int) string { return In(i18n.Locale()).BatchCandidateCount(count) }
+
+// BatchCandidateCount says "{count, plural, one {# candidate} other {# candidates}}"
+// in the language of msgs.
+func (msgs Messages) BatchCandidateCount(count int) string {
+	return Catalog.Format(msgs.locale, "batchCandidateCount", map[string]any{"count": count})
+}
+
+// BatchSelectedFields says "{count, plural, one {# field selected} other {# fields selected}}"
+// in the language the app shows.
+func BatchSelectedFields(count int) string { return In(i18n.Locale()).BatchSelectedFields(count) }
+
+// BatchSelectedFields says "{count, plural, one {# field selected} other {# fields selected}}"
+// in the language of msgs.
+func (msgs Messages) BatchSelectedFields(count int) string {
+	return Catalog.Format(msgs.locale, "batchSelectedFields", map[string]any{"count": count})
+}
+
+// BatchNameMatch says "Matching title and author"
+// in the language the app shows.
+func BatchNameMatch() string { return In(i18n.Locale()).BatchNameMatch() }
+
+// BatchNameMatch says "Matching title and author"
+// in the language of msgs.
+func (msgs Messages) BatchNameMatch() string {
+	return Catalog.Format(msgs.locale, "batchNameMatch", nil)
+}
+
+// BatchISBNMatch says "Matching ISBN"
+// in the language the app shows.
+func BatchISBNMatch() string { return In(i18n.Locale()).BatchISBNMatch() }
+
+// BatchISBNMatch says "Matching ISBN"
+// in the language of msgs.
+func (msgs Messages) BatchISBNMatch() string {
+	return Catalog.Format(msgs.locale, "batchISBNMatch", nil)
+}
+
+// BatchNewFile says "New file"
+// in the language the app shows.
+func BatchNewFile() string { return In(i18n.Locale()).BatchNewFile() }
+
+// BatchNewFile says "New file"
+// in the language of msgs.
+func (msgs Messages) BatchNewFile() string {
+	return Catalog.Format(msgs.locale, "batchNewFile", nil)
+}
+
+// BatchExistingBook says "Existing library book"
+// in the language the app shows.
+func BatchExistingBook() string { return In(i18n.Locale()).BatchExistingBook() }
+
+// BatchExistingBook says "Existing library book"
+// in the language of msgs.
+func (msgs Messages) BatchExistingBook() string {
+	return Catalog.Format(msgs.locale, "batchExistingBook", nil)
+}
+
+// BatchReplaceConfirm says "The existing file in this format will be replaced. Other formats and book metadata will be kept."
+// in the language the app shows.
+func BatchReplaceConfirm() string { return In(i18n.Locale()).BatchReplaceConfirm() }
+
+// BatchReplaceConfirm says "The existing file in this format will be replaced. Other formats and book metadata will be kept."
+// in the language of msgs.
+func (msgs Messages) BatchReplaceConfirm() string {
+	return Catalog.Format(msgs.locale, "batchReplaceConfirm", nil)
+}
+
+// BatchSuggestFormat says "Suggested action: add this file as another format of the existing book."
+// in the language the app shows.
+func BatchSuggestFormat() string { return In(i18n.Locale()).BatchSuggestFormat() }
+
+// BatchSuggestFormat says "Suggested action: add this file as another format of the existing book."
+// in the language of msgs.
+func (msgs Messages) BatchSuggestFormat() string {
+	return Catalog.Format(msgs.locale, "batchSuggestFormat", nil)
+}
+
+// BatchSuggestEdition says "The publication details differ. Consider keeping this edition as a separate book."
+// in the language the app shows.
+func BatchSuggestEdition() string { return In(i18n.Locale()).BatchSuggestEdition() }
+
+// BatchSuggestEdition says "The publication details differ. Consider keeping this edition as a separate book."
+// in the language of msgs.
+func (msgs Messages) BatchSuggestEdition() string {
+	return Catalog.Format(msgs.locale, "batchSuggestEdition", nil)
+}
+
+// BatchSuggestReview says "The files have the same format and different contents. Review them before deciding."
+// in the language the app shows.
+func BatchSuggestReview() string { return In(i18n.Locale()).BatchSuggestReview() }
+
+// BatchSuggestReview says "The files have the same format and different contents. Review them before deciding."
+// in the language of msgs.
+func (msgs Messages) BatchSuggestReview() string {
+	return Catalog.Format(msgs.locale, "batchSuggestReview", nil)
+}
+
+// BatchConfirmReplace says "Confirm replacement"
+// in the language the app shows.
+func BatchConfirmReplace() string { return In(i18n.Locale()).BatchConfirmReplace() }
+
+// BatchConfirmReplace says "Confirm replacement"
+// in the language of msgs.
+func (msgs Messages) BatchConfirmReplace() string {
+	return Catalog.Format(msgs.locale, "batchConfirmReplace", nil)
+}
+
+// BatchLater says "Do this later"
+// in the language the app shows.
+func BatchLater() string { return In(i18n.Locale()).BatchLater() }
+
+// BatchLater says "Do this later"
+// in the language of msgs.
+func (msgs Messages) BatchLater() string {
+	return Catalog.Format(msgs.locale, "batchLater", nil)
+}
+
+// BatchRecheck says "Check again"
+// in the language the app shows.
+func BatchRecheck() string { return In(i18n.Locale()).BatchRecheck() }
+
+// BatchRecheck says "Check again"
+// in the language of msgs.
+func (msgs Messages) BatchRecheck() string {
+	return Catalog.Format(msgs.locale, "batchRecheck", nil)
+}
+
+// BatchSkip says "Skip this file"
+// in the language the app shows.
+func BatchSkip() string { return In(i18n.Locale()).BatchSkip() }
+
+// BatchSkip says "Skip this file"
+// in the language of msgs.
+func (msgs Messages) BatchSkip() string {
+	return Catalog.Format(msgs.locale, "batchSkip", nil)
+}
+
+// BatchKeepNew says "Keep as a new book"
+// in the language the app shows.
+func BatchKeepNew() string { return In(i18n.Locale()).BatchKeepNew() }
+
+// BatchKeepNew says "Keep as a new book"
+// in the language of msgs.
+func (msgs Messages) BatchKeepNew() string {
+	return Catalog.Format(msgs.locale, "batchKeepNew", nil)
+}
+
+// BatchReplace says "Replace existing format"
+// in the language the app shows.
+func BatchReplace() string { return In(i18n.Locale()).BatchReplace() }
+
+// BatchReplace says "Replace existing format"
+// in the language of msgs.
+func (msgs Messages) BatchReplace() string {
+	return Catalog.Format(msgs.locale, "batchReplace", nil)
+}
+
+// BatchFormatLabel says "Format"
+// in the language the app shows.
+func BatchFormatLabel() string { return In(i18n.Locale()).BatchFormatLabel() }
+
+// BatchFormatLabel says "Format"
+// in the language of msgs.
+func (msgs Messages) BatchFormatLabel() string {
+	return Catalog.Format(msgs.locale, "batchFormatLabel", nil)
+}
+
+// BatchFileSize says "File size"
+// in the language the app shows.
+func BatchFileSize() string { return In(i18n.Locale()).BatchFileSize() }
+
+// BatchFileSize says "File size"
+// in the language of msgs.
+func (msgs Messages) BatchFileSize() string {
+	return Catalog.Format(msgs.locale, "batchFileSize", nil)
+}
+
+// BatchTranslator says "Translator"
+// in the language the app shows.
+func BatchTranslator() string { return In(i18n.Locale()).BatchTranslator() }
+
+// BatchTranslator says "Translator"
+// in the language of msgs.
+func (msgs Messages) BatchTranslator() string {
+	return Catalog.Format(msgs.locale, "batchTranslator", nil)
+}
+
+// BatchFilenameEdition says "Edition from filename"
+// in the language the app shows.
+func BatchFilenameEdition() string { return In(i18n.Locale()).BatchFilenameEdition() }
+
+// BatchFilenameEdition says "Edition from filename"
+// in the language of msgs.
+func (msgs Messages) BatchFilenameEdition() string {
+	return Catalog.Format(msgs.locale, "batchFilenameEdition", nil)
+}
+
+// BatchFileProgress says "{done} of {total} files processed"
+// in the language the app shows.
+func BatchFileProgress(done string, total string) string {
+	return In(i18n.Locale()).BatchFileProgress(done, total)
+}
+
+// BatchFileProgress says "{done} of {total} files processed"
+// in the language of msgs.
+func (msgs Messages) BatchFileProgress(done string, total string) string {
+	return Catalog.Format(msgs.locale, "batchFileProgress", map[string]any{"done": done, "total": total})
+}
+
+// BatchComplete says "All tasks for this batch are complete"
+// in the language the app shows.
+func BatchComplete() string { return In(i18n.Locale()).BatchComplete() }
+
+// BatchComplete says "All tasks for this batch are complete"
+// in the language of msgs.
+func (msgs Messages) BatchComplete() string {
+	return Catalog.Format(msgs.locale, "batchComplete", nil)
+}
+
+// BatchPendingCount says "{count, plural, one {# task left} other {# tasks left}}"
+// in the language the app shows.
+func BatchPendingCount(count int) string { return In(i18n.Locale()).BatchPendingCount(count) }
+
+// BatchPendingCount says "{count, plural, one {# task left} other {# tasks left}}"
+// in the language of msgs.
+func (msgs Messages) BatchPendingCount(count int) string {
+	return Catalog.Format(msgs.locale, "batchPendingCount", map[string]any{"count": count})
+}
+
+// BatchRecords says "Processing history"
+// in the language the app shows.
+func BatchRecords() string { return In(i18n.Locale()).BatchRecords() }
+
+// BatchRecords says "Processing history"
+// in the language of msgs.
+func (msgs Messages) BatchRecords() string {
+	return Catalog.Format(msgs.locale, "batchRecords", nil)
+}
+
+// BatchMetadataChoose says "Select books, then set shared fields or look up each book."
+// in the language the app shows.
+func BatchMetadataChoose() string { return In(i18n.Locale()).BatchMetadataChoose() }
+
+// BatchMetadataChoose says "Select books, then set shared fields or look up each book."
+// in the language of msgs.
+func (msgs Messages) BatchMetadataChoose() string {
+	return Catalog.Format(msgs.locale, "batchMetadataChoose", nil)
+}
+
+// BatchCommon says "Set shared fields"
+// in the language the app shows.
+func BatchCommon() string { return In(i18n.Locale()).BatchCommon() }
+
+// BatchCommon says "Set shared fields"
+// in the language of msgs.
+func (msgs Messages) BatchCommon() string {
+	return Catalog.Format(msgs.locale, "batchCommon", nil)
+}
+
+// BatchCommonHint says "Set a language or publisher, or append tags to the selected books."
+// in the language the app shows.
+func BatchCommonHint() string { return In(i18n.Locale()).BatchCommonHint() }
+
+// BatchCommonHint says "Set a language or publisher, or append tags to the selected books."
+// in the language of msgs.
+func (msgs Messages) BatchCommonHint() string {
+	return Catalog.Format(msgs.locale, "batchCommonHint", nil)
+}
+
+// BatchLookup says "Look up each book"
+// in the language the app shows.
+func BatchLookup() string { return In(i18n.Locale()).BatchLookup() }
+
+// BatchLookup says "Look up each book"
+// in the language of msgs.
+func (msgs Messages) BatchLookup() string {
+	return Catalog.Format(msgs.locale, "batchLookup", nil)
+}
+
+// BatchCommonTitle says "Shared metadata"
+// in the language the app shows.
+func BatchCommonTitle() string { return In(i18n.Locale()).BatchCommonTitle() }
+
+// BatchCommonTitle says "Shared metadata"
+// in the language of msgs.
+func (msgs Messages) BatchCommonTitle() string {
+	return Catalog.Format(msgs.locale, "batchCommonTitle", nil)
+}
+
+// BatchLookupTitle says "Search a metadata source"
+// in the language the app shows.
+func BatchLookupTitle() string { return In(i18n.Locale()).BatchLookupTitle() }
+
+// BatchLookupTitle says "Search a metadata source"
+// in the language of msgs.
+func (msgs Messages) BatchLookupTitle() string {
+	return Catalog.Format(msgs.locale, "batchLookupTitle", nil)
+}
+
+// BatchLookupHint says "Search the selected source by ISBN, or by title and author."
+// in the language the app shows.
+func BatchLookupHint() string { return In(i18n.Locale()).BatchLookupHint() }
+
+// BatchLookupHint says "Search the selected source by ISBN, or by title and author."
+// in the language of msgs.
+func (msgs Messages) BatchLookupHint() string {
+	return Catalog.Format(msgs.locale, "batchLookupHint", nil)
+}
+
+// BatchMissingCover says "Missing cover"
+// in the language the app shows.
+func BatchMissingCover() string { return In(i18n.Locale()).BatchMissingCover() }
+
+// BatchMissingCover says "Missing cover"
+// in the language of msgs.
+func (msgs Messages) BatchMissingCover() string {
+	return Catalog.Format(msgs.locale, "batchMissingCover", nil)
+}
+
+// BatchMissingISBN says "Missing ISBN"
+// in the language the app shows.
+func BatchMissingISBN() string { return In(i18n.Locale()).BatchMissingISBN() }
+
+// BatchMissingISBN says "Missing ISBN"
+// in the language of msgs.
+func (msgs Messages) BatchMissingISBN() string {
+	return Catalog.Format(msgs.locale, "batchMissingISBN", nil)
+}
+
+// BatchMissingDescription says "Missing description"
+// in the language the app shows.
+func BatchMissingDescription() string { return In(i18n.Locale()).BatchMissingDescription() }
+
+// BatchMissingDescription says "Missing description"
+// in the language of msgs.
+func (msgs Messages) BatchMissingDescription() string {
+	return Catalog.Format(msgs.locale, "batchMissingDescription", nil)
+}
+
+// BatchFilter says "Filter batch books"
+// in the language the app shows.
+func BatchFilter() string { return In(i18n.Locale()).BatchFilter() }
+
+// BatchFilter says "Filter batch books"
+// in the language of msgs.
+func (msgs Messages) BatchFilter() string {
+	return Catalog.Format(msgs.locale, "batchFilter", nil)
+}
+
+// BatchSelectVisible says "Select all visible books"
+// in the language the app shows.
+func BatchSelectVisible() string { return In(i18n.Locale()).BatchSelectVisible() }
+
+// BatchSelectVisible says "Select all visible books"
+// in the language of msgs.
+func (msgs Messages) BatchSelectVisible() string {
+	return Catalog.Format(msgs.locale, "batchSelectVisible", nil)
+}
+
+// BatchMarkReviewed says "Mark selected books reviewed"
+// in the language the app shows.
+func BatchMarkReviewed() string { return In(i18n.Locale()).BatchMarkReviewed() }
+
+// BatchMarkReviewed says "Mark selected books reviewed"
+// in the language of msgs.
+func (msgs Messages) BatchMarkReviewed() string {
+	return Catalog.Format(msgs.locale, "batchMarkReviewed", nil)
+}
+
+// BatchLeaveEmpty says "Leave unchanged"
+// in the language the app shows.
+func BatchLeaveEmpty() string { return In(i18n.Locale()).BatchLeaveEmpty() }
+
+// BatchLeaveEmpty says "Leave unchanged"
+// in the language of msgs.
+func (msgs Messages) BatchLeaveEmpty() string {
+	return Catalog.Format(msgs.locale, "batchLeaveEmpty", nil)
+}
+
+// BatchTagHint says "Separate tags with commas. Existing tags are kept and duplicates are removed."
+// in the language the app shows.
+func BatchTagHint() string { return In(i18n.Locale()).BatchTagHint() }
+
+// BatchTagHint says "Separate tags with commas. Existing tags are kept and duplicates are removed."
+// in the language of msgs.
+func (msgs Messages) BatchTagHint() string {
+	return Catalog.Format(msgs.locale, "batchTagHint", nil)
+}
+
+// BatchPreview says "Preview changes"
+// in the language the app shows.
+func BatchPreview() string { return In(i18n.Locale()).BatchPreview() }
+
+// BatchPreview says "Preview changes"
+// in the language of msgs.
+func (msgs Messages) BatchPreview() string {
+	return Catalog.Format(msgs.locale, "batchPreview", nil)
+}
+
+// BatchPreviewHint says "Review the proposed fields for each book before applying changes."
+// in the language the app shows.
+func BatchPreviewHint() string { return In(i18n.Locale()).BatchPreviewHint() }
+
+// BatchPreviewHint says "Review the proposed fields for each book before applying changes."
+// in the language of msgs.
+func (msgs Messages) BatchPreviewHint() string {
+	return Catalog.Format(msgs.locale, "batchPreviewHint", nil)
+}
+
+// BatchFillEmpty says "By default, only empty fields are selected. Select an existing field to confirm replacing its value."
+// in the language the app shows.
+func BatchFillEmpty() string { return In(i18n.Locale()).BatchFillEmpty() }
+
+// BatchFillEmpty says "By default, only empty fields are selected. Select an existing field to confirm replacing its value."
+// in the language of msgs.
+func (msgs Messages) BatchFillEmpty() string {
+	return Catalog.Format(msgs.locale, "batchFillEmpty", nil)
+}
+
+// BatchField says "Field"
+// in the language the app shows.
+func BatchField() string { return In(i18n.Locale()).BatchField() }
+
+// BatchField says "Field"
+// in the language of msgs.
+func (msgs Messages) BatchField() string {
+	return Catalog.Format(msgs.locale, "batchField", nil)
+}
+
+// BatchCurrentValue says "Current value"
+// in the language the app shows.
+func BatchCurrentValue() string { return In(i18n.Locale()).BatchCurrentValue() }
+
+// BatchCurrentValue says "Current value"
+// in the language of msgs.
+func (msgs Messages) BatchCurrentValue() string {
+	return Catalog.Format(msgs.locale, "batchCurrentValue", nil)
+}
+
+// BatchProposedValue says "Proposed value"
+// in the language the app shows.
+func BatchProposedValue() string { return In(i18n.Locale()).BatchProposedValue() }
+
+// BatchProposedValue says "Proposed value"
+// in the language of msgs.
+func (msgs Messages) BatchProposedValue() string {
+	return Catalog.Format(msgs.locale, "batchProposedValue", nil)
+}
+
+// BatchNothingToApply says "No changes to apply"
+// in the language the app shows.
+func BatchNothingToApply() string { return In(i18n.Locale()).BatchNothingToApply() }
+
+// BatchNothingToApply says "No changes to apply"
+// in the language of msgs.
+func (msgs Messages) BatchNothingToApply() string {
+	return Catalog.Format(msgs.locale, "batchNothingToApply", nil)
+}
+
+// BatchApplyMetadata says "Apply selected changes"
+// in the language the app shows.
+func BatchApplyMetadata() string { return In(i18n.Locale()).BatchApplyMetadata() }
+
+// BatchApplyMetadata says "Apply selected changes"
+// in the language of msgs.
+func (msgs Messages) BatchApplyMetadata() string {
+	return Catalog.Format(msgs.locale, "batchApplyMetadata", nil)
+}
+
+// BatchLookupFailed says "Lookup failed"
+// in the language the app shows.
+func BatchLookupFailed() string { return In(i18n.Locale()).BatchLookupFailed() }
+
+// BatchLookupFailed says "Lookup failed"
+// in the language of msgs.
+func (msgs Messages) BatchLookupFailed() string {
+	return Catalog.Format(msgs.locale, "batchLookupFailed", nil)
+}
+
+// BatchLookupTimeout says "Source timed out"
+// in the language the app shows.
+func BatchLookupTimeout() string { return In(i18n.Locale()).BatchLookupTimeout() }
+
+// BatchLookupTimeout says "Source timed out"
+// in the language of msgs.
+func (msgs Messages) BatchLookupTimeout() string {
+	return Catalog.Format(msgs.locale, "batchLookupTimeout", nil)
+}
+
+// BatchLookupSettings says "Source needs configuration"
+// in the language the app shows.
+func BatchLookupSettings() string { return In(i18n.Locale()).BatchLookupSettings() }
+
+// BatchLookupSettings says "Source needs configuration"
+// in the language of msgs.
+func (msgs Messages) BatchLookupSettings() string {
+	return Catalog.Format(msgs.locale, "batchLookupSettings", nil)
+}
+
+// BatchNoMatch says "No matching book found"
+// in the language the app shows.
+func BatchNoMatch() string { return In(i18n.Locale()).BatchNoMatch() }
+
+// BatchNoMatch says "No matching book found"
+// in the language of msgs.
+func (msgs Messages) BatchNoMatch() string {
+	return Catalog.Format(msgs.locale, "batchNoMatch", nil)
+}
+
+// BatchImporting says "Importing books"
+// in the language the app shows.
+func BatchImporting() string { return In(i18n.Locale()).BatchImporting() }
+
+// BatchImporting says "Importing books"
+// in the language of msgs.
+func (msgs Messages) BatchImporting() string {
+	return Catalog.Format(msgs.locale, "batchImporting", nil)
+}
+
+// BatchApplying says "Saving batch changes"
+// in the language the app shows.
+func BatchApplying() string { return In(i18n.Locale()).BatchApplying() }
+
+// BatchApplying says "Saving batch changes"
+// in the language of msgs.
+func (msgs Messages) BatchApplying() string {
+	return Catalog.Format(msgs.locale, "batchApplying", nil)
+}
+
+// BatchConflicts says "{count, plural, one {# book changed during review. Review its current values again.} other {# books changed during re…"
+// in the language the app shows.
+func BatchConflicts(count int) string { return In(i18n.Locale()).BatchConflicts(count) }
+
+// BatchConflicts says "{count, plural, one {# book changed during review. Review its current values again.} other {# books changed during re…"
+// in the language of msgs.
+func (msgs Messages) BatchConflicts(count int) string {
+	return Catalog.Format(msgs.locale, "batchConflicts", map[string]any{"count": count})
+}
+
+// BatchMetadataFailed says "Could not update {count, plural, one {# book.} other {# books.}} Check the library and retry."
+// in the language the app shows.
+func BatchMetadataFailed(count int) string { return In(i18n.Locale()).BatchMetadataFailed(count) }
+
+// BatchMetadataFailed says "Could not update {count, plural, one {# book.} other {# books.}} Check the library and retry."
+// in the language of msgs.
+func (msgs Messages) BatchMetadataFailed(count int) string {
+	return Catalog.Format(msgs.locale, "batchMetadataFailed", map[string]any{"count": count})
+}
+
 // CommonCancel says "Cancel"
 // in the language the app shows.
 func CommonCancel() string { return In(i18n.Locale()).CommonCancel() }
@@ -999,6 +2193,16 @@ func (msgs Messages) FetchMetaCandidates() string {
 	return Catalog.Format(msgs.locale, "fetchMetaCandidates", nil)
 }
 
+// FetchMetaPluginDetails says "Catalog details"
+// in the language the app shows.
+func FetchMetaPluginDetails() string { return In(i18n.Locale()).FetchMetaPluginDetails() }
+
+// FetchMetaPluginDetails says "Catalog details"
+// in the language of msgs.
+func (msgs Messages) FetchMetaPluginDetails() string {
+	return Catalog.Format(msgs.locale, "fetchMetaPluginDetails", nil)
+}
+
 // FetchMetaFieldHeader says "FIELD"
 // in the language the app shows.
 func FetchMetaFieldHeader() string { return In(i18n.Locale()).FetchMetaFieldHeader() }
@@ -1781,21 +2985,21 @@ func (msgs Messages) GetBooksAbout() string {
 	return Catalog.Format(msgs.locale, "getBooksAbout", nil)
 }
 
-// GetBooksFromPlugin says "From the {name} plugin. Dalibre downloads the file and adds it to your library."
+// GetBooksFromPlugin says "From the {name} plugin. calibreno downloads the file and adds it to your library."
 // in the language the app shows.
 func GetBooksFromPlugin(name string) string { return In(i18n.Locale()).GetBooksFromPlugin(name) }
 
-// GetBooksFromPlugin says "From the {name} plugin. Dalibre downloads the file and adds it to your library."
+// GetBooksFromPlugin says "From the {name} plugin. calibreno downloads the file and adds it to your library."
 // in the language of msgs.
 func (msgs Messages) GetBooksFromPlugin(name string) string {
 	return Catalog.Format(msgs.locale, "getBooksFromPlugin", map[string]any{"name": name})
 }
 
-// GetBooksFromCatalog says "From {name}, an OPDS catalog. Dalibre downloads the file and adds it to your library."
+// GetBooksFromCatalog says "From {name}, an OPDS catalog. calibreno downloads the file and adds it to your library."
 // in the language the app shows.
 func GetBooksFromCatalog(name string) string { return In(i18n.Locale()).GetBooksFromCatalog(name) }
 
-// GetBooksFromCatalog says "From {name}, an OPDS catalog. Dalibre downloads the file and adds it to your library."
+// GetBooksFromCatalog says "From {name}, an OPDS catalog. calibreno downloads the file and adds it to your library."
 // in the language of msgs.
 func (msgs Messages) GetBooksFromCatalog(name string) string {
 	return Catalog.Format(msgs.locale, "getBooksFromCatalog", map[string]any{"name": name})
@@ -2047,11 +3251,11 @@ func (msgs Messages) CatalogSignInBody() string {
 	return Catalog.Format(msgs.locale, "catalogSignInBody", nil)
 }
 
-// CatalogCantRead says "Dalibre can’t read this part of {name}"
+// CatalogCantRead says "calibreno can’t read this part of {name}"
 // in the language the app shows.
 func CatalogCantRead(name string) string { return In(i18n.Locale()).CatalogCantRead(name) }
 
-// CatalogCantRead says "Dalibre can’t read this part of {name}"
+// CatalogCantRead says "calibreno can’t read this part of {name}"
 // in the language of msgs.
 func (msgs Messages) CatalogCantRead(name string) string {
 	return Catalog.Format(msgs.locale, "catalogCantRead", map[string]any{"name": name})
@@ -2793,11 +3997,11 @@ func (msgs Messages) AppLibraryGone(path string) string {
 	return Catalog.Format(msgs.locale, "appLibraryGone", map[string]any{"path": path})
 }
 
-// AppWindowTitle says "Dalibre — {name}"
+// AppWindowTitle says "calibreno — {name}"
 // in the language the app shows.
 func AppWindowTitle(name string) string { return In(i18n.Locale()).AppWindowTitle(name) }
 
-// AppWindowTitle says "Dalibre — {name}"
+// AppWindowTitle says "calibreno — {name}"
 // in the language of msgs.
 func (msgs Messages) AppWindowTitle(name string) string {
 	return Catalog.Format(msgs.locale, "appWindowTitle", map[string]any{"name": name})
@@ -3095,11 +4299,11 @@ func (msgs Messages) PluginsRemoveTitle(name string) string {
 	return Catalog.Format(msgs.locale, "pluginsRemoveTitle", map[string]any{"name": name})
 }
 
-// PluginsRemoveMessage says "Dalibre stops loading it and forgets its settings. Its folder stays as it is."
+// PluginsRemoveMessage says "calibreno stops loading it and forgets its settings. Its folder stays as it is."
 // in the language the app shows.
 func PluginsRemoveMessage() string { return In(i18n.Locale()).PluginsRemoveMessage() }
 
-// PluginsRemoveMessage says "Dalibre stops loading it and forgets its settings. Its folder stays as it is."
+// PluginsRemoveMessage says "calibreno stops loading it and forgets its settings. Its folder stays as it is."
 // in the language of msgs.
 func (msgs Messages) PluginsRemoveMessage() string {
 	return Catalog.Format(msgs.locale, "pluginsRemoveMessage", nil)
@@ -3225,11 +4429,11 @@ func (msgs Messages) PluginsInstallDialogTitle() string {
 	return Catalog.Format(msgs.locale, "pluginsInstallDialogTitle", nil)
 }
 
-// PluginsPackageFilter says "Dalibre plugins"
+// PluginsPackageFilter says "calibreno plugins"
 // in the language the app shows.
 func PluginsPackageFilter() string { return In(i18n.Locale()).PluginsPackageFilter() }
 
-// PluginsPackageFilter says "Dalibre plugins"
+// PluginsPackageFilter says "calibreno plugins"
 // in the language of msgs.
 func (msgs Messages) PluginsPackageFilter() string {
 	return Catalog.Format(msgs.locale, "pluginsPackageFilter", nil)
@@ -3265,11 +4469,11 @@ func (msgs Messages) PluginsByAuthor(author string) string {
 	return Catalog.Format(msgs.locale, "pluginsByAuthor", map[string]any{"author": author})
 }
 
-// PluginsAddsToTitle says "ADDS TO DALIBRE"
+// PluginsAddsToTitle says "ADDS TO calibreno"
 // in the language the app shows.
 func PluginsAddsToTitle() string { return In(i18n.Locale()).PluginsAddsToTitle() }
 
-// PluginsAddsToTitle says "ADDS TO DALIBRE"
+// PluginsAddsToTitle says "ADDS TO calibreno"
 // in the language of msgs.
 func (msgs Messages) PluginsAddsToTitle() string {
 	return Catalog.Format(msgs.locale, "pluginsAddsToTitle", nil)
@@ -3357,11 +4561,11 @@ func (msgs Messages) PluginsNoteAllowed() string {
 	return Catalog.Format(msgs.locale, "pluginsNoteAllowed", nil)
 }
 
-// PluginsNoteBuiltIn says "Ships with Dalibre."
+// PluginsNoteBuiltIn says "Ships with calibreno."
 // in the language the app shows.
 func PluginsNoteBuiltIn() string { return In(i18n.Locale()).PluginsNoteBuiltIn() }
 
-// PluginsNoteBuiltIn says "Ships with Dalibre."
+// PluginsNoteBuiltIn says "Ships with calibreno."
 // in the language of msgs.
 func (msgs Messages) PluginsNoteBuiltIn() string {
 	return Catalog.Format(msgs.locale, "pluginsNoteBuiltIn", nil)
@@ -3627,13 +4831,13 @@ func (msgs Messages) PluginsErrIDMismatch(path string, id string, linked string)
 	return Catalog.Format(msgs.locale, "pluginsErrIDMismatch", map[string]any{"path": path, "id": id, "linked": linked})
 }
 
-// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with Dalibre"
+// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with calibreno"
 // in the language the app shows.
 func PluginsErrIDReserved(path string, id string) string {
 	return In(i18n.Locale()).PluginsErrIDReserved(path, id)
 }
 
-// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with Dalibre"
+// PluginsErrIDReserved says "{path}: id \"{id}\" is kept for plugins that ship with calibreno"
 // in the language of msgs.
 func (msgs Messages) PluginsErrIDReserved(path string, id string) string {
 	return Catalog.Format(msgs.locale, "pluginsErrIDReserved", map[string]any{"path": path, "id": id})
@@ -3831,11 +5035,11 @@ func (msgs Messages) PluginsDetailReleaseAsset(tag string, when string, asset st
 	return Catalog.Format(msgs.locale, "pluginsDetailReleaseAsset", map[string]any{"tag": tag, "when": when, "asset": asset, "size": size})
 }
 
-// PluginsNotAPlugin says "This isn’t a Dalibre plugin: {error}"
+// PluginsNotAPlugin says "This isn’t a calibreno plugin: {error}"
 // in the language the app shows.
 func PluginsNotAPlugin(error string) string { return In(i18n.Locale()).PluginsNotAPlugin(error) }
 
-// PluginsNotAPlugin says "This isn’t a Dalibre plugin: {error}"
+// PluginsNotAPlugin says "This isn’t a calibreno plugin: {error}"
 // in the language of msgs.
 func (msgs Messages) PluginsNotAPlugin(error string) string {
 	return Catalog.Format(msgs.locale, "pluginsNotAPlugin", map[string]any{"error": error})
@@ -4071,11 +5275,11 @@ func (msgs Messages) SettingsShowDetailsBody() string {
 	return Catalog.Format(msgs.locale, "settingsShowDetailsBody", nil)
 }
 
-// SettingsLibraryBody says "Dalibre reads and writes calibre libraries: calibre can open the same folder."
+// SettingsLibraryBody says "calibreno reads and writes calibre libraries: calibre can open the same folder."
 // in the language the app shows.
 func SettingsLibraryBody() string { return In(i18n.Locale()).SettingsLibraryBody() }
 
-// SettingsLibraryBody says "Dalibre reads and writes calibre libraries: calibre can open the same folder."
+// SettingsLibraryBody says "calibreno reads and writes calibre libraries: calibre can open the same folder."
 // in the language of msgs.
 func (msgs Messages) SettingsLibraryBody() string {
 	return Catalog.Format(msgs.locale, "settingsLibraryBody", nil)
@@ -4283,11 +5487,11 @@ func (msgs Messages) SettingsLocalNetworkTitle() string {
 	return Catalog.Format(msgs.locale, "settingsLocalNetworkTitle", nil)
 }
 
-// SettingsLocalNetworkBody says "This address is on your network, so Dalibre will reach it only for this catalog. Passwords are kept in the system’s…"
+// SettingsLocalNetworkBody says "This address is on your network, so calibreno will reach it only for this catalog. Passwords are kept in the system…"
 // in the language the app shows.
 func SettingsLocalNetworkBody() string { return In(i18n.Locale()).SettingsLocalNetworkBody() }
 
-// SettingsLocalNetworkBody says "This address is on your network, so Dalibre will reach it only for this catalog. Passwords are kept in the system’s…"
+// SettingsLocalNetworkBody says "This address is on your network, so calibreno will reach it only for this catalog. Passwords are kept in the system…"
 // in the language of msgs.
 func (msgs Messages) SettingsLocalNetworkBody() string {
 	return Catalog.Format(msgs.locale, "settingsLocalNetworkBody", nil)
@@ -4385,11 +5589,11 @@ func (msgs Messages) SettingsSignInBody() string {
 	return Catalog.Format(msgs.locale, "settingsSignInBody", nil)
 }
 
-// SettingsNotCatalogTitle says "That isn’t a catalog Dalibre can read"
+// SettingsNotCatalogTitle says "That isn’t a catalog calibreno can read"
 // in the language the app shows.
 func SettingsNotCatalogTitle() string { return In(i18n.Locale()).SettingsNotCatalogTitle() }
 
-// SettingsNotCatalogTitle says "That isn’t a catalog Dalibre can read"
+// SettingsNotCatalogTitle says "That isn’t a catalog calibreno can read"
 // in the language of msgs.
 func (msgs Messages) SettingsNotCatalogTitle() string {
 	return Catalog.Format(msgs.locale, "settingsNotCatalogTitle", nil)
@@ -4677,11 +5881,11 @@ func (msgs Messages) SettingsInstallGitHubTitle() string {
 	return Catalog.Format(msgs.locale, "settingsInstallGitHubTitle", nil)
 }
 
-// SettingsInstallGitHubBody says "Install from a release or a branch. Dalibre can keep it up to date from the same place."
+// SettingsInstallGitHubBody says "Install from a release or a branch. calibreno can keep it up to date from the same place."
 // in the language the app shows.
 func SettingsInstallGitHubBody() string { return In(i18n.Locale()).SettingsInstallGitHubBody() }
 
-// SettingsInstallGitHubBody says "Install from a release or a branch. Dalibre can keep it up to date from the same place."
+// SettingsInstallGitHubBody says "Install from a release or a branch. calibreno can keep it up to date from the same place."
 // in the language of msgs.
 func (msgs Messages) SettingsInstallGitHubBody() string {
 	return Catalog.Format(msgs.locale, "settingsInstallGitHubBody", nil)
@@ -5039,11 +6243,11 @@ func (msgs Messages) WelcomeHeadline() string {
 	return Catalog.Format(msgs.locale, "welcomeHeadline", nil)
 }
 
-// WelcomeSubtitleFirstRun says "Dalibre reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
+// WelcomeSubtitleFirstRun says "calibreno reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
 // in the language the app shows.
 func WelcomeSubtitleFirstRun() string { return In(i18n.Locale()).WelcomeSubtitleFirstRun() }
 
-// WelcomeSubtitleFirstRun says "Dalibre reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
+// WelcomeSubtitleFirstRun says "calibreno reads and writes calibre libraries. Open the one you have, or start a new one in a folder you choose."
 // in the language of msgs.
 func (msgs Messages) WelcomeSubtitleFirstRun() string {
 	return Catalog.Format(msgs.locale, "welcomeSubtitleFirstRun", nil)
@@ -5173,11 +6377,11 @@ func (msgs Messages) WelcomeOpening(name string) string {
 	return Catalog.Format(msgs.locale, "welcomeOpening", map[string]any{"name": name})
 }
 
-// WelcomeCreateIntro says "Dalibre makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
+// WelcomeCreateIntro says "calibreno makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
 // in the language the app shows.
 func WelcomeCreateIntro() string { return In(i18n.Locale()).WelcomeCreateIntro() }
 
-// WelcomeCreateIntro says "Dalibre makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
+// WelcomeCreateIntro says "calibreno makes a calibre library: a folder with a metadata.db and a folder per author. calibre can open it too."
 // in the language of msgs.
 func (msgs Messages) WelcomeCreateIntro() string {
 	return Catalog.Format(msgs.locale, "welcomeCreateIntro", nil)
@@ -5285,11 +6489,11 @@ func (msgs Messages) WelcomeNotLibraryTitle(name string) string {
 	return Catalog.Format(msgs.locale, "welcomeNotLibraryTitle", map[string]any{"name": name})
 }
 
-// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. Dalibre can make it a new library, or you can pick another folder."
+// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. calibreno can make it a new library, or you can pick another folder."
 // in the language the app shows.
 func WelcomeNotLibraryBody() string { return In(i18n.Locale()).WelcomeNotLibraryBody() }
 
-// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. Dalibre can make it a new library, or you can pick another folder."
+// WelcomeNotLibraryBody says "There’s no metadata.db in this folder. calibreno can make it a new library, or you can pick another folder."
 // in the language of msgs.
 func (msgs Messages) WelcomeNotLibraryBody() string {
 	return Catalog.Format(msgs.locale, "welcomeNotLibraryBody", nil)
@@ -5367,11 +6571,11 @@ func (msgs Messages) AppUpdatesMenu() string {
 	return Catalog.Format(msgs.locale, "appUpdatesMenu", nil)
 }
 
-// AppUpdatesVersion says "Dalibre {version}"
+// AppUpdatesVersion says "calibreno {version}"
 // in the language the app shows.
 func AppUpdatesVersion(version string) string { return In(i18n.Locale()).AppUpdatesVersion(version) }
 
-// AppUpdatesVersion says "Dalibre {version}"
+// AppUpdatesVersion says "calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesVersion(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesVersion", map[string]any{"version": version})
@@ -5447,11 +6651,11 @@ func (msgs Messages) AppUpdatesCheckFailed() string {
 	return Catalog.Format(msgs.locale, "appUpdatesCheckFailed", nil)
 }
 
-// AppUpdatesDisabled says "This copy of Dalibre can’t update itself"
+// AppUpdatesDisabled says "This copy of calibreno can’t update itself"
 // in the language the app shows.
 func AppUpdatesDisabled() string { return In(i18n.Locale()).AppUpdatesDisabled() }
 
-// AppUpdatesDisabled says "This copy of Dalibre can’t update itself"
+// AppUpdatesDisabled says "This copy of calibreno can’t update itself"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesDisabled() string {
 	return Catalog.Format(msgs.locale, "appUpdatesDisabled", nil)
@@ -5477,13 +6681,13 @@ func (msgs Messages) AppUpdatesBeta() string {
 	return Catalog.Format(msgs.locale, "appUpdatesBeta", nil)
 }
 
-// AppUpdatesAvailable says "Dalibre {version} is available"
+// AppUpdatesAvailable says "calibreno {version} is available"
 // in the language the app shows.
 func AppUpdatesAvailable(version string) string {
 	return In(i18n.Locale()).AppUpdatesAvailable(version)
 }
 
-// AppUpdatesAvailable says "Dalibre {version} is available"
+// AppUpdatesAvailable says "calibreno {version} is available"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesAvailable(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesAvailable", map[string]any{"version": version})
@@ -5539,13 +6743,13 @@ func (msgs Messages) AppUpdatesFullNotes() string {
 	return Catalog.Format(msgs.locale, "appUpdatesFullNotes", nil)
 }
 
-// AppUpdatesDownloading says "Downloading Dalibre {version}"
+// AppUpdatesDownloading says "Downloading calibreno {version}"
 // in the language the app shows.
 func AppUpdatesDownloading(version string) string {
 	return In(i18n.Locale()).AppUpdatesDownloading(version)
 }
 
-// AppUpdatesDownloading says "Downloading Dalibre {version}"
+// AppUpdatesDownloading says "Downloading calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesDownloading(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesDownloading", map[string]any{"version": version})
@@ -5575,21 +6779,21 @@ func (msgs Messages) AppUpdatesDownloadingProgress(progress string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesDownloadingProgress", map[string]any{"progress": progress})
 }
 
-// AppUpdatesReady says "Dalibre {version} is ready"
+// AppUpdatesReady says "calibreno {version} is ready"
 // in the language the app shows.
 func AppUpdatesReady(version string) string { return In(i18n.Locale()).AppUpdatesReady(version) }
 
-// AppUpdatesReady says "Dalibre {version} is ready"
+// AppUpdatesReady says "calibreno {version} is ready"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesReady(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesReady", map[string]any{"version": version})
 }
 
-// AppUpdatesReadyBody says "It installs when Dalibre restarts."
+// AppUpdatesReadyBody says "It installs when calibreno restarts."
 // in the language the app shows.
 func AppUpdatesReadyBody() string { return In(i18n.Locale()).AppUpdatesReadyBody() }
 
-// AppUpdatesReadyBody says "It installs when Dalibre restarts."
+// AppUpdatesReadyBody says "It installs when calibreno restarts."
 // in the language of msgs.
 func (msgs Messages) AppUpdatesReadyBody() string {
 	return Catalog.Format(msgs.locale, "appUpdatesReadyBody", nil)
@@ -5615,13 +6819,13 @@ func (msgs Messages) AppUpdatesLater() string {
 	return Catalog.Format(msgs.locale, "appUpdatesLater", nil)
 }
 
-// AppUpdatesInstallFailed says "Couldn’t install Dalibre {version}"
+// AppUpdatesInstallFailed says "Couldn’t install calibreno {version}"
 // in the language the app shows.
 func AppUpdatesInstallFailed(version string) string {
 	return In(i18n.Locale()).AppUpdatesInstallFailed(version)
 }
 
-// AppUpdatesInstallFailed says "Couldn’t install Dalibre {version}"
+// AppUpdatesInstallFailed says "Couldn’t install calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) AppUpdatesInstallFailed(version string) string {
 	return Catalog.Format(msgs.locale, "appUpdatesInstallFailed", map[string]any{"version": version})
@@ -5751,11 +6955,11 @@ func (msgs Messages) SharingOff() string {
 	return Catalog.Format(msgs.locale, "sharingOff", nil)
 }
 
-// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while Dalibre is o…"
+// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while calibreno is…"
 // in the language the app shows.
 func McpBody() string { return In(i18n.Locale()).McpBody() }
 
-// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while Dalibre is o…"
+// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while calibreno is…"
 // in the language of msgs.
 func (msgs Messages) McpBody() string {
 	return Catalog.Format(msgs.locale, "mcpBody", nil)
@@ -6733,11 +7937,11 @@ func (msgs Messages) WirelessLost(device string) string {
 	return Catalog.Format(msgs.locale, "wirelessLost", map[string]any{"device": device})
 }
 
-// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to Dalibre the same way: in KOReader, Ca…"
+// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to calibreno the same way: in KOReader, …"
 // in the language the app shows.
 func WirelessBody() string { return In(i18n.Locale()).WirelessBody() }
 
-// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to Dalibre the same way: in KOReader, Ca…"
+// WirelessBody says "Reading apps that connect to calibre over Wi‑Fi, such as KOReader, connect to calibreno the same way: in KOReader, …"
 // in the language of msgs.
 func (msgs Messages) WirelessBody() string {
 	return Catalog.Format(msgs.locale, "wirelessBody", nil)
@@ -7091,11 +8295,11 @@ func (msgs Messages) PluginsBookFilesAccess() string {
 	return Catalog.Format(msgs.locale, "pluginsBookFilesAccess", nil)
 }
 
-// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through Dalibre, never your other files."
+// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through calibreno, never your other files."
 // in the language the app shows.
 func PluginsBookFilesAccessDetail() string { return In(i18n.Locale()).PluginsBookFilesAccessDetail() }
 
-// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through Dalibre, never your other files."
+// PluginsBookFilesAccessDetail says "The books you add, and those you run it on. Only through calibreno, never your other files."
 // in the language of msgs.
 func (msgs Messages) PluginsBookFilesAccessDetail() string {
 	return Catalog.Format(msgs.locale, "pluginsBookFilesAccessDetail", nil)
@@ -7277,6 +8481,102 @@ func MainNavTools() string { return In(i18n.Locale()).MainNavTools() }
 // in the language of msgs.
 func (msgs Messages) MainNavTools() string {
 	return Catalog.Format(msgs.locale, "mainNavTools", nil)
+}
+
+// LibraryDuplicateScan says "Scan library for duplicates"
+// in the language the app shows.
+func LibraryDuplicateScan() string { return In(i18n.Locale()).LibraryDuplicateScan() }
+
+// LibraryDuplicateScan says "Scan library for duplicates"
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateScan() string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateScan", nil)
+}
+
+// LibraryDuplicateScanning says "Scanning for duplicate files"
+// in the language the app shows.
+func LibraryDuplicateScanning() string { return In(i18n.Locale()).LibraryDuplicateScanning() }
+
+// LibraryDuplicateScanning says "Scanning for duplicate files"
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateScanning() string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateScanning", nil)
+}
+
+// LibraryDuplicateCancelled says "Duplicate scan stopped."
+// in the language the app shows.
+func LibraryDuplicateCancelled() string { return In(i18n.Locale()).LibraryDuplicateCancelled() }
+
+// LibraryDuplicateCancelled says "Duplicate scan stopped."
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateCancelled() string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateCancelled", nil)
+}
+
+// LibraryDuplicateSummary says "Books scanned: {books} · Files checked: {files}"
+// in the language the app shows.
+func LibraryDuplicateSummary(books string, files string) string {
+	return In(i18n.Locale()).LibraryDuplicateSummary(books, files)
+}
+
+// LibraryDuplicateSummary says "Books scanned: {books} · Files checked: {files}"
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateSummary(books string, files string) string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateSummary", map[string]any{"books": books, "files": files})
+}
+
+// LibraryDuplicateGroup says "{format} files match · Group {group}"
+// in the language the app shows.
+func LibraryDuplicateGroup(format string, group string) string {
+	return In(i18n.Locale()).LibraryDuplicateGroup(format, group)
+}
+
+// LibraryDuplicateGroup says "{format} files match · Group {group}"
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateGroup(format string, group string) string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateGroup", map[string]any{"format": format, "group": group})
+}
+
+// LibraryDuplicateNone says "No identical files found."
+// in the language the app shows.
+func LibraryDuplicateNone() string { return In(i18n.Locale()).LibraryDuplicateNone() }
+
+// LibraryDuplicateNone says "No identical files found."
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateNone() string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateNone", nil)
+}
+
+// LibraryDuplicateNoneReadable says "No identical files found in the files that could be read."
+// in the language the app shows.
+func LibraryDuplicateNoneReadable() string { return In(i18n.Locale()).LibraryDuplicateNoneReadable() }
+
+// LibraryDuplicateNoneReadable says "No identical files found in the files that could be read."
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateNoneReadable() string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateNoneReadable", nil)
+}
+
+// LibraryDuplicateStale says "The library has changed. Scan again to see current results."
+// in the language the app shows.
+func LibraryDuplicateStale() string { return In(i18n.Locale()).LibraryDuplicateStale() }
+
+// LibraryDuplicateStale says "The library has changed. Scan again to see current results."
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateStale() string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateStale", nil)
+}
+
+// LibraryDuplicateUnreadable says "{count, plural, one {# unreadable file skipped} other {# unreadable files skipped}}"
+// in the language the app shows.
+func LibraryDuplicateUnreadable(count int) string {
+	return In(i18n.Locale()).LibraryDuplicateUnreadable(count)
+}
+
+// LibraryDuplicateUnreadable says "{count, plural, one {# unreadable file skipped} other {# unreadable files skipped}}"
+// in the language of msgs.
+func (msgs Messages) LibraryDuplicateUnreadable(count int) string {
+	return Catalog.Format(msgs.locale, "libraryDuplicateUnreadable", map[string]any{"count": count})
 }
 
 // ActionFailed says "{action} failed: {reason}"
@@ -7647,23 +8947,23 @@ func (msgs Messages) PluginsNotANumber(name string) string {
 	return Catalog.Format(msgs.locale, "pluginsNotANumber", map[string]any{"name": name})
 }
 
-// MarketNeedsDalibre says "Needs Dalibre {version}"
+// MarketNeedsDalibre says "Needs calibreno {version}"
 // in the language the app shows.
 func MarketNeedsDalibre(version string) string { return In(i18n.Locale()).MarketNeedsDalibre(version) }
 
-// MarketNeedsDalibre says "Needs Dalibre {version}"
+// MarketNeedsDalibre says "Needs calibreno {version}"
 // in the language of msgs.
 func (msgs Messages) MarketNeedsDalibre(version string) string {
 	return Catalog.Format(msgs.locale, "marketNeedsDalibre", map[string]any{"version": version})
 }
 
-// MarketNeedsDalibreNote says "It needs Dalibre {version} or newer: update Dalibre to install it."
+// MarketNeedsDalibreNote says "It needs calibreno {version} or newer: update calibreno to install it."
 // in the language the app shows.
 func MarketNeedsDalibreNote(version string) string {
 	return In(i18n.Locale()).MarketNeedsDalibreNote(version)
 }
 
-// MarketNeedsDalibreNote says "It needs Dalibre {version} or newer: update Dalibre to install it."
+// MarketNeedsDalibreNote says "It needs calibreno {version} or newer: update calibreno to install it."
 // in the language of msgs.
 func (msgs Messages) MarketNeedsDalibreNote(version string) string {
 	return Catalog.Format(msgs.locale, "marketNeedsDalibreNote", map[string]any{"version": version})
@@ -7729,11 +9029,11 @@ func (msgs Messages) ToolsNotSandboxed() string {
 	return Catalog.Format(msgs.locale, "toolsNotSandboxed", nil)
 }
 
-// ToolsInstallsWith says "Dalibre installs it with {command}."
+// ToolsInstallsWith says "calibreno installs it with {command}."
 // in the language the app shows.
 func ToolsInstallsWith(command string) string { return In(i18n.Locale()).ToolsInstallsWith(command) }
 
-// ToolsInstallsWith says "Dalibre installs it with {command}."
+// ToolsInstallsWith says "calibreno installs it with {command}."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallsWith(command string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallsWith", map[string]any{"command": command})
@@ -7815,21 +9115,21 @@ func (msgs Messages) ToolsChooseFileTitle(tool string) string {
 	return Catalog.Format(msgs.locale, "toolsChooseFileTitle", map[string]any{"tool": tool})
 }
 
-// ToolsDownloadTitle says "Download with Dalibre"
+// ToolsDownloadTitle says "Download with calibreno"
 // in the language the app shows.
 func ToolsDownloadTitle() string { return In(i18n.Locale()).ToolsDownloadTitle() }
 
-// ToolsDownloadTitle says "Download with Dalibre"
+// ToolsDownloadTitle says "Download with calibreno"
 // in the language of msgs.
 func (msgs Messages) ToolsDownloadTitle() string {
 	return Catalog.Format(msgs.locale, "toolsDownloadTitle", nil)
 }
 
-// ToolsDownloadDetail says "From {host}. Only Dalibre uses it, and it goes with the plugin."
+// ToolsDownloadDetail says "From {host}. Only calibreno uses it, and it goes with the plugin."
 // in the language the app shows.
 func ToolsDownloadDetail(host string) string { return In(i18n.Locale()).ToolsDownloadDetail(host) }
 
-// ToolsDownloadDetail says "From {host}. Only Dalibre uses it, and it goes with the plugin."
+// ToolsDownloadDetail says "From {host}. Only calibreno uses it, and it goes with the plugin."
 // in the language of msgs.
 func (msgs Messages) ToolsDownloadDetail(host string) string {
 	return Catalog.Format(msgs.locale, "toolsDownloadDetail", map[string]any{"host": host})
@@ -7845,23 +9145,23 @@ func (msgs Messages) ToolsInstallWith(manager string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallWith", map[string]any{"manager": manager})
 }
 
-// ToolsInstallWithDetail says "Dalibre runs {command}. You can use it in Terminal too, and it updates with the others."
+// ToolsInstallWithDetail says "calibreno runs {command}. You can use it in Terminal too, and it updates with the others."
 // in the language the app shows.
 func ToolsInstallWithDetail(command string) string {
 	return In(i18n.Locale()).ToolsInstallWithDetail(command)
 }
 
-// ToolsInstallWithDetail says "Dalibre runs {command}. You can use it in Terminal too, and it updates with the others."
+// ToolsInstallWithDetail says "calibreno runs {command}. You can use it in Terminal too, and it updates with the others."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallWithDetail(command string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallWithDetail", map[string]any{"command": command})
 }
 
-// ToolsInstallWithWingetDetail says "Dalibre runs winget for you, accepting the package’s license. You can use it in Terminal too."
+// ToolsInstallWithWingetDetail says "calibreno runs winget for you, accepting the package’s license. You can use it in Terminal too."
 // in the language the app shows.
 func ToolsInstallWithWingetDetail() string { return In(i18n.Locale()).ToolsInstallWithWingetDetail() }
 
-// ToolsInstallWithWingetDetail says "Dalibre runs winget for you, accepting the package’s license. You can use it in Terminal too."
+// ToolsInstallWithWingetDetail says "calibreno runs winget for you, accepting the package’s license. You can use it in Terminal too."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallWithWingetDetail() string {
 	return Catalog.Format(msgs.locale, "toolsInstallWithWingetDetail", nil)
@@ -7909,11 +9209,11 @@ func (msgs Messages) ToolsSandboxNote(tools string) string {
 	return Catalog.Format(msgs.locale, "toolsSandboxNote", map[string]any{"tools": tools})
 }
 
-// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what Dalibre downloaded."
+// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what calibreno downloaded."
 // in the language the app shows.
 func ToolsSectionNote(tools string) string { return In(i18n.Locale()).ToolsSectionNote(tools) }
 
-// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what Dalibre downloaded."
+// ToolsSectionNote says "{tools} runs outside the sandbox. Uninstalling the plugin removes only what calibreno downloaded."
 // in the language of msgs.
 func (msgs Messages) ToolsSectionNote(tools string) string {
 	return Catalog.Format(msgs.locale, "toolsSectionNote", map[string]any{"tools": tools})
@@ -7953,11 +9253,11 @@ func (msgs Messages) ToolsFailed(error string) string {
 	return Catalog.Format(msgs.locale, "toolsFailed", map[string]any{"error": error})
 }
 
-// ToolsFromDownload says "Downloaded by Dalibre · {size}"
+// ToolsFromDownload says "Downloaded by calibreno · {size}"
 // in the language the app shows.
 func ToolsFromDownload(size string) string { return In(i18n.Locale()).ToolsFromDownload(size) }
 
-// ToolsFromDownload says "Downloaded by Dalibre · {size}"
+// ToolsFromDownload says "Downloaded by calibreno · {size}"
 // in the language of msgs.
 func (msgs Messages) ToolsFromDownload(size string) string {
 	return Catalog.Format(msgs.locale, "toolsFromDownload", map[string]any{"size": size})
@@ -8121,13 +9421,13 @@ func (msgs Messages) ToolsInstallFailedTitle(manager string, tool string) string
 	return Catalog.Format(msgs.locale, "toolsInstallFailedTitle", map[string]any{"manager": manager, "tool": tool})
 }
 
-// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. Dalibre can download it itself instead."
+// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. calibreno can download it itself instead."
 // in the language the app shows.
 func ToolsInstallFailedBody(plugin string) string {
 	return In(i18n.Locale()).ToolsInstallFailedBody(plugin)
 }
 
-// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. Dalibre can download it itself instead."
+// ToolsInstallFailedBody says "{plugin} stays off until it has the tool. calibreno can download it itself instead."
 // in the language of msgs.
 func (msgs Messages) ToolsInstallFailedBody(plugin string) string {
 	return Catalog.Format(msgs.locale, "toolsInstallFailedBody", map[string]any{"plugin": plugin})
@@ -8153,11 +9453,11 @@ func (msgs Messages) ToolsCopyLog() string {
 	return Catalog.Format(msgs.locale, "toolsCopyLog", nil)
 }
 
-// ToolsDownloadInstead says "Download with Dalibre · {size}"
+// ToolsDownloadInstead says "Download with calibreno · {size}"
 // in the language the app shows.
 func ToolsDownloadInstead(size string) string { return In(i18n.Locale()).ToolsDownloadInstead(size) }
 
-// ToolsDownloadInstead says "Download with Dalibre · {size}"
+// ToolsDownloadInstead says "Download with calibreno · {size}"
 // in the language of msgs.
 func (msgs Messages) ToolsDownloadInstead(size string) string {
 	return Catalog.Format(msgs.locale, "toolsDownloadInstead", map[string]any{"size": size})
@@ -8213,13 +9513,13 @@ func (msgs Messages) ToolsNoBuild(tool string) string {
 	return Catalog.Format(msgs.locale, "toolsNoBuild", map[string]any{"tool": tool})
 }
 
-// ToolsInstalledNotFound says "{manager} finished, but Dalibre can’t find {tool} {min} or later from it"
+// ToolsInstalledNotFound says "{manager} finished, but calibreno can’t find {tool} {min} or later from it"
 // in the language the app shows.
 func ToolsInstalledNotFound(manager string, tool string, min string) string {
 	return In(i18n.Locale()).ToolsInstalledNotFound(manager, tool, min)
 }
 
-// ToolsInstalledNotFound says "{manager} finished, but Dalibre can’t find {tool} {min} or later from it"
+// ToolsInstalledNotFound says "{manager} finished, but calibreno can’t find {tool} {min} or later from it"
 // in the language of msgs.
 func (msgs Messages) ToolsInstalledNotFound(manager string, tool string, min string) string {
 	return Catalog.Format(msgs.locale, "toolsInstalledNotFound", map[string]any{"manager": manager, "tool": tool, "min": min})
@@ -8855,11 +10155,11 @@ func (msgs Messages) EmailSenderTitle() string {
 	return Catalog.Format(msgs.locale, "emailSenderTitle", nil)
 }
 
-// EmailSenderBody says "The mail account Dalibre sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud an…"
+// EmailSenderBody says "The mail account calibreno sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud …"
 // in the language the app shows.
 func EmailSenderBody() string { return In(i18n.Locale()).EmailSenderBody() }
 
-// EmailSenderBody says "The mail account Dalibre sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud an…"
+// EmailSenderBody says "The mail account calibreno sends from, as set up in a mail app: its SMTP server, address and password. Gmail, iCloud …"
 // in the language of msgs.
 func (msgs Messages) EmailSenderBody() string {
 	return Catalog.Format(msgs.locale, "emailSenderBody", nil)
@@ -8947,21 +10247,21 @@ func (msgs Messages) EmailTestSent(address string, time_ string) string {
 	return Catalog.Format(msgs.locale, "emailTestSent", map[string]any{"address": address, "time": time_})
 }
 
-// EmailTestSubject says "Dalibre test email"
+// EmailTestSubject says "calibreno test email"
 // in the language the app shows.
 func EmailTestSubject() string { return In(i18n.Locale()).EmailTestSubject() }
 
-// EmailTestSubject says "Dalibre test email"
+// EmailTestSubject says "calibreno test email"
 // in the language of msgs.
 func (msgs Messages) EmailTestSubject() string {
 	return Catalog.Format(msgs.locale, "emailTestSubject", nil)
 }
 
-// EmailTestBody says "Dalibre can send mail from this address. Books emailed to your Kindles come from it the same way."
+// EmailTestBody says "calibreno can send mail from this address. Books emailed to your Kindles come from it the same way."
 // in the language the app shows.
 func EmailTestBody() string { return In(i18n.Locale()).EmailTestBody() }
 
-// EmailTestBody says "Dalibre can send mail from this address. Books emailed to your Kindles come from it the same way."
+// EmailTestBody says "calibreno can send mail from this address. Books emailed to your Kindles come from it the same way."
 // in the language of msgs.
 func (msgs Messages) EmailTestBody() string {
 	return Catalog.Format(msgs.locale, "emailTestBody", nil)
@@ -9059,11 +10359,11 @@ func (msgs Messages) LinkCopied(title string) string {
 	return Catalog.Format(msgs.locale, "linkCopied", map[string]any{"title": title})
 }
 
-// LinkNoLibrary says "Couldn’t open the link: its library isn’t one Dalibre has opened"
+// LinkNoLibrary says "Couldn’t open the link: its library isn’t one calibreno has opened"
 // in the language the app shows.
 func LinkNoLibrary() string { return In(i18n.Locale()).LinkNoLibrary() }
 
-// LinkNoLibrary says "Couldn’t open the link: its library isn’t one Dalibre has opened"
+// LinkNoLibrary says "Couldn’t open the link: its library isn’t one calibreno has opened"
 // in the language of msgs.
 func (msgs Messages) LinkNoLibrary() string {
 	return Catalog.Format(msgs.locale, "linkNoLibrary", nil)

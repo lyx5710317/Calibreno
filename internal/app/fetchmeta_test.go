@@ -10,8 +10,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
+	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/plugin"
 	builtin "dalibre/plugins"
 )
@@ -20,6 +22,7 @@ const neodbThreeBody = `{"uuid":"0Oio","category":"book","title":"The Three-Body
 	"language":["en"],"pub_house":"Tor Books","pub_year":2014,"pub_month":11,"isbn":"9780765382030",
 	"tags":["science fiction","china"],"description":"The Three-Body Problem is the first chance for English-speaking readers.",
 	"cover_image_url":"https://neodb.social/m/cover.png","series":"Remembrance of Earth's Past",
+	"rating":8.8,"rating_count":21,"translator":["Ken Liu"],"pages":400,"binding":"Hardcover",
 	"external_resources":[{"url":"https://www.goodreads.com/book/show/20518872"}]}`
 
 const neodbSanTi = `{"uuid":"7OGq","category":"book","title":"三体","author":["刘慈欣"],"language":["zh"],
@@ -180,6 +183,24 @@ func TestFetchMetadataStates(t *testing.T) {
 	tt.Frame()
 	if !tt.HasText("No plugin fetches metadata") {
 		t.Fatalf("no plugins: %q", tt.Texts())
+	}
+}
+
+func TestFetchMetadataChineseDetails(t *testing.T) {
+	i18n.SetLocaleFunc(func() string { return "zh-Hans" })
+	t.Cleanup(func() { i18n.SetLocaleFunc(nil) })
+	a, _ := neodbApp(t)
+	tt := ui.NewTester(a.View, 1440, 900)
+	tt.SetLocale("zh-Hans")
+	tt.Frame()
+	clickBatch(t, tt, "The Three-Body Problem")
+	a.openEditor(a.current())
+	tt.Frame()
+	clickBatch(t, tt, locales.CommonFetchMetadata())
+	for _, label := range []string{locales.FetchMetaPluginDetails(), "8.8 / 10（21 人评分）", "译者", "Ken Liu", "页数", "装帧", "精装"} {
+		if !tt.HasText(label) {
+			t.Errorf("missing localized source detail %q", label)
+		}
 	}
 }
 

@@ -36,6 +36,7 @@ const (
 	pageGetBooks
 	pageCatalog // an OPDS catalog's feeds
 	pageDevice  // a reader plugged in: its library (devices.go)
+	pageBatch   // import work and its durable review queue
 )
 
 type getBooksState struct {

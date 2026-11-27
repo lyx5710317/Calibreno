@@ -107,7 +107,7 @@ func (a *App) savePluginValues(m *plugin.Manifest, values map[string]string, don
 		}
 		a.post(func() {
 			if err != nil {
-				a.toastError(errors.New(locales.PluginsKeychainFailed(m.Name, err.Error())))
+				a.toastError(errors.New(locales.PluginsKeychainFailed(m.Name, presentError(err))))
 				return
 			}
 			a.settings.Plugin(m.ID).Values = plain

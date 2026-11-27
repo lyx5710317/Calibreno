@@ -217,6 +217,15 @@ func (l *Library) Book(id int64) (*Book, error) {
 	return books[0], nil
 }
 
+// BookByUUID identifies an import even if the caller exited before recording its row ID.
+func (l *Library) BookByUUID(uuid string) (*Book, error) {
+	var id int64
+	if err := l.db.QueryRow("SELECT id FROM books WHERE uuid = ?", uuid).Scan(&id); err != nil {
+		return nil, err
+	}
+	return l.Book(id)
+}
+
 // loadBooks loads the book with the id, or every book when id is 0.
 func (l *Library) loadBooks(id int64) ([]*Book, error) {
 	where, linkWhere := "", ""

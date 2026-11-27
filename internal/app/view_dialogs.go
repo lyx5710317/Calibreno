@@ -31,11 +31,11 @@ func (a *App) dialogs(c *ui.Context) {
 	a.toolInstallDialog(c)
 	a.notLibrarySheet(c)
 	a.createLibrarySheet(c)
-	a.importReviewSheet(c)
 	a.appUpdateDialog(c)
 	a.formDialog(c)
 	a.reviewDialog(c)
 	a.exportDialog(c)
+	a.errorDetailsDialog(c)
 }
 
 // ---- Edit metadata
@@ -292,7 +292,7 @@ func (a *App) chooseCover() {
 		}
 		a.post(func() {
 			if err != nil {
-				a.toastError(errors.New(locales.DialogsCoverReadFailed(err.Error())))
+				a.toastError(errors.New(locales.DialogsCoverReadFailed(presentError(err))))
 				return
 			}
 			a.edit.cover, a.edit.coverBmp = data, bmp

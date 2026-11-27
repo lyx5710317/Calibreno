@@ -107,9 +107,9 @@ func (a *App) coverWall(c *ui.Context) {
 func (a *App) welcomeContent(c *ui.Context) {
 	ui.Row(c).Gap(theme.Space12).AlignItems(ui.Center).Children(func() {
 		ui.Box(c).Size(36, 36).Radius(9).Background(onDark(1)).Center().Children(func() {
-			ui.Text(c, "D").FontWeight(700).FontSize(18).TextColor(ui.RGBA(0, 0, 0, 1))
+			ui.Text(c, "C").FontWeight(700).FontSize(18).TextColor(ui.RGBA(0, 0, 0, 1))
 		})
-		ui.Text(c, "Dalibre").FontWeight(600).FontSize(17).LetterSpacing(-0.2)
+		ui.Text(c, Name).FontWeight(600).FontSize(17).LetterSpacing(-0.2)
 	})
 	headline := locales.WelcomeHeadline()
 	size := headlineSize(headline, 560)
