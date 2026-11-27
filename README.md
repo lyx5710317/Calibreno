@@ -37,9 +37,25 @@ Build a release (exe + installer in `cmd/dalibre/build`):
 go tool mygo build ./cmd/dalibre
 ```
 
-### Release
+### Releases from this fork
 
-Dalibre updates itself from this repository's GitHub releases. Releases
+This public fork of [djyde/dalibre](https://github.com/djyde/dalibre)
+continues to use [GPL-3.0-or-later](LICENSE). Each release distributed as
+a binary will make the complete corresponding source available at the
+same time. Keep the original copyright and license notices and record
+the fork's changes in [CHANGELOG.md](CHANGELOG.md).
+
+Publish each release from a public Git tag for the commit used to build
+its binaries. Include a source download link in the GitHub Release and
+provide the build and installation scripts, plus any required source
+that the Git tag does not contain. See
+[GPLv3, sections 5 and 6](https://www.gnu.org/licenses/gpl-3.0.html).
+
+### Upstream release process
+
+The bundled updater currently points to `djyde/dalibre`. Configure the
+fork's release repository and its own signing keys before publishing
+updates from this fork. Upstream releases
 are signed with the update key of `go tool mygo keygen`, which is the
 `MYGO_UPDATER_PRIVATE_KEY` secret of the repository; keep a copy in a
 password manager, as installed apps only accept updates it signs.
