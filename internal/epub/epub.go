@@ -17,6 +17,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -284,13 +285,7 @@ func (b *Book) Save() (int64, error) {
 			return 0, err
 		}
 	}
-	tmp := b.path + ".dalibre-part"
-	if err := writeSynced(tmp, out.Bytes()); err != nil {
-		os.Remove(tmp)
-		return 0, err
-	}
-	if err := os.Rename(tmp, b.path); err != nil {
-		os.Remove(tmp)
+	if err := replaceFile(b.path, out.Bytes()); err != nil {
 		return 0, err
 	}
 	// The saved file is the new original: unchanged entries copy from it.
@@ -310,20 +305,30 @@ func (b *Book) Save() (int64, error) {
 	return int64(out.Len()), nil
 }
 
-func writeSynced(name string, data []byte) error {
-	f, err := os.Create(name)
+func replaceFile(name string, data []byte) error {
+	f, err := os.CreateTemp(filepath.Dir(name), ".dalibre-part-*")
 	if err != nil {
 		return err
 	}
+	defer os.Remove(f.Name())
+	defer f.Close()
 	if _, err := f.Write(data); err != nil {
-		f.Close()
+		return err
+	}
+	if info, err := os.Stat(name); err == nil {
+		if err := f.Chmod(info.Mode().Perm()); err != nil {
+			return err
+		}
+	} else if !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
 	if err := f.Sync(); err != nil {
-		f.Close()
 		return err
 	}
-	return f.Close()
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return os.Rename(f.Name(), name)
 }
 
 // ---- The package: container.xml, the OPF, the table of contents.

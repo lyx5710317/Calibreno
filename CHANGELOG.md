@@ -10,6 +10,8 @@ shows, so write them for readers of the app. `mygo build` needs a
 - 新增「待整理」与批次结果。导入后可以复核重复项、批量补资料，并在重新打开应用后继续处理。
 - 批量元数据支持 NeoDB 查询、字段预览和失败项单独重试。
 - 新增只读「全库查重」，按格式和文件内容找出完全相同的文件。
+- Windows x64 新增桌面格式转换，支持 Kindle 格式、EPUB 横竖排和 PDF 逐页 OCR。
+- 支持 BOOXDrop 局域网传书和微信读书网页辅助导入，USB Kindle 可以在发送时按需转换 EPUB。
 
 ## 0.8.0
 

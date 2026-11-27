@@ -17,6 +17,12 @@ import (
 )
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "convert" {
+		if err := convertBook(os.Args[2:], os.Stdout, os.Stderr); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "mcp" {
 		serveMCP()
 		return
@@ -61,7 +67,10 @@ func main() {
 			win.Focus()
 		})
 	})
-	if err := mygo.App.Run(); err != nil {
+	err := mygo.App.Run()
+	a.ShutdownConversion()
+	a.ShutdownUSBTransfer()
+	if err != nil {
 		log.Fatal(err)
 	}
 }

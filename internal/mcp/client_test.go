@@ -13,7 +13,13 @@ import (
 // dalibre-plugin dev reaches the running app with its token and adds a
 // plugin's folder.
 func TestDial(t *testing.T) {
-	s := New(&testHost{lib: testLibrary(t)}, "test", true)
+	h := &testHost{lib: testLibrary(t)}
+	defer func() {
+		for _, p := range h.added {
+			p.Close()
+		}
+	}()
+	s := New(h, "test", true)
 	s.SetToken("secret")
 	srv := httptest.NewServer(s.Handler())
 	defer srv.Close()
@@ -27,6 +33,7 @@ func TestDial(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer cs.Close()
 	var out addPluginOut
 	if err := CallTool(ctx, cs, "add_plugin", map[string]string{"path": dir}, &out); err != nil {
 		t.Fatal(err)

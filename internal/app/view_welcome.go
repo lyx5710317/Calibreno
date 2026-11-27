@@ -141,6 +141,9 @@ func (a *App) welcomeContent(c *ui.Context) {
 			a.openCreateSheet()
 		}
 	})
+	if a.conversionEnabled() && darkButton(c, icons.Replace, locales.ConversionLocal(), false).Clicked() {
+		a.chooseLocalConversion()
+	}
 
 	w := &a.welcome
 	switch {

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -74,6 +75,16 @@ func newTestApp(t *testing.T) *App {
 		t.Fatalf("library not open: %s", msgText(a.loadErr))
 	}
 	return a
+}
+
+func useTestPluginDir(t *testing.T, a *App) {
+	t.Helper()
+	a.pluginDir = t.TempDir()
+	t.Cleanup(func() {
+		for _, p := range a.plugins {
+			p.Close()
+		}
+	})
 }
 
 // shot saves the tester's frame as a PNG when DALIBRE_SHOTS names a folder.
@@ -254,15 +265,30 @@ func TestWelcomeWithoutLibrary(t *testing.T) {
 func TestWelcomeOffersCalibreLibrary(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("APPDATA", filepath.Join(home, "AppData"))
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
 	root := filepath.Join(home, "Calibre Library")
 	lib, err := calibre.Create(root)
 	if err != nil {
 		t.Fatal(err)
 	}
 	lib.Close()
-	prefs := filepath.Join(home, "Library", "Preferences", "calibre")
-	os.MkdirAll(prefs, 0o755)
-	os.WriteFile(filepath.Join(prefs, "global.py.json"), []byte(`{"library_path": "`+root+`"}`), 0o644)
+	config, err := os.UserConfigDir()
+	if err != nil {
+		t.Fatal(err)
+	}
+	prefs := filepath.Join(config, "calibre")
+	if err := os.MkdirAll(prefs, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	data, err := json.Marshal(map[string]string{"library_path": root})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(prefs, "global.py.json"), data, 0o644); err != nil {
+		t.Fatal(err)
+	}
 
 	a := New("")
 	a.run = func(func()) { t.Error("calibre's library was opened before the user asked") }
@@ -278,11 +304,11 @@ func TestWelcomeOffersCalibreLibrary(t *testing.T) {
 func TestWelcomeCreateLibrary(t *testing.T) {
 	a := New("")
 	a.run = func(fn func()) { fn() }
-	t.Cleanup(func() {
+	defer func() {
 		if a.lib != nil {
 			a.lib.Close()
 		}
-	})
+	}()
 	tt := ui.NewTester(a.View, 1440, 900)
 	tt.Frame()
 	if err := tt.Click("Create a new library"); err != nil {
@@ -309,11 +335,11 @@ func TestWelcomeCreateLibrary(t *testing.T) {
 func TestWelcomeFolderNotLibrary(t *testing.T) {
 	a := New("")
 	a.run = func(fn func()) { fn() }
-	t.Cleanup(func() {
+	defer func() {
 		if a.lib != nil {
 			a.lib.Close()
 		}
-	})
+	}()
 	dir := filepath.Join(t.TempDir(), "Downloads")
 	os.MkdirAll(dir, 0o755)
 	os.WriteFile(filepath.Join(dir, "a.epub"), []byte("x"), 0o644)

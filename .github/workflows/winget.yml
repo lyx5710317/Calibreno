@@ -1,5 +1,5 @@
 # Opens a pull request at microsoft/winget-pkgs that adds each published
-# release of Dalibre to WinGet as Dalibre.Dalibre, with its NSIS
+# release from the upstream Dalibre repository to WinGet as Dalibre.Dalibre, with its NSIS
 # installers. It runs on publishing, not on the tag: release.yml uploads
 # to a draft, whose download URLs work only once it is published.
 #
@@ -23,6 +23,7 @@ on:
 
 jobs:
   winget:
+    if: github.repository == 'djyde/dalibre'
     runs-on: ubuntu-latest
     steps:
       - uses: vedantmgoyal9/winget-releaser@v2

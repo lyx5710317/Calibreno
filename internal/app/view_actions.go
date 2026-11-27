@@ -24,6 +24,9 @@ func (a *App) toolsNav(c *ui.Context) {
 		r := a.act.results
 		a.navItem(c, "tool:library-duplicates", icons.Copy, locales.LibraryDuplicateScan(), 0,
 			r != nil && r.duplicates != nil, nil, a.runLibraryDuplicateScan)
+		if a.conversionEnabled() {
+			a.navItem(c, "tool:convert-file", icons.Replace, locales.ConversionLocal(), 0, false, nil, a.chooseLocalConversion)
+		}
 		for _, t := range tools {
 			showing := r != nil && r.plugin == t.p.Manifest.ID && r.action == t.act.ID
 			a.navItem(c, "tool:"+t.p.Manifest.ID+":"+t.act.ID, actionIcon(t.act), pluginDisplayText(t.p.Manifest.ID, t.act.Title), 0, showing, nil, func() {

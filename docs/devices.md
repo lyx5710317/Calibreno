@@ -18,9 +18,14 @@ since 2024) and other readers (Kobo) without changing the app.
   calibre matches).
 - **Send books** from the library's book menu (Send to Kindle), each in
   the first format the reader takes of those the book has (AZW3, MOBI,
-  AZW, …; EPUB, FB2, CBZ and DJVU too on a Kindle with KOReader), or by
-  dropping files on the reader's page. Books in no format the reader
-  takes are said; there is no conversion yet.
+  AZW, …; EPUB, FB2, CBZ and DJVU too on a Kindle with KOReader). Files can
+  also be dropped on the reader's page.
+- **Convert while sending to Kindle** on Windows x64. When the connected
+  Kindle takes AZW3 and the library book has an EPUB but no format the
+  device takes, Calibreno generates a temporary AZW3 and sends it. The
+  first conversion downloads and verifies Epub3-Kindle 0.5.2. Later
+  conversions can use the cached component offline. The library retains
+  the original EPUB, and the temporary files are removed after the transfer.
 - **Remove books** from the reader (book menu, detail, Delete key), after
   asking, with the notes and reading position the reader keeps for them.
   From the library's book menu, Remove from Kindle removes the copies of
@@ -35,6 +40,23 @@ since 2024) and other readers (Kobo) without changing the app.
   without a password on a desktop session, and shows its library. One
   that was ejected and stays plugged in is listed the same way; it is
   never mounted unless chosen.
+
+## BOOX and WeRead
+
+- For **BOOXDrop**, connect the computer and reader to the same network,
+  open BOOXDrop on the reader, and enter the address it displays in
+  Calibreno's **Settings → BOOX**. Test the connection and apply the
+  address, then use **Send to BOOX** from the library's book menu. The
+  app reports confirmed uploads and flags uncertain results so you can
+  check the device before resending. The settings pane and eligible
+  transfer errors offer the device's manual upload page.
+  [BOOX transfer guide](https://help.boox.com/fa5fa/48481/36dc4)
+- For **WeRead**, use **Import to WeRead…** on a library book. Calibreno
+  opens the official shelf and reveals the book's EPUB. Choose
+  **传书到手机** on the website, sign in if requested, and select the
+  EPUB. If the book needs an EPUB, the app opens the conversion dialog
+  with EPUB as the target.
+  [WeRead shelf](https://weread.qq.com/web/shelf)
 
 ## calibre compatibility
 
@@ -124,8 +146,6 @@ reading state are in `KoboReader.sqlite`. Add it to `App.deviceDrivers`.
 
 ## Not done yet
 
-- Conversion on the way to the reader (EPUB → AZW3 for a stock Kindle);
-  see "Capability: Convert" in docs/plugins/capabilities.md.
 - Writing ASIN and cdetype into MOBI/AZW3 files sent, for their covers.
 - Collections, annotations (`My Clippings.txt`), page numbers (APNX).
 - The USB ids of drives on macOS and Windows (they are matched by what

@@ -154,7 +154,7 @@ func TestMCPPortInUse(t *testing.T) {
 // can't take an installed plugin's id, nor remove what the user installed.
 func TestMCPPlugins(t *testing.T) {
 	a := newTestApp(t)
-	a.pluginDir = t.TempDir()
+	useTestPluginDir(t, a)
 	h := mcpHost{a}
 	ctx := context.Background()
 	folder := func(id, hosts string) string {

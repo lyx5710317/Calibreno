@@ -9677,6 +9677,902 @@ func (msgs Messages) DeviceSending(device string) string {
 	return Catalog.Format(msgs.locale, "deviceSending", map[string]any{"device": device})
 }
 
+// DeviceTransferSwitchBusy says "Wait for the reader transfer to finish before switching libraries."
+// in the language the app shows.
+func DeviceTransferSwitchBusy() string { return In(i18n.Locale()).DeviceTransferSwitchBusy() }
+
+// DeviceTransferSwitchBusy says "Wait for the reader transfer to finish before switching libraries."
+// in the language of msgs.
+func (msgs Messages) DeviceTransferSwitchBusy() string {
+	return Catalog.Format(msgs.locale, "deviceTransferSwitchBusy", nil)
+}
+
+// ConversionTitle says "Convert book…"
+// in the language the app shows.
+func ConversionTitle() string { return In(i18n.Locale()).ConversionTitle() }
+
+// ConversionTitle says "Convert book…"
+// in the language of msgs.
+func (msgs Messages) ConversionTitle() string {
+	return Catalog.Format(msgs.locale, "conversionTitle", nil)
+}
+
+// ConversionLocal says "Convert a local file…"
+// in the language the app shows.
+func ConversionLocal() string { return In(i18n.Locale()).ConversionLocal() }
+
+// ConversionLocal says "Convert a local file…"
+// in the language of msgs.
+func (msgs Messages) ConversionLocal() string {
+	return Catalog.Format(msgs.locale, "conversionLocal", nil)
+}
+
+// ConversionFiles says "Convertible ebook files"
+// in the language the app shows.
+func ConversionFiles() string { return In(i18n.Locale()).ConversionFiles() }
+
+// ConversionFiles says "Convertible ebook files"
+// in the language of msgs.
+func (msgs Messages) ConversionFiles() string {
+	return Catalog.Format(msgs.locale, "conversionFiles", nil)
+}
+
+// ConversionSourceFormat says "Source format"
+// in the language the app shows.
+func ConversionSourceFormat() string { return In(i18n.Locale()).ConversionSourceFormat() }
+
+// ConversionSourceFormat says "Source format"
+// in the language of msgs.
+func (msgs Messages) ConversionSourceFormat() string {
+	return Catalog.Format(msgs.locale, "conversionSourceFormat", nil)
+}
+
+// ConversionTargetFormat says "Output format"
+// in the language the app shows.
+func ConversionTargetFormat() string { return In(i18n.Locale()).ConversionTargetFormat() }
+
+// ConversionTargetFormat says "Output format"
+// in the language of msgs.
+func (msgs Messages) ConversionTargetFormat() string {
+	return Catalog.Format(msgs.locale, "conversionTargetFormat", nil)
+}
+
+// ConversionLayout says "Reading direction"
+// in the language the app shows.
+func ConversionLayout() string { return In(i18n.Locale()).ConversionLayout() }
+
+// ConversionLayout says "Reading direction"
+// in the language of msgs.
+func (msgs Messages) ConversionLayout() string {
+	return Catalog.Format(msgs.locale, "conversionLayout", nil)
+}
+
+// ConversionHorizontal says "Horizontal"
+// in the language the app shows.
+func ConversionHorizontal() string { return In(i18n.Locale()).ConversionHorizontal() }
+
+// ConversionHorizontal says "Horizontal"
+// in the language of msgs.
+func (msgs Messages) ConversionHorizontal() string {
+	return Catalog.Format(msgs.locale, "conversionHorizontal", nil)
+}
+
+// ConversionVerticalRTL says "Vertical, right to left"
+// in the language the app shows.
+func ConversionVerticalRTL() string { return In(i18n.Locale()).ConversionVerticalRTL() }
+
+// ConversionVerticalRTL says "Vertical, right to left"
+// in the language of msgs.
+func (msgs Messages) ConversionVerticalRTL() string {
+	return Catalog.Format(msgs.locale, "conversionVerticalRTL", nil)
+}
+
+// ConversionPDFLayout says "PDF reading direction"
+// in the language the app shows.
+func ConversionPDFLayout() string { return In(i18n.Locale()).ConversionPDFLayout() }
+
+// ConversionPDFLayout says "PDF reading direction"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFLayout() string {
+	return Catalog.Format(msgs.locale, "conversionPDFLayout", nil)
+}
+
+// ConversionPDFLanguage says "Recognition language"
+// in the language the app shows.
+func ConversionPDFLanguage() string { return In(i18n.Locale()).ConversionPDFLanguage() }
+
+// ConversionPDFLanguage says "Recognition language"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFLanguage() string {
+	return Catalog.Format(msgs.locale, "conversionPDFLanguage", nil)
+}
+
+// ConversionLanguageAuto says "Automatic"
+// in the language the app shows.
+func ConversionLanguageAuto() string { return In(i18n.Locale()).ConversionLanguageAuto() }
+
+// ConversionLanguageAuto says "Automatic"
+// in the language of msgs.
+func (msgs Messages) ConversionLanguageAuto() string {
+	return Catalog.Format(msgs.locale, "conversionLanguageAuto", nil)
+}
+
+// ConversionLanguageTraditional says "Traditional Chinese"
+// in the language the app shows.
+func ConversionLanguageTraditional() string { return In(i18n.Locale()).ConversionLanguageTraditional() }
+
+// ConversionLanguageTraditional says "Traditional Chinese"
+// in the language of msgs.
+func (msgs Messages) ConversionLanguageTraditional() string {
+	return Catalog.Format(msgs.locale, "conversionLanguageTraditional", nil)
+}
+
+// ConversionLanguageJapanese says "Japanese"
+// in the language the app shows.
+func ConversionLanguageJapanese() string { return In(i18n.Locale()).ConversionLanguageJapanese() }
+
+// ConversionLanguageJapanese says "Japanese"
+// in the language of msgs.
+func (msgs Messages) ConversionLanguageJapanese() string {
+	return Catalog.Format(msgs.locale, "conversionLanguageJapanese", nil)
+}
+
+// ConversionOCR says "Run OCR on all pages"
+// in the language the app shows.
+func ConversionOCR() string { return In(i18n.Locale()).ConversionOCR() }
+
+// ConversionOCR says "Run OCR on all pages"
+// in the language of msgs.
+func (msgs Messages) ConversionOCR() string {
+	return Catalog.Format(msgs.locale, "conversionOCR", nil)
+}
+
+// ConversionPages says "Pages to preview"
+// in the language the app shows.
+func ConversionPages() string { return In(i18n.Locale()).ConversionPages() }
+
+// ConversionPages says "Pages to preview"
+// in the language of msgs.
+func (msgs Messages) ConversionPages() string {
+	return Catalog.Format(msgs.locale, "conversionPages", nil)
+}
+
+// ConversionPageRangeHint says "Example: 1, 3–5"
+// in the language the app shows.
+func ConversionPageRangeHint() string { return In(i18n.Locale()).ConversionPageRangeHint() }
+
+// ConversionPageRangeHint says "Example: 1, 3–5"
+// in the language of msgs.
+func (msgs Messages) ConversionPageRangeHint() string {
+	return Catalog.Format(msgs.locale, "conversionPageRangeHint", nil)
+}
+
+// ConversionInvalidPageRange says "Enter up to 20 pages or ranges within 1–3000."
+// in the language the app shows.
+func ConversionInvalidPageRange() string { return In(i18n.Locale()).ConversionInvalidPageRange() }
+
+// ConversionInvalidPageRange says "Enter up to 20 pages or ranges within 1–3000."
+// in the language of msgs.
+func (msgs Messages) ConversionInvalidPageRange() string {
+	return Catalog.Format(msgs.locale, "conversionInvalidPageRange", nil)
+}
+
+// ConversionPreviewPages says "Preview pages"
+// in the language the app shows.
+func ConversionPreviewPages() string { return In(i18n.Locale()).ConversionPreviewPages() }
+
+// ConversionPreviewPages says "Preview pages"
+// in the language of msgs.
+func (msgs Messages) ConversionPreviewPages() string {
+	return Catalog.Format(msgs.locale, "conversionPreviewPages", nil)
+}
+
+// ConversionReviewPages says "Review pages"
+// in the language the app shows.
+func ConversionReviewPages() string { return In(i18n.Locale()).ConversionReviewPages() }
+
+// ConversionReviewPages says "Review pages"
+// in the language of msgs.
+func (msgs Messages) ConversionReviewPages() string {
+	return Catalog.Format(msgs.locale, "conversionReviewPages", nil)
+}
+
+// ConversionDestination says "Save to"
+// in the language the app shows.
+func ConversionDestination() string { return In(i18n.Locale()).ConversionDestination() }
+
+// ConversionDestination says "Save to"
+// in the language of msgs.
+func (msgs Messages) ConversionDestination() string {
+	return Catalog.Format(msgs.locale, "conversionDestination", nil)
+}
+
+// ConversionToLibrary says "Add format to this book"
+// in the language the app shows.
+func ConversionToLibrary() string { return In(i18n.Locale()).ConversionToLibrary() }
+
+// ConversionToLibrary says "Add format to this book"
+// in the language of msgs.
+func (msgs Messages) ConversionToLibrary() string {
+	return Catalog.Format(msgs.locale, "conversionToLibrary", nil)
+}
+
+// ConversionToCopy says "Save a copy"
+// in the language the app shows.
+func ConversionToCopy() string { return In(i18n.Locale()).ConversionToCopy() }
+
+// ConversionToCopy says "Save a copy"
+// in the language of msgs.
+func (msgs Messages) ConversionToCopy() string {
+	return Catalog.Format(msgs.locale, "conversionToCopy", nil)
+}
+
+// ConversionExistingFormat says "This book already has this format. Save the result as a copy."
+// in the language the app shows.
+func ConversionExistingFormat() string { return In(i18n.Locale()).ConversionExistingFormat() }
+
+// ConversionExistingFormat says "This book already has this format. Save the result as a copy."
+// in the language of msgs.
+func (msgs Messages) ConversionExistingFormat() string {
+	return Catalog.Format(msgs.locale, "conversionExistingFormat", nil)
+}
+
+// ConversionUnsupported says "No conversion is available for this format."
+// in the language the app shows.
+func ConversionUnsupported() string { return In(i18n.Locale()).ConversionUnsupported() }
+
+// ConversionUnsupported says "No conversion is available for this format."
+// in the language of msgs.
+func (msgs Messages) ConversionUnsupported() string {
+	return Catalog.Format(msgs.locale, "conversionUnsupported", nil)
+}
+
+// ConversionSubmit says "Convert"
+// in the language the app shows.
+func ConversionSubmit() string { return In(i18n.Locale()).ConversionSubmit() }
+
+// ConversionSubmit says "Convert"
+// in the language of msgs.
+func (msgs Messages) ConversionSubmit() string {
+	return Catalog.Format(msgs.locale, "conversionSubmit", nil)
+}
+
+// ConversionCopySuffix says "converted"
+// in the language the app shows.
+func ConversionCopySuffix() string { return In(i18n.Locale()).ConversionCopySuffix() }
+
+// ConversionCopySuffix says "converted"
+// in the language of msgs.
+func (msgs Messages) ConversionCopySuffix() string {
+	return Catalog.Format(msgs.locale, "conversionCopySuffix", nil)
+}
+
+// ConversionExpectedExtension says "Choose a file name ending in {extension}."
+// in the language the app shows.
+func ConversionExpectedExtension(extension string) string {
+	return In(i18n.Locale()).ConversionExpectedExtension(extension)
+}
+
+// ConversionExpectedExtension says "Choose a file name ending in {extension}."
+// in the language of msgs.
+func (msgs Messages) ConversionExpectedExtension(extension string) string {
+	return Catalog.Format(msgs.locale, "conversionExpectedExtension", map[string]any{"extension": extension})
+}
+
+// ConversionBusy says "Converting book"
+// in the language the app shows.
+func ConversionBusy() string { return In(i18n.Locale()).ConversionBusy() }
+
+// ConversionBusy says "Converting book"
+// in the language of msgs.
+func (msgs Messages) ConversionBusy() string {
+	return Catalog.Format(msgs.locale, "conversionBusy", nil)
+}
+
+// ConversionSwitchBusy says "Wait for the conversion to finish before switching libraries."
+// in the language the app shows.
+func ConversionSwitchBusy() string { return In(i18n.Locale()).ConversionSwitchBusy() }
+
+// ConversionSwitchBusy says "Wait for the conversion to finish before switching libraries."
+// in the language of msgs.
+func (msgs Messages) ConversionSwitchBusy() string {
+	return Catalog.Format(msgs.locale, "conversionSwitchBusy", nil)
+}
+
+// ConversionFailed says "Book conversion failed"
+// in the language the app shows.
+func ConversionFailed() string { return In(i18n.Locale()).ConversionFailed() }
+
+// ConversionFailed says "Book conversion failed"
+// in the language of msgs.
+func (msgs Messages) ConversionFailed() string {
+	return Catalog.Format(msgs.locale, "conversionFailed", nil)
+}
+
+// ConversionFinished says "Converted to {format}"
+// in the language the app shows.
+func ConversionFinished(format string) string { return In(i18n.Locale()).ConversionFinished(format) }
+
+// ConversionFinished says "Converted to {format}"
+// in the language of msgs.
+func (msgs Messages) ConversionFinished(format string) string {
+	return Catalog.Format(msgs.locale, "conversionFinished", map[string]any{"format": format})
+}
+
+// ConversionFinishedWarnings says "Converted to {format}. Check the content and layout."
+// in the language the app shows.
+func ConversionFinishedWarnings(format string) string {
+	return In(i18n.Locale()).ConversionFinishedWarnings(format)
+}
+
+// ConversionFinishedWarnings says "Converted to {format}. Check the content and layout."
+// in the language of msgs.
+func (msgs Messages) ConversionFinishedWarnings(format string) string {
+	return Catalog.Format(msgs.locale, "conversionFinishedWarnings", map[string]any{"format": format})
+}
+
+// ConversionPDFPagePosition says "Page {page, number} of {total, number}"
+// in the language the app shows.
+func ConversionPDFPagePosition(page int, total int) string {
+	return In(i18n.Locale()).ConversionPDFPagePosition(page, total)
+}
+
+// ConversionPDFPagePosition says "Page {page, number} of {total, number}"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFPagePosition(page int, total int) string {
+	return Catalog.Format(msgs.locale, "conversionPDFPagePosition", map[string]any{"page": page, "total": total})
+}
+
+// ConversionPDFPageNumber says "Page number"
+// in the language the app shows.
+func ConversionPDFPageNumber() string { return In(i18n.Locale()).ConversionPDFPageNumber() }
+
+// ConversionPDFPageNumber says "Page number"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFPageNumber() string {
+	return Catalog.Format(msgs.locale, "conversionPDFPageNumber", nil)
+}
+
+// ConversionPDFGoToPage says "Go to page"
+// in the language the app shows.
+func ConversionPDFGoToPage() string { return In(i18n.Locale()).ConversionPDFGoToPage() }
+
+// ConversionPDFGoToPage says "Go to page"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFGoToPage() string {
+	return Catalog.Format(msgs.locale, "conversionPDFGoToPage", nil)
+}
+
+// ConversionPDFPreviousPage says "Previous page"
+// in the language the app shows.
+func ConversionPDFPreviousPage() string { return In(i18n.Locale()).ConversionPDFPreviousPage() }
+
+// ConversionPDFPreviousPage says "Previous page"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFPreviousPage() string {
+	return Catalog.Format(msgs.locale, "conversionPDFPreviousPage", nil)
+}
+
+// ConversionPDFNextPage says "Next page"
+// in the language the app shows.
+func ConversionPDFNextPage() string { return In(i18n.Locale()).ConversionPDFNextPage() }
+
+// ConversionPDFNextPage says "Next page"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFNextPage() string {
+	return Catalog.Format(msgs.locale, "conversionPDFNextPage", nil)
+}
+
+// ConversionPDFNextReview says "Next page to review"
+// in the language the app shows.
+func ConversionPDFNextReview() string { return In(i18n.Locale()).ConversionPDFNextReview() }
+
+// ConversionPDFNextReview says "Next page to review"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFNextReview() string {
+	return Catalog.Format(msgs.locale, "conversionPDFNextReview", nil)
+}
+
+// ConversionPDFNeedsReview says "Needs review"
+// in the language the app shows.
+func ConversionPDFNeedsReview() string { return In(i18n.Locale()).ConversionPDFNeedsReview() }
+
+// ConversionPDFNeedsReview says "Needs review"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFNeedsReview() string {
+	return Catalog.Format(msgs.locale, "conversionPDFNeedsReview", nil)
+}
+
+// ConversionPDFNotProcessed says "Not yet recognized"
+// in the language the app shows.
+func ConversionPDFNotProcessed() string { return In(i18n.Locale()).ConversionPDFNotProcessed() }
+
+// ConversionPDFNotProcessed says "Not yet recognized"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFNotProcessed() string {
+	return Catalog.Format(msgs.locale, "conversionPDFNotProcessed", nil)
+}
+
+// ConversionPDFRecognized says "Processed"
+// in the language the app shows.
+func ConversionPDFRecognized() string { return In(i18n.Locale()).ConversionPDFRecognized() }
+
+// ConversionPDFRecognized says "Processed"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFRecognized() string {
+	return Catalog.Format(msgs.locale, "conversionPDFRecognized", nil)
+}
+
+// ConversionPDFOriginal says "Original page"
+// in the language the app shows.
+func ConversionPDFOriginal() string { return In(i18n.Locale()).ConversionPDFOriginal() }
+
+// ConversionPDFOriginal says "Original page"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFOriginal() string {
+	return Catalog.Format(msgs.locale, "conversionPDFOriginal", nil)
+}
+
+// ConversionPDFRecognizedText says "Recognized text"
+// in the language the app shows.
+func ConversionPDFRecognizedText() string { return In(i18n.Locale()).ConversionPDFRecognizedText() }
+
+// ConversionPDFRecognizedText says "Recognized text"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFRecognizedText() string {
+	return Catalog.Format(msgs.locale, "conversionPDFRecognizedText", nil)
+}
+
+// ConversionPDFPreviewUnavailable says "No preview for this page"
+// in the language the app shows.
+func ConversionPDFPreviewUnavailable() string {
+	return In(i18n.Locale()).ConversionPDFPreviewUnavailable()
+}
+
+// ConversionPDFPreviewUnavailable says "No preview for this page"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFPreviewUnavailable() string {
+	return Catalog.Format(msgs.locale, "conversionPDFPreviewUnavailable", nil)
+}
+
+// ConversionPDFNoRecognizedText says "No text was recognized on this page."
+// in the language the app shows.
+func ConversionPDFNoRecognizedText() string { return In(i18n.Locale()).ConversionPDFNoRecognizedText() }
+
+// ConversionPDFNoRecognizedText says "No text was recognized on this page."
+// in the language of msgs.
+func (msgs Messages) ConversionPDFNoRecognizedText() string {
+	return Catalog.Format(msgs.locale, "conversionPDFNoRecognizedText", nil)
+}
+
+// ConversionPDFRerun says "Recognize again"
+// in the language the app shows.
+func ConversionPDFRerun() string { return In(i18n.Locale()).ConversionPDFRerun() }
+
+// ConversionPDFRerun says "Recognize again"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFRerun() string {
+	return Catalog.Format(msgs.locale, "conversionPDFRerun", nil)
+}
+
+// ConversionPDFRerunRange says "Pages to recognize again"
+// in the language the app shows.
+func ConversionPDFRerunRange() string { return In(i18n.Locale()).ConversionPDFRerunRange() }
+
+// ConversionPDFRerunRange says "Pages to recognize again"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFRerunRange() string {
+	return Catalog.Format(msgs.locale, "conversionPDFRerunRange", nil)
+}
+
+// ConversionPDFLowConfidence says "Low-confidence text"
+// in the language the app shows.
+func ConversionPDFLowConfidence() string { return In(i18n.Locale()).ConversionPDFLowConfidence() }
+
+// ConversionPDFLowConfidence says "Low-confidence text"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFLowConfidence() string {
+	return Catalog.Format(msgs.locale, "conversionPDFLowConfidence", nil)
+}
+
+// ConversionPDFBack says "Back to conversion"
+// in the language the app shows.
+func ConversionPDFBack() string { return In(i18n.Locale()).ConversionPDFBack() }
+
+// ConversionPDFBack says "Back to conversion"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFBack() string {
+	return Catalog.Format(msgs.locale, "conversionPDFBack", nil)
+}
+
+// ConversionPDFZoom says "Original page zoom"
+// in the language the app shows.
+func ConversionPDFZoom() string { return In(i18n.Locale()).ConversionPDFZoom() }
+
+// ConversionPDFZoom says "Original page zoom"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFZoom() string {
+	return Catalog.Format(msgs.locale, "conversionPDFZoom", nil)
+}
+
+// ConversionPDFFit says "Fit"
+// in the language the app shows.
+func ConversionPDFFit() string { return In(i18n.Locale()).ConversionPDFFit() }
+
+// ConversionPDFFit says "Fit"
+// in the language of msgs.
+func (msgs Messages) ConversionPDFFit() string {
+	return Catalog.Format(msgs.locale, "conversionPDFFit", nil)
+}
+
+// BooxName says "BOOX"
+// in the language the app shows.
+func BooxName() string { return In(i18n.Locale()).BooxName() }
+
+// BooxName says "BOOX"
+// in the language of msgs.
+func (msgs Messages) BooxName() string {
+	return Catalog.Format(msgs.locale, "booxName", nil)
+}
+
+// BooxSetupBody says "Connect your computer and BOOX to the same network. Open BOOXDrop on the device and enter the address it displays."
+// in the language the app shows.
+func BooxSetupBody() string { return In(i18n.Locale()).BooxSetupBody() }
+
+// BooxSetupBody says "Connect your computer and BOOX to the same network. Open BOOXDrop on the device and enter the address it displays."
+// in the language of msgs.
+func (msgs Messages) BooxSetupBody() string {
+	return Catalog.Format(msgs.locale, "booxSetupBody", nil)
+}
+
+// BooxAddress says "BOOXDrop address"
+// in the language the app shows.
+func BooxAddress() string { return In(i18n.Locale()).BooxAddress() }
+
+// BooxAddress says "BOOXDrop address"
+// in the language of msgs.
+func (msgs Messages) BooxAddress() string {
+	return Catalog.Format(msgs.locale, "booxAddress", nil)
+}
+
+// BooxTestConnection says "Test connection"
+// in the language the app shows.
+func BooxTestConnection() string { return In(i18n.Locale()).BooxTestConnection() }
+
+// BooxTestConnection says "Test connection"
+// in the language of msgs.
+func (msgs Messages) BooxTestConnection() string {
+	return Catalog.Format(msgs.locale, "booxTestConnection", nil)
+}
+
+// BooxTesting says "Checking BOOXDrop…"
+// in the language the app shows.
+func BooxTesting() string { return In(i18n.Locale()).BooxTesting() }
+
+// BooxTesting says "Checking BOOXDrop…"
+// in the language of msgs.
+func (msgs Messages) BooxTesting() string {
+	return Catalog.Format(msgs.locale, "booxTesting", nil)
+}
+
+// BooxOpenUpload says "Open device upload page"
+// in the language the app shows.
+func BooxOpenUpload() string { return In(i18n.Locale()).BooxOpenUpload() }
+
+// BooxOpenUpload says "Open device upload page"
+// in the language of msgs.
+func (msgs Messages) BooxOpenUpload() string {
+	return Catalog.Format(msgs.locale, "booxOpenUpload", nil)
+}
+
+// BooxUploadHelp says "Use the device upload page to send a file manually if direct transfer is unavailable."
+// in the language the app shows.
+func BooxUploadHelp() string { return In(i18n.Locale()).BooxUploadHelp() }
+
+// BooxUploadHelp says "Use the device upload page to send a file manually if direct transfer is unavailable."
+// in the language of msgs.
+func (msgs Messages) BooxUploadHelp() string {
+	return Catalog.Format(msgs.locale, "booxUploadHelp", nil)
+}
+
+// BooxSend says "Send to BOOX"
+// in the language the app shows.
+func BooxSend() string { return In(i18n.Locale()).BooxSend() }
+
+// BooxSend says "Send to BOOX"
+// in the language of msgs.
+func (msgs Messages) BooxSend() string {
+	return Catalog.Format(msgs.locale, "booxSend", nil)
+}
+
+// BooxConfigure says "Set up BOOX sending…"
+// in the language the app shows.
+func BooxConfigure() string { return In(i18n.Locale()).BooxConfigure() }
+
+// BooxConfigure says "Set up BOOX sending…"
+// in the language of msgs.
+func (msgs Messages) BooxConfigure() string {
+	return Catalog.Format(msgs.locale, "booxConfigure", nil)
+}
+
+// BooxAddressRemoved says "BOOXDrop address removed."
+// in the language the app shows.
+func BooxAddressRemoved() string { return In(i18n.Locale()).BooxAddressRemoved() }
+
+// BooxAddressRemoved says "BOOXDrop address removed."
+// in the language of msgs.
+func (msgs Messages) BooxAddressRemoved() string {
+	return Catalog.Format(msgs.locale, "booxAddressRemoved", nil)
+}
+
+// BooxAddressSaved says "BOOXDrop address saved."
+// in the language the app shows.
+func BooxAddressSaved() string { return In(i18n.Locale()).BooxAddressSaved() }
+
+// BooxAddressSaved says "BOOXDrop address saved."
+// in the language of msgs.
+func (msgs Messages) BooxAddressSaved() string {
+	return Catalog.Format(msgs.locale, "booxAddressSaved", nil)
+}
+
+// BooxInvalidAddress says "Enter the private HTTP address displayed on your BOOX, such as http://192.168.1.20:8085."
+// in the language the app shows.
+func BooxInvalidAddress() string { return In(i18n.Locale()).BooxInvalidAddress() }
+
+// BooxInvalidAddress says "Enter the private HTTP address displayed on your BOOX, such as http://192.168.1.20:8085."
+// in the language of msgs.
+func (msgs Messages) BooxInvalidAddress() string {
+	return Catalog.Format(msgs.locale, "booxInvalidAddress", nil)
+}
+
+// BooxConnected says "Connected to {device}."
+// in the language the app shows.
+func BooxConnected(device string) string { return In(i18n.Locale()).BooxConnected(device) }
+
+// BooxConnected says "Connected to {device}."
+// in the language of msgs.
+func (msgs Messages) BooxConnected(device string) string {
+	return Catalog.Format(msgs.locale, "booxConnected", map[string]any{"device": device})
+}
+
+// BooxReady says "Connected to BOOXDrop."
+// in the language the app shows.
+func BooxReady() string { return In(i18n.Locale()).BooxReady() }
+
+// BooxReady says "Connected to BOOXDrop."
+// in the language of msgs.
+func (msgs Messages) BooxReady() string {
+	return Catalog.Format(msgs.locale, "booxReady", nil)
+}
+
+// BooxSending says "Sending to BOOX"
+// in the language the app shows.
+func BooxSending() string { return In(i18n.Locale()).BooxSending() }
+
+// BooxSending says "Sending to BOOX"
+// in the language of msgs.
+func (msgs Messages) BooxSending() string {
+	return Catalog.Format(msgs.locale, "booxSending", nil)
+}
+
+// BooxSent says "BOOX confirmed receipt of {count, plural, one {# book} other {# books}}."
+// in the language the app shows.
+func BooxSent(count int) string { return In(i18n.Locale()).BooxSent(count) }
+
+// BooxSent says "BOOX confirmed receipt of {count, plural, one {# book} other {# books}}."
+// in the language of msgs.
+func (msgs Messages) BooxSent(count int) string {
+	return Catalog.Format(msgs.locale, "booxSent", map[string]any{"count": count})
+}
+
+// BooxNoFormat says "No format supported by BOOXDrop is available for {titles}."
+// in the language the app shows.
+func BooxNoFormat(titles string) string { return In(i18n.Locale()).BooxNoFormat(titles) }
+
+// BooxNoFormat says "No format supported by BOOXDrop is available for {titles}."
+// in the language of msgs.
+func (msgs Messages) BooxNoFormat(titles string) string {
+	return Catalog.Format(msgs.locale, "booxNoFormat", map[string]any{"titles": titles})
+}
+
+// BooxUnconfirmed says "BOOX did not confirm {titles}. Check received files on the device before resending."
+// in the language the app shows.
+func BooxUnconfirmed(titles string) string { return In(i18n.Locale()).BooxUnconfirmed(titles) }
+
+// BooxUnconfirmed says "BOOX did not confirm {titles}. Check received files on the device before resending."
+// in the language of msgs.
+func (msgs Messages) BooxUnconfirmed(titles string) string {
+	return Catalog.Format(msgs.locale, "booxUnconfirmed", map[string]any{"titles": titles})
+}
+
+// BooxFailed says "Couldn’t send {title}. {reason}"
+// in the language the app shows.
+func BooxFailed(title string, reason string) string {
+	return In(i18n.Locale()).BooxFailed(title, reason)
+}
+
+// BooxFailed says "Couldn’t send {title}. {reason}"
+// in the language of msgs.
+func (msgs Messages) BooxFailed(title string, reason string) string {
+	return Catalog.Format(msgs.locale, "booxFailed", map[string]any{"title": title, "reason": reason})
+}
+
+// BooxMoreFailed says "{count, plural, one {# other transfer failed.} other {# other transfers failed.}}"
+// in the language the app shows.
+func BooxMoreFailed(count int) string { return In(i18n.Locale()).BooxMoreFailed(count) }
+
+// BooxMoreFailed says "{count, plural, one {# other transfer failed.} other {# other transfers failed.}}"
+// in the language of msgs.
+func (msgs Messages) BooxMoreFailed(count int) string {
+	return Catalog.Format(msgs.locale, "booxMoreFailed", map[string]any{"count": count})
+}
+
+// BooxNotSent says "{count, plural, one {# book was not sent.} other {# books were not sent.}}"
+// in the language the app shows.
+func BooxNotSent(count int) string { return In(i18n.Locale()).BooxNotSent(count) }
+
+// BooxNotSent says "{count, plural, one {# book was not sent.} other {# books were not sent.}}"
+// in the language of msgs.
+func (msgs Messages) BooxNotSent(count int) string {
+	return Catalog.Format(msgs.locale, "booxNotSent", map[string]any{"count": count})
+}
+
+// BooxDisconnected says "BOOXDrop could not be reached. Check the address and make sure BOOXDrop is open on the same network."
+// in the language the app shows.
+func BooxDisconnected() string { return In(i18n.Locale()).BooxDisconnected() }
+
+// BooxDisconnected says "BOOXDrop could not be reached. Check the address and make sure BOOXDrop is open on the same network."
+// in the language of msgs.
+func (msgs Messages) BooxDisconnected() string {
+	return Catalog.Format(msgs.locale, "booxDisconnected", nil)
+}
+
+// BooxIncompatible says "Direct transfer is unavailable at this address. Try the device upload page."
+// in the language the app shows.
+func BooxIncompatible() string { return In(i18n.Locale()).BooxIncompatible() }
+
+// BooxIncompatible says "Direct transfer is unavailable at this address. Try the device upload page."
+// in the language of msgs.
+func (msgs Messages) BooxIncompatible() string {
+	return Catalog.Format(msgs.locale, "booxIncompatible", nil)
+}
+
+// BooxRejected says "BOOXDrop rejected the upload. Check free space or try uploading on the device page."
+// in the language the app shows.
+func BooxRejected() string { return In(i18n.Locale()).BooxRejected() }
+
+// BooxRejected says "BOOXDrop rejected the upload. Check free space or try uploading on the device page."
+// in the language of msgs.
+func (msgs Messages) BooxRejected() string {
+	return Catalog.Format(msgs.locale, "booxRejected", nil)
+}
+
+// BooxInvalidFile says "The book file could not be read or changed during transfer."
+// in the language the app shows.
+func BooxInvalidFile() string { return In(i18n.Locale()).BooxInvalidFile() }
+
+// BooxInvalidFile says "The book file could not be read or changed during transfer."
+// in the language of msgs.
+func (msgs Messages) BooxInvalidFile() string {
+	return Catalog.Format(msgs.locale, "booxInvalidFile", nil)
+}
+
+// BooxPageFailed says "Couldn’t open the BOOXDrop upload page."
+// in the language the app shows.
+func BooxPageFailed() string { return In(i18n.Locale()).BooxPageFailed() }
+
+// BooxPageFailed says "Couldn’t open the BOOXDrop upload page."
+// in the language of msgs.
+func (msgs Messages) BooxPageFailed() string {
+	return Catalog.Format(msgs.locale, "booxPageFailed", nil)
+}
+
+// BooxSwitchBusy says "Wait for the BOOX transfer to finish before switching libraries."
+// in the language the app shows.
+func BooxSwitchBusy() string { return In(i18n.Locale()).BooxSwitchBusy() }
+
+// BooxSwitchBusy says "Wait for the BOOX transfer to finish before switching libraries."
+// in the language of msgs.
+func (msgs Messages) BooxSwitchBusy() string {
+	return Catalog.Format(msgs.locale, "booxSwitchBusy", nil)
+}
+
+// WeReadImport says "Import to WeRead…"
+// in the language the app shows.
+func WeReadImport() string { return In(i18n.Locale()).WeReadImport() }
+
+// WeReadImport says "Import to WeRead…"
+// in the language of msgs.
+func (msgs Messages) WeReadImport() string {
+	return Catalog.Format(msgs.locale, "weReadImport", nil)
+}
+
+// WeReadNeedsEPUB says "Convert this book to EPUB before importing it to WeRead."
+// in the language the app shows.
+func WeReadNeedsEPUB() string { return In(i18n.Locale()).WeReadNeedsEPUB() }
+
+// WeReadNeedsEPUB says "Convert this book to EPUB before importing it to WeRead."
+// in the language of msgs.
+func (msgs Messages) WeReadNeedsEPUB() string {
+	return Catalog.Format(msgs.locale, "weReadNeedsEPUB", nil)
+}
+
+// WeReadOpenFailed says "Couldn’t prepare this book for WeRead import."
+// in the language the app shows.
+func WeReadOpenFailed() string { return In(i18n.Locale()).WeReadOpenFailed() }
+
+// WeReadOpenFailed says "Couldn’t prepare this book for WeRead import."
+// in the language of msgs.
+func (msgs Messages) WeReadOpenFailed() string {
+	return Catalog.Format(msgs.locale, "weReadOpenFailed", nil)
+}
+
+// WeReadOpened says "WeRead is open. Choose Transfer to phone on the site, then select the EPUB."
+// in the language the app shows.
+func WeReadOpened() string { return In(i18n.Locale()).WeReadOpened() }
+
+// WeReadOpened says "WeRead is open. Choose Transfer to phone on the site, then select the EPUB."
+// in the language of msgs.
+func (msgs Messages) WeReadOpened() string {
+	return Catalog.Format(msgs.locale, "weReadOpened", nil)
+}
+
+// WeReadCopyPath says "Copy EPUB path"
+// in the language the app shows.
+func WeReadCopyPath() string { return In(i18n.Locale()).WeReadCopyPath() }
+
+// WeReadCopyPath says "Copy EPUB path"
+// in the language of msgs.
+func (msgs Messages) WeReadCopyPath() string {
+	return Catalog.Format(msgs.locale, "weReadCopyPath", nil)
+}
+
+// WeReadCopiedPath says "EPUB path copied."
+// in the language the app shows.
+func WeReadCopiedPath() string { return In(i18n.Locale()).WeReadCopiedPath() }
+
+// WeReadCopiedPath says "EPUB path copied."
+// in the language of msgs.
+func (msgs Messages) WeReadCopiedPath() string {
+	return Catalog.Format(msgs.locale, "weReadCopiedPath", nil)
+}
+
+// DeviceKindleConverting says "Converting “{title}” to AZW3"
+// in the language the app shows.
+func DeviceKindleConverting(title string) string {
+	return In(i18n.Locale()).DeviceKindleConverting(title)
+}
+
+// DeviceKindleConverting says "Converting “{title}” to AZW3"
+// in the language of msgs.
+func (msgs Messages) DeviceKindleConverting(title string) string {
+	return Catalog.Format(msgs.locale, "deviceKindleConverting", map[string]any{"title": title})
+}
+
+// DeviceKindleConversionFailed says "Couldn’t convert “{title}” to AZW3"
+// in the language the app shows.
+func DeviceKindleConversionFailed(title string) string {
+	return In(i18n.Locale()).DeviceKindleConversionFailed(title)
+}
+
+// DeviceKindleConversionFailed says "Couldn’t convert “{title}” to AZW3"
+// in the language of msgs.
+func (msgs Messages) DeviceKindleConversionFailed(title string) string {
+	return Catalog.Format(msgs.locale, "deviceKindleConversionFailed", map[string]any{"title": title})
+}
+
+// DeviceKindleConversionWarnings says "Check the converted AZW3 for changes to the content or layout of {titles}."
+// in the language the app shows.
+func DeviceKindleConversionWarnings(titles string) string {
+	return In(i18n.Locale()).DeviceKindleConversionWarnings(titles)
+}
+
+// DeviceKindleConversionWarnings says "Check the converted AZW3 for changes to the content or layout of {titles}."
+// in the language of msgs.
+func (msgs Messages) DeviceKindleConversionWarnings(titles string) string {
+	return Catalog.Format(msgs.locale, "deviceKindleConversionWarnings", map[string]any{"titles": titles})
+}
+
 // DeviceAddToLibrary says "Add to library"
 // in the language the app shows.
 func DeviceAddToLibrary() string { return In(i18n.Locale()).DeviceAddToLibrary() }

@@ -46,6 +46,8 @@ type devicesState struct {
 	view *deviceView
 	// busy is the reader being written to, by Info().ID; "" for none.
 	busy string
+	// sending tracks a library or dropped-file upload to a USB reader.
+	sending *usbTransfer
 	// ejecting is the reader being ejected, which goes without a word.
 	ejecting device.Device
 	// remove is the removal from a reader being asked about.
@@ -57,6 +59,13 @@ type devicesState struct {
 	// until needed, and again whenever the readers or their books or the
 	// library's change.
 	on map[int64]device.Device
+}
+
+type usbTransfer struct {
+	reader       device.Device
+	cancel       context.CancelFunc
+	done         chan struct{}
+	disconnected bool // main thread only
 }
 
 // readerOf is the reader the library's book id is on, the first of them
@@ -186,6 +195,13 @@ func (a *App) devicesChanged() {
 	before := ds.list
 	ds.list, ds.on = ds.watcher.Devices(), nil
 	ds.available = ds.watcher.Available()
+	if job := ds.sending; job != nil && !job.disconnected && sameReader(ds.list, job.reader) == nil {
+		job.disconnected = true
+		job.cancel()
+		if ds.view == nil || ds.view.dev != job.reader {
+			a.toastError(errors.New(locales.WirelessLost(job.reader.Info().Name)))
+		}
+	}
 	for _, d := range ds.list {
 		// One the user asked to mount opens by itself, unannounced.
 		if !slices.Contains(before, d) && ds.connecting == "" {
@@ -499,11 +515,57 @@ func deviceFormat(d device.Device, formats []string) string {
 	return ""
 }
 
-// sendToReader sends the library's books of ids to d, each in the format
-// it takes best, with their metadata and cover, as calibre does.
+func (a *App) beginUSBTransfer(d device.Device, total int) (context.Context, *usbTransfer) {
+	ctx, cancel := context.WithCancel(context.Background())
+	job := &usbTransfer{reader: d, cancel: cancel, done: make(chan struct{})}
+	info := d.Info()
+	a.dev.sending, a.dev.busy = job, info.ID
+	a.busy, a.busyDone, a.busyTotal, a.busyStop = locales.DeviceSending(info.Name), 0, total, cancel
+	return ctx, job
+}
+
+// finishUSBTransfer runs after the worker and its temporary files are done.
+func (a *App) finishUSBTransfer(ctx context.Context, job *usbTransfer, report func()) {
+	cancelled := ctx.Err() != nil
+	job.cancel()
+	close(job.done)
+	a.post(func() {
+		a.dev.sending, a.dev.busy = nil, ""
+		a.busy, a.busyDone, a.busyTotal, a.busyStop = "", 0, 0, nil
+		if cancelled && !job.disconnected {
+			a.toast("%s", locales.ErrorCancelled())
+		}
+		report()
+		if !job.disconnected {
+			a.deviceWritten(job.reader)
+		}
+	})
+}
+
+// ShutdownUSBTransfer cancels a USB upload and gives the worker time to finish.
+func (a *App) ShutdownUSBTransfer() {
+	if a.dev == nil || a.dev.sending == nil {
+		return
+	}
+	job := a.dev.sending
+	job.cancel()
+	timer := time.NewTimer(4 * time.Second)
+	defer timer.Stop()
+	select {
+	case <-job.done:
+	case <-timer.C:
+	}
+}
+
+// sendToReader sends the library's books of ids to d, with their metadata
+// and cover. For a Kindle that takes none of a book's formats, an EPUB
+// can be converted to a temporary AZW3 for this transfer.
 func (a *App) sendToReader(d device.Device, ids []int64) {
 	lib := a.lib
-	if lib == nil || a.dev == nil || a.dev.busy != "" || a.busy != "" {
+	if lib == nil || d == nil || a.dev == nil || a.dev.busy != "" || a.busy != "" || a.loading {
+		return
+	}
+	if d = sameReader(a.dev.list, d); d == nil {
 		return
 	}
 	var books []*calibre.Book
@@ -516,39 +578,83 @@ func (a *App) sendToReader(d device.Device, ids []int64) {
 		return
 	}
 	name := d.Info().Name
-	a.dev.busy = d.Info().ID
-	a.busy, a.busyDone, a.busyTotal = locales.DeviceSending(name), 0, len(books)
+	converter := a.kindleConverter
+	canConvert := converter != nil && d.Info().Kind == "kindle" && slices.Contains(d.Formats(), "AZW3")
+	ctx, job := a.beginUSBTransfer(d, len(books))
 	a.run(func() {
 		var ups []device.Upload
-		var unreadable []string
+		var workdirs []string
+		var unreadable, warnings []string
+		type conversionFailure struct {
+			title string
+			err   error
+		}
+		var failures []conversionFailure
 		for _, b := range books {
-			up, ok := readerUpload(lib, d, b)
+			if ctx.Err() != nil {
+				break
+			}
+			format := deviceFormat(d, b.Formats)
+			convert := format == "" && canConvert && slices.Contains(b.Formats, "EPUB")
+			if convert {
+				format = "EPUB"
+			}
+			up, ok := readerUpload(lib, b, format)
 			if !ok {
 				unreadable = append(unreadable, b.Title)
 				continue
 			}
+			if convert {
+				a.post(func() { a.busy = locales.DeviceKindleConverting(b.Title) })
+				work, err := os.MkdirTemp("", "calibreno-azw3-")
+				var warned bool
+				if err == nil {
+					workdirs = append(workdirs, work)
+					up.File, warned, err = converter(ctx, up.File, work)
+				}
+				if ctx.Err() != nil {
+					break
+				}
+				if err != nil {
+					failures = append(failures, conversionFailure{b.Title, err})
+					continue
+				}
+				if warned {
+					warnings = append(warnings, b.Title)
+				}
+			}
 			ups = append(ups, up)
 		}
-		a.post(func() { a.busyTotal = len(ups) })
-		sent, err := d.Send(context.Background(), ups, func(n int) { a.post(func() { a.busyDone = n }) })
-		a.post(func() {
-			a.dev.busy, a.busy = "", ""
+		var sent []device.Book
+		var err error
+		if ctx.Err() == nil && len(ups) > 0 {
+			a.post(func() { a.busy, a.busyTotal = locales.DeviceSending(name), len(ups) })
+			sent, err = d.Send(ctx, ups, func(n int) { a.post(func() { a.busyDone = n }) })
+		}
+		for _, work := range workdirs {
+			_ = os.RemoveAll(work)
+		}
+		a.finishUSBTransfer(ctx, job, func() {
 			a.sayDeviceErrors(err)
+			for _, failure := range failures {
+				a.toastErrorSummary(locales.DeviceKindleConversionFailed(failure.title), failure.err)
+			}
+			if len(warnings) > 0 {
+				a.toast("%s", locales.DeviceKindleConversionWarnings(strings.Join(warnings, ", ")))
+			}
 			if len(unreadable) > 0 {
 				a.toastError(errors.New(locales.WirelessNoFormat(strings.Join(unreadable, ", "), name)))
 			}
 			if len(sent) > 0 {
 				a.toast("%s", locales.WirelessSent(len(sent), name))
 			}
-			a.deviceWritten(d)
 		})
 	})
 }
 
-// readerUpload is what sending b to d is: its file in the format d takes
-// best, its metadata and its cover. Any goroutine.
-func readerUpload(lib *calibre.Library, d device.Device, b *calibre.Book) (device.Upload, bool) {
-	format := deviceFormat(d, b.Formats)
+// readerUpload puts the requested file, metadata and cover into an upload.
+// Any goroutine.
+func readerUpload(lib *calibre.Library, b *calibre.Book, format string) (device.Upload, bool) {
 	if format == "" {
 		return device.Upload{}, false
 	}
@@ -559,7 +665,15 @@ func readerUpload(lib *calibre.Library, d device.Device, b *calibre.Book) (devic
 	file := ""
 	for _, f := range det.Files {
 		if f.Format == format {
-			file = f.Path
+			file, err = lib.ResolveLibraryFile(f.Path)
+			if err != nil {
+				return device.Upload{}, false
+			}
+			if !strings.EqualFold(filepath.Ext(file), filepath.Ext(f.Path)) {
+				// The path's extension determines the format copied to the reader.
+				file = f.Path
+			}
+			break
 		}
 	}
 	if file == "" {
@@ -572,7 +686,9 @@ func readerUpload(lib *calibre.Library, d device.Device, b *calibre.Book) (devic
 		Pubdate: b.Pubdate, Timestamp: b.Timestamp, LastModified: b.LastModified, ApplicationID: b.ID,
 	}}
 	if b.HasCover {
-		up.Cover, _ = os.ReadFile(lib.CoverPath(b))
+		if cover, err := lib.ResolveLibraryFile(lib.CoverPath(b)); err == nil {
+			up.Cover, _ = os.ReadFile(cover)
+		}
 	}
 	return up, true
 }
@@ -580,16 +696,21 @@ func readerUpload(lib *calibre.Library, d device.Device, b *calibre.Book) (devic
 // sendFilesToReader sends files dropped on a reader's page, with the
 // metadata they carry.
 func (a *App) sendFilesToReader(d device.Device, paths []string) {
-	if a.dev == nil || a.dev.busy != "" || a.busy != "" {
+	if d == nil || a.dev == nil || a.dev.busy != "" || a.busy != "" || a.loading {
+		return
+	}
+	if d = sameReader(a.dev.list, d); d == nil {
 		return
 	}
 	name := d.Info().Name
-	a.dev.busy = d.Info().ID
-	a.busy, a.busyDone, a.busyTotal = locales.DeviceSending(name), 0, 0
+	ctx, job := a.beginUSBTransfer(d, 0)
 	a.run(func() {
 		var ups []device.Upload
 		var unreadable []string
-		for _, p := range expandFiles(paths) {
+		for _, p := range expandFiles(ctx, paths) {
+			if ctx.Err() != nil {
+				break
+			}
 			pr := calibre.Prepare(p, calibre.Metadata{}, nil)
 			if !slices.Contains(d.Formats(), pr.Format) {
 				unreadable = append(unreadable, strings.TrimSuffix(fileBase(p), "."+strings.ToLower(pr.Format)))
@@ -602,10 +723,13 @@ func (a *App) sendFilesToReader(d device.Device, paths []string) {
 				Identifiers: m.Identifiers, Pubdate: m.Pubdate,
 			}})
 		}
-		a.post(func() { a.busyTotal = len(ups) })
-		sent, err := d.Send(context.Background(), ups, func(n int) { a.post(func() { a.busyDone = n }) })
-		a.post(func() {
-			a.dev.busy, a.busy = "", ""
+		var sent []device.Book
+		var err error
+		if ctx.Err() == nil && len(ups) > 0 {
+			a.post(func() { a.busyTotal = len(ups) })
+			sent, err = d.Send(ctx, ups, func(n int) { a.post(func() { a.busyDone = n }) })
+		}
+		a.finishUSBTransfer(ctx, job, func() {
 			a.sayDeviceErrors(err)
 			if len(unreadable) > 0 {
 				a.toastError(errors.New(locales.WirelessNoFormat(strings.Join(unreadable, ", "), name)))
@@ -613,16 +737,21 @@ func (a *App) sendFilesToReader(d device.Device, paths []string) {
 			if len(sent) > 0 {
 				a.toast("%s", locales.WirelessSent(len(sent), name))
 			}
-			a.deviceWritten(d)
 		})
 	})
 }
 
 // expandFiles is paths with the e-books in the folders among them.
-func expandFiles(paths []string) []string {
+func expandFiles(ctx context.Context, paths []string) []string {
 	var out []string
 	for _, p := range paths {
+		if ctx.Err() != nil {
+			break
+		}
 		filepath.WalkDir(p, func(path string, d os.DirEntry, err error) error {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
 			if err == nil && !d.IsDir() && (path == p || isEbook(path)) {
 				out = append(out, path)
 			}
@@ -644,7 +773,9 @@ func (a *App) sayDeviceErrors(err error) {
 		errs = j.Unwrap()
 	}
 	for _, e := range errs {
-		a.toastError(e)
+		if !errors.Is(e, context.Canceled) {
+			a.toastError(e)
+		}
 	}
 }
 

@@ -93,6 +93,10 @@ func TestOpen(t *testing.T) {
 
 func TestSave(t *testing.T) {
 	p := writeBook(t)
+	other := p + ".dalibre-part"
+	if err := os.WriteFile(other, []byte("other data"), 0o600); err != nil {
+		t.Fatal(err)
+	}
 	b, err := Open(p)
 	if err != nil {
 		t.Fatal(err)
@@ -113,11 +117,14 @@ func TestSave(t *testing.T) {
 	if fi, _ := os.Stat(p); fi.Size() != size {
 		t.Errorf("size %d, file %d", size, fi.Size())
 	}
-	zr, err := zip.OpenReader(p)
+	data, err := os.ReadFile(p)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer zr.Close()
+	zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		t.Fatal(err)
+	}
 	if f := zr.File[0]; f.Name != "mimetype" || f.Method != zip.Store {
 		t.Errorf("first entry %q method %d", f.Name, f.Method)
 	}
@@ -151,8 +158,11 @@ func TestSave(t *testing.T) {
 	if ch, _ := b2.Read("OEBPS/Text/chapter2.xhtml"); !strings.Contains(string(ch), "Edited here.") {
 		t.Errorf("chapter2 lost its edit: %s", ch)
 	}
-	if _, err := os.Stat(p + ".dalibre-part"); !os.IsNotExist(err) {
-		t.Error("temporary file left behind")
+	if data, err := os.ReadFile(other); err != nil || string(data) != "other data" {
+		t.Errorf("save replaced an existing sibling file: %q, %v", data, err)
+	}
+	if staged, err := filepath.Glob(filepath.Join(filepath.Dir(p), ".dalibre-part-*")); err != nil || len(staged) != 0 {
+		t.Errorf("temporary files left behind: %v, %v", staged, err)
 	}
 }
 

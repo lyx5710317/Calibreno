@@ -364,17 +364,13 @@ func TestCheckFile(t *testing.T) {
 	books, _ := lib.Books()
 	d, _ := lib.Details(books[0])
 	inside := d.Files[0].Path
-	link := filepath.Join(dir, "link.epub")
-	os.Symlink(inside, link)
 	for _, c := range []struct{ path, want string }{
 		{write("ok.epub", 10), ""},
 		{"relative.epub", "isn't an absolute path"},
-		{filepath.Join(dir, "missing.epub"), "no such file"},
 		{dir, "isn't a file"},
 		{write("notes.md", 10), "isn't an e-book"},
 		{write("empty.epub", 0), "is empty"},
 		{inside, "inside the library folder"},
-		{link, "inside the library folder"},
 	} {
 		err := checkFile(lib, c.path)
 		switch {
@@ -384,6 +380,18 @@ func TestCheckFile(t *testing.T) {
 			t.Errorf("%s: %v, want %q", c.path, err, c.want)
 		}
 	}
+	if err := checkFile(lib, filepath.Join(dir, "missing.epub")); !errors.Is(err, os.ErrNotExist) {
+		t.Errorf("missing file: %v", err)
+	}
+	t.Run("Symlink", func(t *testing.T) {
+		link := filepath.Join(dir, "link.epub")
+		if err := os.Symlink(inside, link); err != nil {
+			t.Skipf("cannot create symlinks in the test directory: %v", err)
+		}
+		if err := checkFile(lib, link); err == nil || !strings.Contains(err.Error(), "inside the library folder") {
+			t.Errorf("symlink into the library: %v", err)
+		}
+	})
 	big := filepath.Join(dir, "big.epub")
 	f, _ := os.Create(big)
 	f.Truncate(MaxFileSize + 1) // sparse

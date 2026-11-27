@@ -20,8 +20,10 @@ import (
 	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/app/icons"
 	"dalibre/internal/batch"
+	"dalibre/internal/bookconvert"
 	"dalibre/internal/calibre"
 	"dalibre/internal/catalog"
+	"dalibre/internal/kindleconvert"
 	"dalibre/internal/plugin"
 	"dalibre/internal/settings"
 )
@@ -42,6 +44,8 @@ type App struct {
 	trash func(path string) error
 	// open opens a library; tests open real libraries read-only.
 	open func(root string) (*calibre.Library, error)
+
+	kindleConverter kindleconvert.Converter
 
 	settings *settings.Settings
 
@@ -172,7 +176,8 @@ type App struct {
 	mcpTicking   bool         // a rebuild is due to keep MCP's status current
 
 	// emailTestState is Settings › Email's last test email.
-	emailTestState emailTest
+	emailTestState   emailTest
+	readingTransfers readingTransfers
 
 	// OPDS: the catalogs' sources, what checking each found (by catalog
 	// id), the catalog page, and the server sharing the library.
@@ -214,7 +219,10 @@ type App struct {
 	duplicateScan *libraryDuplicateScan
 	toasts        []toastMsg
 	// ex is the Export to folder dialog.
-	ex exportState
+	ex               exportState
+	conversion       *conversionSession
+	conversionHome   string
+	conversionEngine bookconvert.Engine
 	// editors are the book editor windows open, by book; editorToasts
 	// the messages waiting for theirs.
 	editors      map[int64]*bookEditor
@@ -245,16 +253,24 @@ func New(settingsPath string) *App {
 		batchPath = filepath.Join(filepath.Dir(settingsPath), "calibreno")
 	}
 	a := &App{
-		cur:        -1,
-		curAt:      -1,
-		byID:       map[int64]*calibre.Book{},
-		details:    map[int64]*calibre.Details{},
-		detailsReq: map[int64]bool{},
-		sectionsOn: map[string]bool{"formats": true},
-		covers:     newCoverCache(),
-		settings:   settings.Load(settingsPath),
-		batchStore: batch.NewStore(batchPath),
-		gb:         newGetBooks(),
+		cur:              -1,
+		curAt:            -1,
+		byID:             map[int64]*calibre.Book{},
+		details:          map[int64]*calibre.Details{},
+		detailsReq:       map[int64]bool{},
+		sectionsOn:       map[string]bool{"formats": true},
+		covers:           newCoverCache(),
+		settings:         settings.Load(settingsPath),
+		batchStore:       batch.NewStore(batchPath),
+		gb:               newGetBooks(),
+		readingTransfers: newReadingTransfers(),
+	}
+	if settingsPath != "" {
+		home := filepath.Dir(settingsPath)
+		cache := filepath.Join(home, "conversion-tools")
+		a.kindleConverter = kindleconvert.New(cache)
+		a.conversionHome = filepath.Join(home, "conversion")
+		a.conversionEngine.KindleCache = cache
 	}
 	a.post = func(fn func()) { fn() }
 	a.run = func(fn func()) { go fn() }
@@ -345,9 +361,12 @@ func (a *App) toastError(err error) {
 	if err == nil {
 		return
 	}
-	summary, raw := presentError(err), err.Error()
+	a.toastErrorSummary(presentError(err), err)
+}
+
+func (a *App) toastErrorSummary(summary string, err error) {
 	toast := toastMsg{text: summary, error: true}
-	if summary != raw {
+	if summary != err.Error() {
 		details := errorDetailsText(err)
 		toast.action = locales.ErrorDetails()
 		toast.onAction = func() { a.errorDetails, a.errorDetailsOpen = details, true }
@@ -398,6 +417,18 @@ func (a *App) openLibrary(root string) {
 	}
 	if a.batch.work || len(a.imports) > 0 {
 		a.toast("%s", locales.BatchSwitchBusy())
+		return
+	}
+	if s := a.conversion; s != nil && s.lib != nil && s.running {
+		a.toast("%s", locales.ConversionSwitchBusy())
+		return
+	}
+	if a.readingTransfers.sending {
+		a.toast("%s", locales.BooxSwitchBusy())
+		return
+	}
+	if a.readingTransfers.preparing || a.dev != nil && a.dev.sending != nil {
+		a.toast("%s", locales.DeviceTransferSwitchBusy())
 		return
 	}
 	if a.duplicateScan != nil {

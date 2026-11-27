@@ -148,7 +148,8 @@ func (a *App) shortcuts(c *ui.Context) {
 
 func (a *App) anyDialog() bool {
 	return a.editOpen || a.deleteOpen || a.welcome.notLib.open || a.welcome.create.open || a.settingsOpen || a.errorDetailsOpen || a.consent != nil ||
-		a.act.form != nil || a.act.review != nil || a.dev != nil && a.dev.remove.open
+		a.act.form != nil || a.act.review != nil || a.dev != nil && a.dev.remove.open ||
+		a.conversion != nil && (a.conversion.form.open || a.conversion.pdf.open)
 }
 
 // ---- Sidebar

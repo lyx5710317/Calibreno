@@ -483,6 +483,7 @@ func (a *App) bookMenu(b *calibre.Book) func(m *ui.Menu) {
 			if editorFormat(b) != "" && m.Item(locales.EditorMenuEditBook()).Icon(icons.Menu(icons.File)).Trailing("Ctrl+E").Chosen() {
 				a.editBook(b, "")
 			}
+			a.conversionMenuItem(m, b, "")
 		}
 		// The separator only parts Remove from what is above it: a
 		// selection may have nothing there.
@@ -515,6 +516,7 @@ func (a *App) bookMenu(b *calibre.Book) func(m *ui.Menu) {
 		if a.emailMenuItems(m, ids) {
 			above = true
 		}
+		a.readingTransferMenu(m, ids, "")
 		if m.Item(locales.ExportMenu()).Icon(icons.Menu(icons.Download)).Disabled(a.busy != "").Chosen() {
 			a.openExport(ids)
 		}

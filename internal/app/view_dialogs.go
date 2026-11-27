@@ -35,6 +35,7 @@ func (a *App) dialogs(c *ui.Context) {
 	a.formDialog(c)
 	a.reviewDialog(c)
 	a.exportDialog(c)
+	a.conversionDialogs(c)
 	a.errorDetailsDialog(c)
 }
 

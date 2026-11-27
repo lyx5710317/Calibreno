@@ -61,6 +61,8 @@ type Settings struct {
 	Export Export `json:"export,omitzero"`
 	// Email is emailing books to Kindles.
 	Email Email `json:"email,omitzero"`
+	// BOOXAddress is the BOOXDrop address displayed by the reader.
+	BOOXAddress string `json:"booxAddress,omitempty"`
 
 	path string
 }

@@ -30,6 +30,7 @@ const (
 	sectionMCP
 	sectionWireless
 	sectionEmail
+	sectionBOOX
 )
 
 // sections lists the Settings sections. id is the stable key; the title
@@ -46,6 +47,7 @@ var sections = []struct {
 	{sectionMCP, "MCP", locales.SettingsSectionMCP, icons.Bot},
 	{sectionWireless, "Wireless", locales.WirelessName, icons.Wifi},
 	{sectionEmail, "Email", locales.SettingsSectionEmail, icons.Send},
+	{sectionBOOX, "BOOX", locales.BooxName, icons.BookOpen},
 }
 
 // settingsWidth is the Settings window's width: Plugins' list and plugin
@@ -85,10 +87,16 @@ func (a *App) settingsDialog(c *ui.Context) {
 				a.wirelessPane(c)
 			case sectionEmail:
 				a.emailPane(c)
+			case sectionBOOX:
+				a.booxSettingsPane(c)
 			}
 		})
 	}, func() {
-		ui.Text(c, locales.SettingsChangesApplyNote()).FontSize(12).TextColor(pal().TextTertiary).Grow(1)
+		if a.section == sectionBOOX {
+			ui.Spacer(c)
+		} else {
+			ui.Text(c, locales.SettingsChangesApplyNote()).FontSize(12).TextColor(pal().TextTertiary).Grow(1)
+		}
 		if widgets.ButtonSized(c, widgets.Primary, nil, locales.CommonDone(), theme.ControlS).Clicked() {
 			a.settingsOpen = false
 		}

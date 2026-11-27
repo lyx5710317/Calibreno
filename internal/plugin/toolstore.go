@@ -111,8 +111,19 @@ func (s *ToolStore) Fetch(ctx context.Context, b Build, progress func(done, tota
 	if err := os.WriteFile(filepath.Join(tmp, complete), nil, 0o644); err != nil {
 		return "", err
 	}
+	unlock, err := lockToolStore(ctx, s.Dir)
+	if err != nil {
+		return "", err
+	}
+	defer unlock()
+	// Another process may have finished while this one was downloading.
+	if exe, ok := s.Path(b); ok {
+		return exe, nil
+	}
 	dst := s.buildDir(b)
-	os.RemoveAll(dst)
+	if err := os.RemoveAll(dst); err != nil {
+		return "", err
+	}
 	if err := os.Rename(tmp, dst); err != nil {
 		return "", err
 	}
@@ -121,6 +132,40 @@ func (s *ToolStore) Fetch(ctx context.Context, b Build, progress func(done, tota
 		return "", errors.New("the build isn’t where it was put")
 	}
 	return exe, nil
+}
+
+// lockToolStore serializes cache publication across processes. The lock file
+// stays in place so every publisher locks the same file, including after a crash.
+func lockToolStore(ctx context.Context, dir string) (func(), error) {
+	f, err := os.OpenFile(filepath.Join(dir, ".publish.lock"), os.O_CREATE|os.O_RDWR, 0o600)
+	if err != nil {
+		return nil, err
+	}
+	retry := time.NewTicker(25 * time.Millisecond)
+	defer retry.Stop()
+	for {
+		if err := ctx.Err(); err != nil {
+			f.Close()
+			return nil, err
+		}
+		unlock, err := tryToolStoreLock(f)
+		if err != nil {
+			f.Close()
+			return nil, err
+		}
+		if unlock != nil {
+			return func() {
+				unlock()
+				f.Close()
+			}, nil
+		}
+		select {
+		case <-ctx.Done():
+			f.Close()
+			return nil, ctx.Err()
+		case <-retry.C:
+		}
+	}
 }
 
 // Unpack downloads build b, checks it is the build named, and unpacks

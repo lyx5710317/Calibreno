@@ -289,7 +289,7 @@ func (g *fakeGitHub) release(t *testing.T, version string, hosts string) {
 
 func TestInstallFromGitHubAndUpdate(t *testing.T) {
 	a := newTestApp(t)
-	a.pluginDir = t.TempDir()
+	useTestPluginDir(t, a)
 	gh := newFakeGitHub(t)
 	gh.release(t, "1.0.0", `"books.example.com"`)
 	a.github = &plugin.GitHub{API: gh.srv.URL}

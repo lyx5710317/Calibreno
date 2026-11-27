@@ -15,6 +15,7 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"dalibre/internal/sysproxy"
 )
@@ -180,8 +181,12 @@ func TestToolStore(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if st, err := os.Stat(exe); err != nil || st.Mode()&0o111 == 0 || last != int64(len(tgz)) {
-		t.Fatalf("tool: %v %v, progress %d", st, err, last)
+	st, statErr := os.Stat(exe)
+	if statErr != nil || !st.Mode().IsRegular() || last != int64(len(tgz)) {
+		t.Fatalf("tool: %v %v, progress %d", st, statErr, last)
+	}
+	if runtime.GOOS != "windows" && st.Mode()&0o111 == 0 {
+		t.Errorf("tool is not executable: %s", st.Mode())
 	}
 	if _, err := os.Lstat(filepath.Join(filepath.Dir(exe), "..", "evil")); err == nil {
 		t.Error("kept a link leading out of the build")
@@ -213,6 +218,66 @@ func TestToolStore(t *testing.T) {
 	}
 	if _, ok := s.Path(rb); !ok {
 		t.Error("Keep removed a build that is declared")
+	}
+}
+
+func TestToolStoreConcurrentFetch(t *testing.T) {
+	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+	defer cancel()
+	started, release := make(chan struct{}), make(chan struct{})
+	raw := []byte("raw tool")
+	client := func(handler http.HandlerFunc) *http.Client {
+		return &http.Client{Transport: serve{handler}}
+	}
+	first := &ToolStore{Dir: t.TempDir(), Client: client(func(w http.ResponseWriter, r *http.Request) {
+		w.Write(raw)
+	})}
+	second := &ToolStore{Dir: first.Dir, Client: client(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		select {
+		case <-release:
+			w.Write(raw)
+		case <-r.Context().Done():
+		}
+	})}
+	b := Build{URL: "https://dl.example/tool", SHA256: sha(raw)}
+	// A publisher must be able to replace an incomplete cache entry.
+	if err := os.Mkdir(first.buildDir(b), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	type result struct {
+		path string
+		err  error
+	}
+	finished := make(chan result, 1)
+	go func() {
+		path, err := second.Fetch(ctx, b, nil)
+		finished <- result{path: path, err: err}
+	}()
+	select {
+	case <-started:
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
+	exe, err := first.Fetch(ctx, b, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	marker := filepath.Join(first.buildDir(b), "keep")
+	if err := os.WriteFile(marker, nil, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	close(release)
+	select {
+	case got := <-finished:
+		if got.err != nil || got.path != exe {
+			t.Fatalf("second fetch: %q, %v", got.path, got.err)
+		}
+	case <-ctx.Done():
+		t.Fatal(ctx.Err())
+	}
+	if _, err := os.Stat(marker); err != nil {
+		t.Fatalf("the second download replaced the published build: %v", err)
 	}
 }
 

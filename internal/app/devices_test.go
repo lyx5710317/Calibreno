@@ -10,6 +10,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/device"
 	"dalibre/internal/device/kindle"
 )
@@ -160,6 +161,117 @@ func TestReaderRefusesFormat(t *testing.T) {
 	}
 	if !found {
 		t.Errorf("toasts = %+v", a.toasts)
+	}
+}
+
+func TestReaderConvertsEPUBWhenNeeded(t *testing.T) {
+	a := newTestApp(t)
+	root := fakeKindle(t, false)
+	d := plugIn(t, a, root)
+	needsConversion, ready := a.books[0], a.books[1]
+	azw3, err := os.ReadFile(filepath.Join("..", "epub", "testdata", "alice.azw3"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readyFile := filepath.Join(t.TempDir(), "ready.azw3")
+	if err := os.WriteFile(readyFile, azw3, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if err := a.lib.AddFormat(ready.ID, readyFile); err != nil {
+		t.Fatal(err)
+	}
+	if a.byID[ready.ID], err = a.lib.Book(ready.ID); err != nil {
+		t.Fatal(err)
+	}
+	var calls int
+	var workDir string
+	a.kindleConverter = func(_ context.Context, source, work string) (string, bool, error) {
+		calls++
+		workDir = work
+		if filepath.Ext(source) != ".epub" {
+			t.Errorf("converter got %q instead of EPUB", source)
+		}
+		output := filepath.Join(work, "book.azw3")
+		return output, false, os.WriteFile(output, azw3, 0o600)
+	}
+	a.sendToReader(d, []int64{needsConversion.ID, ready.ID})
+	if calls != 1 || len(d.Books()) != 2 {
+		t.Fatalf("converted %d books, sent %d", calls, len(d.Books()))
+	}
+	for _, book := range d.Books() {
+		if book.Format() != "AZW3" {
+			t.Errorf("device format = %q", book.Format())
+		}
+		if _, err := os.Stat(filepath.Join(root, filepath.FromSlash(book.LPath))); err != nil {
+			t.Error(err)
+		}
+	}
+	book, err := a.lib.Book(needsConversion.ID)
+	if err != nil || len(book.Formats) != 1 || book.Formats[0] != "EPUB" {
+		t.Fatalf("library was modified: %+v, %v", book, err)
+	}
+	if _, err := os.Stat(workDir); !os.IsNotExist(err) {
+		t.Fatalf("temporary conversion directory remains: %v", err)
+	}
+}
+
+func TestReaderReportsConversionFailure(t *testing.T) {
+	a := newTestApp(t)
+	d := plugIn(t, a, fakeKindle(t, false))
+	b := a.books[0]
+	var workDir string
+	a.kindleConverter = func(_ context.Context, _, work string) (string, bool, error) {
+		workDir = work
+		return "", false, errors.New("writer failed")
+	}
+	a.toasts = nil
+	a.sendToReader(d, []int64{b.ID})
+	if len(d.Books()) != 0 || len(a.toasts) != 1 || !a.toasts[0].error || !strings.Contains(a.toasts[0].text, b.Title) {
+		t.Fatalf("sent %d books, toasts = %+v", len(d.Books()), a.toasts)
+	}
+	if _, err := os.Stat(workDir); !os.IsNotExist(err) {
+		t.Fatalf("failed conversion directory remains: %v", err)
+	}
+}
+
+func TestReaderTransferStopsDuringConversion(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		stop func(*App)
+		text func(device.Device) string
+	}{
+		{"cancelled", func(a *App) { a.busyStop() }, func(device.Device) string { return locales.ErrorCancelled() }},
+		{"disconnected", func(a *App) {
+			a.dev.watcher.Sources = nil
+			a.dev.watcher.Scan(context.Background())
+			a.devicesChanged()
+		}, func(d device.Device) string { return locales.WirelessLost(d.Info().Name) }},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			a := newTestApp(t)
+			d := plugIn(t, a, fakeKindle(t, false))
+			b := a.books[0]
+			var workDir string
+			a.kindleConverter = func(ctx context.Context, _, work string) (string, bool, error) {
+				workDir = work
+				tc.stop(a)
+				if !errors.Is(ctx.Err(), context.Canceled) {
+					t.Fatalf("converter context after stopping: %v", ctx.Err())
+				}
+				return "", false, ctx.Err()
+			}
+			a.toasts = nil
+			a.sendToReader(d, []int64{b.ID})
+			if a.dev.sending != nil || a.dev.busy != "" || a.busyStop != nil || a.busy != "" || len(d.Books()) != 0 {
+				t.Fatalf("reader sent %d books and left transfer state active", len(d.Books()))
+			}
+			if len(a.toasts) != 1 || a.toasts[0].text != tc.text(d) {
+				t.Fatalf("toasts after stopping: %+v", a.toasts)
+			}
+			if _, err := os.Stat(workDir); !os.IsNotExist(err) {
+				t.Fatalf("temporary conversion directory remains: %v", err)
+			}
+		})
 	}
 }
 

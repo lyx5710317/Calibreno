@@ -77,7 +77,7 @@ func (f *fakeMarketplace) publish(id, name, version, category string, downloads 
 
 func TestMarketplaceInstallAndUpdate(t *testing.T) {
 	a := newTestApp(t)
-	a.pluginDir = t.TempDir()
+	useTestPluginDir(t, a)
 	mk := newFakeMarketplace(t)
 	mk.publish("org.example.dupes", "Find Duplicates", "1.0.0", "library", 11688, "")
 	mk.publish("org.example.wiki", "Wikidata", "1.0.0", "metadata", 2542, `"www.wikidata.org"`)
