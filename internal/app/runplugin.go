@@ -226,12 +226,28 @@ func (a *App) runDone(p *plugin.Plugin, title string, out runOutcome) {
 	switch {
 	case out.changed > 0:
 		lib, undo, dir := a.lib, out.undo, out.undoDir
-		a.toasts = append(a.toasts, toastMsg{text: locales.RunPluginChanged(title, out.changed),
-			action: locales.CommonUndo(), onAction: func() { a.undoRun(lib, undo, dir) },
-			onClose: func() { go os.RemoveAll(dir) }})
+		a.toastPluginUndo(title, out.changed, dir, func() { a.undoRun(lib, undo, dir) })
 	case out.setup == nil && len(out.failed) == 0:
 		a.toast("%s", locales.RunPluginNothing(title))
 	}
+}
+
+func (a *App) toastPluginUndo(title string, changed int, dir string, undo func()) {
+	started := false
+	a.toasts = append(a.toasts, toastMsg{
+		text:   locales.RunPluginChanged(title, changed),
+		action: locales.CommonUndo(),
+		onAction: func() {
+			started = true
+			undo()
+		},
+		onClose: func() {
+			// The action also closes the toast. Once started, undoRun owns its files.
+			if !started && dir != "" {
+				go os.RemoveAll(dir)
+			}
+		},
+	})
 }
 
 // undoRun puts back the files a run replaced.

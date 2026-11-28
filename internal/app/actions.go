@@ -510,9 +510,7 @@ func (a *App) actionDone(p *plugin.Plugin, act *plugin.Action, ids []int64, out 
 	}
 	if out.changed > 0 {
 		lib, undo, files := a.lib, out.undo, out.files
-		a.toasts = append(a.toasts, toastMsg{text: locales.RunPluginChanged(title, out.changed),
-			action: locales.CommonUndo(), onAction: func() { a.undoAction(lib, undo, files) },
-			onClose: func() { go os.RemoveAll(files.undoDir) }})
+		a.toastPluginUndo(title, out.changed, files.undoDir, func() { a.undoAction(lib, undo, files) })
 		said = true
 	} else if out.files.undoDir != "" {
 		go os.RemoveAll(out.files.undoDir)

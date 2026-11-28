@@ -369,6 +369,8 @@ declare namespace Dalibre {
 }
 
 declare const dalibre: {
+  /** Reads packaged files under assets/, with optional gzip decoding. */
+  readonly assets: { read(name: string, compression?: "gzip"): ArrayBuffer };
   /** The plugin API version of the running Dalibre. */
   readonly api: number;
   readonly plugin: { readonly id: string; readonly version: string };

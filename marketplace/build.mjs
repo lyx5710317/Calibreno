@@ -6,7 +6,7 @@
 //   node build.mjs epub-merge build one
 
 import { build } from "esbuild";
-import { readdir, stat } from "node:fs/promises";
+import { copyFile, cp, mkdir, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 
 
@@ -16,6 +16,16 @@ const names = (await readdir("plugins")).filter((n) => !n.startsWith(".") && (on
 for (const name of names) {
   const entry = `src/${name}/main.js`;
   if (!existsSync(entry)) continue;
+  if (name === "japanese-furigana") {
+    // Keep dictionary data in its original compressed form, outside the
+    // script so opening the Plugins window doesn't load the dictionary.
+    const assets = `plugins/${name}/assets`;
+    await mkdir(assets, { recursive: true });
+    await cp("node_modules/kuromoji/dict", `${assets}/ipadic`, { recursive: true });
+    await copyFile("node_modules/kuromoji/LICENSE-2.0.txt", `${assets}/kuromoji-license.txt`);
+    await copyFile("node_modules/kuromoji/NOTICE.md", `${assets}/ipadic-notice.txt`);
+    await copyFile("node_modules/doublearray/LICENSE.txt", `${assets}/doublearray-license.txt`);
+  }
   await build({
     entryPoints: [entry],
     bundle: true,

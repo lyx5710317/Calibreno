@@ -267,7 +267,7 @@ func (p *Plugin) start() error {
 			return err
 		}
 	}
-	for name, fn := range map[string]moejs.NativeFunc{"__host_ask": p.hostAsk, "__host_exec": p.hostExec} {
+	for name, fn := range map[string]moejs.NativeFunc{"__host_ask": p.hostAsk, "__host_exec": p.hostExec, "__host_asset": p.hostAsset} {
 		if err := rt.SetGlobal(name, fn); err != nil {
 			p.stop()
 			return err

@@ -600,6 +600,7 @@ What only Dalibre can give you:
 | `dalibre.error(kind, message?)` | An `Error` Dalibre understands; see below. |
 | `dalibre.plugin` | `{ id, version }` from your manifest. |
 | `dalibre.api` | The plugin API version of the running Dalibre. |
+| `dalibre.assets.read(name, compression?)` | Reads an asset from the plugin package's `assets/` folder as an ArrayBuffer. Specify `"gzip"` to decompress it. Available in Calibreno 0.8.2 and later. |
 | `dalibre.form`, `dalibre.library`, `dalibre.progress`, `dalibre.interactive` | For an action while it runs; see [`run`](#run). |
 | `dalibre.exec(id, args, options?)` | Runs one of your [tools](#tools). |
 | `dalibre.html.tokens(html)`, `dalibre.html.escape(text)` | HTML and XHTML as tokens; see below. |

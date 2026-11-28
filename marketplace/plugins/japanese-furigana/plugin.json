@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../sdk/plugin.schema.json",
+  "id": "io.github.lyx5710317.calibreno.japanese-furigana",
+  "name": "日文假名标注",
+  "version": "0.1.0",
+  "api": 1,
+  "dalibre": ">=0.8.2",
+  "author": "Calibreno",
+  "homepage": "https://github.com/lyx5710317/Calibreno/tree/main/marketplace/plugins/japanese-furigana",
+  "license": "GPL-3.0-or-later",
+  "main": "main.js",
+  "description": "离线为日文 EPUB 添加平假名读音，可选全量、标准或生僻注音。",
+  "icon": "book-open",
+  "capabilities": {
+    "actions": [
+      {
+        "id": "annotate",
+        "title": "日文假名标注…",
+        "icon": "pencil",
+        "scope": "books",
+        "books": { "min": 1 },
+        "formats": ["EPUB"],
+        "files": true
+      }
+    ]
+  },
+  "permissions": {
+    "hosts": [],
+    "library": "read"
+  }
+}

@@ -10,7 +10,8 @@
   "use strict";
   const hostLog = __host_log, hostSettle = __host_settle, hostInfo = __host_info;
   const hostAsk = __host_ask, hostExec = __host_exec, hostFlag = __host_flag, hostProgress = __host_progress, hostHTML = __host_html;
-  for (const k of ["__host_log", "__host_settle", "__host_info", "__host_ask", "__host_exec", "__host_flag", "__host_progress", "__host_html"]) delete globalThis[k];
+  const hostAsset = __host_asset;
+  for (const k of ["__host_log", "__host_settle", "__host_info", "__host_ask", "__host_exec", "__host_flag", "__host_progress", "__host_html", "__host_asset"]) delete globalThis[k];
   const { parse, stringify } = JSON;
   const { freeze, defineProperty, keys } = Object;
   const resolved = Promise.resolve.bind(Promise), rejected = Promise.reject.bind(Promise);
@@ -93,6 +94,9 @@
     get interactive() { return hostFlag("interactive") === "1"; },
     form(spec) { return ask("form", spec); },
     exec,
+    assets: freeze({
+      read(name, compression) { return compression === undefined ? hostAsset(name) : hostAsset(name, compression); },
+    }),
     progress(done, total) { hostProgress(Math.trunc(Number(done)) || 0, Math.trunc(Number(total)) || 0); },
     html: freeze({
       tokens(s) { return parse(hostHTML(String(s))); },

@@ -6,6 +6,11 @@ shows, so write them for readers of the app. `mygo build` needs a
 
 ## Unreleased
 
+## 0.8.2
+
+- 支持自研「日文假名标注」插件。可离线为日文 EPUB 添加三种范围的平假名注音，保留书中已有的读音和原始 EPUB。
+- 修复插件改写书籍格式后，点击「撤销」时临时文件可能提前清理的问题。
+
 ## 0.8.1
 
 - 桌面应用名称更新为 Calibreno，并补齐简体中文界面、插件入口和常用提示。
