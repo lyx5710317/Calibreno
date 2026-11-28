@@ -23,6 +23,7 @@
     "zh-metadata-review": { "category": "metadata", "origin": "calibreno" },
     "extract-isbn": { "category": "metadata", "origin": "upstream", "calibre": "Extract ISBN" },
     "chinese-convert": { "category": "language", "origin": "upstream", "calibre": "Chinese Text Conversion" },
+    "japanese-furigana": { "category": "language", "origin": "calibreno" },
     "epub-merge": { "category": "epub", "origin": "upstream", "calibre": "EpubMerge" },
     "epub-split": { "category": "epub", "origin": "upstream", "calibre": "EpubSplit" },
     "modify-epub": { "category": "epub", "origin": "upstream", "calibre": "Modify ePub" },
