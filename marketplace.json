@@ -20,6 +20,7 @@
   ],
   "featured": [
     "org.randynamic.dalibre.search-internet",
+    "io.github.lyx5710317.calibreno.zh-metadata-review",
     "org.randynamic.dalibre.chinese-convert",
     "org.randynamic.dalibre.extract-isbn",
     "org.randynamic.dalibre.epub-merge",
@@ -39,7 +40,7 @@
       "category": "library",
       "origin": "upstream",
       "calibre": "Find Duplicates",
-      "downloads": 11819,
+      "downloads": 11821,
       "repo": "lyx5710317/Calibreno",
       "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.find-duplicates-1.0.0.dalibre-plugin",
       "capabilities": {
@@ -206,7 +207,7 @@
       "category": "library",
       "origin": "upstream",
       "calibre": "Search The Internet",
-      "downloads": 3581,
+      "downloads": 3583,
       "repo": "lyx5710317/Calibreno",
       "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.search-internet-1.2.1.dalibre-plugin",
       "capabilities": {
@@ -287,39 +288,29 @@
       }
     },
     {
-      "id": "org.randynamic.dalibre.count-pages",
-      "name": "Count Pages",
-      "version": "1.0.0",
-      "description": "Counts words and estimates pages",
-      "author": "Randy",
+      "id": "io.github.lyx5710317.calibreno.zh-metadata-review",
+      "name": "中文书目校对",
+      "version": "0.1.0",
+      "description": "离线清理书名和作者的格式问题，预览后确认修改，并提示复核版次、卷次、译者和异常 ISBN。",
+      "author": "Calibreno",
       "license": "GPL-3.0-or-later",
-      "icon": "library",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/count-pages",
-      "dalibre": ">=0.4.0",
-      "category": "library",
-      "origin": "upstream",
-      "calibre": "Count Pages",
-      "downloads": 8543,
+      "icon": "book-open",
+      "homepage": "https://github.com/lyx5710317/Calibreno/tree/main/marketplace/plugins/zh-metadata-review",
+      "dalibre": ">=0.8.1",
+      "category": "metadata",
+      "origin": "calibreno",
       "repo": "lyx5710317/Calibreno",
-      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.count-pages-1.0.0.dalibre-plugin",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/io.github.lyx5710317.calibreno.zh-metadata-review-0.1.0.dalibre-plugin",
       "capabilities": {
         "actions": [
           {
-            "id": "count",
-            "title": "Count pages…",
-            "icon": "file",
+            "id": "review",
+            "title": "中文书目校对…",
+            "icon": "check-circle",
             "scope": "books",
             "books": {
               "min": 1
-            },
-            "formats": [
-              "EPUB",
-              "KEPUB",
-              "TXT",
-              "HTMLZ",
-              "FB2"
-            ],
-            "files": true
+            }
           }
         ]
       },
@@ -341,7 +332,7 @@
       "category": "metadata",
       "origin": "upstream",
       "calibre": "Extract ISBN",
-      "downloads": 4097,
+      "downloads": 4098,
       "repo": "lyx5710317/Calibreno",
       "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.extract-isbn-1.0.0.dalibre-plugin",
       "capabilities": {
@@ -409,75 +400,6 @@
       }
     },
     {
-      "id": "org.randynamic.dalibre.apple-books",
-      "name": "Apple Books covers",
-      "version": "1.0.0",
-      "description": "High-resolution covers from the Apple Books store",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "book-open",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/apple-books",
-      "dalibre": ">=0.4.0",
-      "category": "metadata",
-      "origin": "upstream",
-      "calibre": "Apple Books covers",
-      "downloads": 2915,
-      "repo": "lyx5710317/Calibreno",
-      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.apple-books-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "metadata": {
-          "fields": [
-            "cover"
-          ]
-        }
-      },
-      "permissions": {
-        "hosts": [
-          "itunes.apple.com",
-          "*.mzstatic.com"
-        ],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.wikidata",
-      "name": "Wikidata",
-      "version": "1.0.0",
-      "description": "Book details and covers from Wikidata",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "network",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/wikidata",
-      "dalibre": ">=0.4.0",
-      "category": "metadata",
-      "origin": "upstream",
-      "calibre": "Wikidata",
-      "downloads": 2570,
-      "repo": "lyx5710317/Calibreno",
-      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.wikidata-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "metadata": {
-          "fields": [
-            "title",
-            "authors",
-            "series",
-            "tags",
-            "pubdate",
-            "identifiers",
-            "cover"
-          ]
-        }
-      },
-      "permissions": {
-        "hosts": [
-          "query.wikidata.org",
-          "commons.wikimedia.org",
-          "upload.wikimedia.org"
-        ],
-        "library": "read"
-      }
-    },
-    {
       "id": "org.randynamic.dalibre.epub-merge",
       "name": "EPUB Merge",
       "version": "1.0.0",
@@ -490,7 +412,7 @@
       "category": "epub",
       "origin": "upstream",
       "calibre": "EpubMerge",
-      "downloads": 9363,
+      "downloads": 9364,
       "repo": "lyx5710317/Calibreno",
       "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.epub-merge-1.0.0.dalibre-plugin",
       "capabilities": {
@@ -529,7 +451,7 @@
       "category": "epub",
       "origin": "upstream",
       "calibre": "EpubSplit",
-      "downloads": 8760,
+      "downloads": 8761,
       "repo": "lyx5710317/Calibreno",
       "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.epub-split-1.0.0.dalibre-plugin",
       "capabilities": {
@@ -630,146 +552,6 @@
       },
       "permissions": {
         "hosts": [],
-        "library": "read"
-      }
-    },
-    {
-      "id": "io.github.bellussi1.hardcover",
-      "name": "Hardcover",
-      "version": "1.0.1",
-      "description": "Fetch metadata and sync reading status & ratings with Hardcover (KOReader-friendly)",
-      "author": "Enzo Bellussi",
-      "license": "MIT",
-      "icon": "bookmark",
-      "homepage": "https://github.com/bellussi1/dalibre-hardcover",
-      "dalibre": ">=0.4.0",
-      "category": "metadata",
-      "origin": "community",
-      "repo": "bellussi1/dalibre-hardcover",
-      "community": true,
-      "package": "https://github.com/bellussi1/dalibre-hardcover/releases/download/v1.0.1/io.github.bellussi1.hardcover-1.0.1.dalibre-plugin",
-      "capabilities": {
-        "metadata": {
-          "fields": [
-            "title",
-            "authors",
-            "series",
-            "tags",
-            "publisher",
-            "pubdate",
-            "language",
-            "identifiers",
-            "cover",
-            "description"
-          ]
-        },
-        "actions": [
-          {
-            "id": "sync-from-hardcover",
-            "title": "Sync from Hardcover…",
-            "icon": "refresh",
-            "scope": "library"
-          },
-          {
-            "id": "set-hardcover-status",
-            "title": "Set Hardcover status…",
-            "icon": "bookmark",
-            "scope": "books",
-            "books": {
-              "min": 1
-            }
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [
-          "api.hardcover.app",
-          "assets.hardcover.app"
-        ],
-        "library": "read"
-      }
-    },
-    {
-      "id": "io.github.bellussi1.isbn-brasil",
-      "name": "ISBN Brasil",
-      "version": "1.0.1",
-      "description": "Brazilian ISBN metadata (CBL / Mercado Editorial) via BrasilAPI, with fallback covers",
-      "author": "Enzo Bellussi",
-      "license": "MIT",
-      "icon": "bookmark",
-      "homepage": "https://github.com/bellussi1/dalibre-isbn-brasil",
-      "dalibre": ">=0.6.0",
-      "category": "metadata",
-      "origin": "community",
-      "repo": "bellussi1/dalibre-isbn-brasil",
-      "community": true,
-      "package": "https://github.com/bellussi1/dalibre-isbn-brasil/releases/download/v1.0.1/io.github.bellussi1.isbn-brasil-1.0.1.dalibre-plugin",
-      "capabilities": {
-        "metadata": {
-          "fields": [
-            "title",
-            "authors",
-            "tags",
-            "publisher",
-            "pubdate",
-            "language",
-            "identifiers",
-            "cover",
-            "description"
-          ]
-        }
-      },
-      "permissions": {
-        "hosts": [
-          "archive.org",
-          "*.archive.org",
-          "brasilapi.com.br",
-          "covers.openlibrary.org",
-          "openlibrary.org",
-          "www.googleapis.com"
-        ],
-        "covers": "any",
-        "library": "read"
-      }
-    },
-    {
-      "id": "io.github.bellussi1.openlibrary",
-      "name": "Open Library",
-      "version": "1.0.1",
-      "description": "Book details, covers, series and descriptions from Open Library",
-      "author": "Enzo Bellussi",
-      "license": "MIT",
-      "icon": "library",
-      "homepage": "https://github.com/bellussi1/dalibre-openlibrary",
-      "dalibre": ">=0.4.0",
-      "category": "metadata",
-      "origin": "community",
-      "repo": "bellussi1/dalibre-openlibrary",
-      "community": true,
-      "package": "https://github.com/bellussi1/dalibre-openlibrary/releases/download/v1.0.1/io.github.bellussi1.openlibrary-1.0.1.dalibre-plugin",
-      "capabilities": {
-        "metadata": {
-          "fields": [
-            "title",
-            "authors",
-            "series",
-            "tags",
-            "publisher",
-            "pubdate",
-            "language",
-            "identifiers",
-            "cover",
-            "description"
-          ]
-        }
-      },
-      "permissions": {
-        "hosts": [
-          "archive.org",
-          "*.archive.org",
-          "covers.openlibrary.org",
-          "openlibrary.org"
-        ],
         "library": "read"
       }
     }
