@@ -207,7 +207,7 @@
       "category": "library",
       "origin": "upstream",
       "calibre": "Search The Internet",
-      "downloads": 3583,
+      "downloads": 3584,
       "repo": "lyx5710317/Calibreno",
       "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.search-internet-1.2.1.dalibre-plugin",
       "capabilities": {
@@ -400,6 +400,42 @@
       }
     },
     {
+      "id": "io.github.lyx5710317.calibreno.japanese-furigana",
+      "name": "日文假名标注",
+      "version": "0.1.0",
+      "description": "离线为日文 EPUB 添加平假名读音，可选全量、标准或生僻注音。",
+      "author": "Calibreno",
+      "license": "GPL-3.0-or-later",
+      "icon": "book-open",
+      "homepage": "https://github.com/lyx5710317/Calibreno/tree/main/marketplace/plugins/japanese-furigana",
+      "dalibre": ">=0.8.2",
+      "category": "language",
+      "origin": "calibreno",
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/io.github.lyx5710317.calibreno.japanese-furigana-0.1.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "annotate",
+            "title": "日文假名标注…",
+            "icon": "pencil",
+            "scope": "books",
+            "books": {
+              "min": 1
+            },
+            "formats": [
+              "EPUB"
+            ],
+            "files": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
       "id": "org.randynamic.dalibre.epub-merge",
       "name": "EPUB Merge",
       "version": "1.0.0",
@@ -530,7 +566,7 @@
       "category": "epub",
       "origin": "upstream",
       "calibre": "KoboTouchExtended",
-      "downloads": 8256,
+      "downloads": 8257,
       "repo": "lyx5710317/Calibreno",
       "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.kepub-1.0.0.dalibre-plugin",
       "capabilities": {
