@@ -137,6 +137,40 @@ func TestSelectShowsDetails(t *testing.T) {
 	shot(t, tt, "detail")
 }
 
+func TestBookDetailDoubanLink(t *testing.T) {
+	a := newTestApp(t)
+	b := a.byID[bookID(t, a, "Dune")]
+	metadata := b.Metadata(a.detailsOf(b))
+	metadata.Identifiers["douban"] = "1003078"
+	if err := a.lib.UpdateMetadata(b.ID, metadata); err != nil {
+		t.Fatal(err)
+	}
+	a.reload(nil)
+	tt := ui.NewTester(a.View, 1440, 900)
+	tt.Frame()
+	if err := tt.Click("Dune"); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	if !tt.HasText("Open on Douban") {
+		t.Fatal("a linked book does not show the Douban link")
+	}
+	if err := tt.Click("Piranesi"); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	if tt.HasText("Open on Douban") {
+		t.Fatal("a different book shows the previous book's Douban link")
+	}
+
+	if got := doubanBookURL("http://book.douban.com/subject/1003078/?from=book"); got != "https://book.douban.com/subject/1003078/" {
+		t.Errorf("legacy link resolved to %q", got)
+	}
+	if got := doubanBookURL("https://example.com/book.douban.com/subject/1003078/"); got != "" {
+		t.Errorf("unrelated host produced %q", got)
+	}
+}
+
 func TestSearchAndFilter(t *testing.T) {
 	a := newTestApp(t)
 	tt := ui.NewTester(a.View, 1440, 900)

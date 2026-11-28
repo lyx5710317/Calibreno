@@ -2,7 +2,7 @@
   "name": "Calibreno",
   "identifier": "org.randynamic.dalibre",
   "publisher": "Calibreno",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "out": "build",
   "urlSchemes": ["dalibre"],
   "i18n": {

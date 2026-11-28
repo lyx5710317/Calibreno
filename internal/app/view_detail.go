@@ -149,6 +149,11 @@ func (a *App) bookDetail(c *ui.Context, b *calibre.Book) {
 					}
 				}
 			})
+			if d != nil {
+				if link := doubanBookURL(d.Identifiers["douban"]); link != "" {
+					ui.Link(c, locales.DetailOpenDouban(), link).FontSize(13).TextColor(pal().TextAccent).Underline()
+				}
+			}
 			if b.Rating > 0 {
 				widgets.Stars(c, b.Rating, 13)
 			}
@@ -317,6 +322,22 @@ func (a *App) bookDetail(c *ui.Context, b *calibre.Book) {
 			ui.Text(c, htmlToText(d.Comments)).FontSize(13).LineHeight(1.55).TextColor(pal().TextSecondary).Selectable()
 		})
 	}
+}
+
+var (
+	doubanBookID   = regexp.MustCompile(`^[1-9][0-9]*$`)
+	doubanBookLink = regexp.MustCompile(`(?i)^https?://book\.douban\.com/subject/([1-9][0-9]*)/?(?:[?#][^\s]*)?$`)
+)
+
+func doubanBookURL(value string) string {
+	value = strings.TrimSpace(value)
+	if link := doubanBookLink.FindStringSubmatch(value); link != nil {
+		value = link[1]
+	}
+	if !doubanBookID.MatchString(value) {
+		return ""
+	}
+	return "https://book.douban.com/subject/" + value + "/"
 }
 
 var (

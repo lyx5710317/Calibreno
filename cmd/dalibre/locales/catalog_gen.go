@@ -1859,6 +1859,16 @@ func (msgs Messages) DetailBooksBy(author string) string {
 	return Catalog.Format(msgs.locale, "detailBooksBy", map[string]any{"author": author})
 }
 
+// DetailOpenDouban says "Open on Douban"
+// in the language the app shows.
+func DetailOpenDouban() string { return In(i18n.Locale()).DetailOpenDouban() }
+
+// DetailOpenDouban says "Open on Douban"
+// in the language of msgs.
+func (msgs Messages) DetailOpenDouban() string {
+	return Catalog.Format(msgs.locale, "detailOpenDouban", nil)
+}
+
 // DetailOverlineDetails says "DETAILS"
 // in the language the app shows.
 func DetailOverlineDetails() string { return In(i18n.Locale()).DetailOverlineDetails() }

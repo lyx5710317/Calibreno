@@ -6,6 +6,11 @@ shows, so write them for readers of the app. `mygo build` needs a
 
 ## Unreleased
 
+## 0.8.3
+
+- 已绑定豆瓣书页的书籍，可以从详情栏的书名下方直接打开对应页面。
+- 支持「豆瓣书目链接」插件，可手动绑定豆瓣书页，或按 ISBN 查找并确认对应版本。
+
 ## 0.8.2
 
 - 支持自研「日文假名标注」插件。可离线为日文 EPUB 添加三种范围的平假名注音，保留书中已有的读音和原始 EPUB。

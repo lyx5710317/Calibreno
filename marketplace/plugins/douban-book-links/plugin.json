@@ -1,0 +1,36 @@
+{
+  "$schema": "../../../sdk/plugin.schema.json",
+  "id": "io.github.lyx5710317.calibreno.douban-book-links",
+  "name": "豆瓣书目链接",
+  "version": "0.1.0",
+  "api": 1,
+  "dalibre": ">=0.8.3",
+  "author": "Calibreno",
+  "homepage": "https://github.com/lyx5710317/Calibreno/tree/main/marketplace/plugins/douban-book-links",
+  "license": "GPL-3.0-or-later",
+  "main": "main.js",
+  "description": "粘贴豆瓣书页链接，或按 ISBN 查找并绑定对应版本。",
+  "icon": "book-open",
+  "capabilities": {
+    "actions": [
+      {
+        "id": "bind",
+        "title": "绑定豆瓣链接…",
+        "icon": "external",
+        "scope": "books",
+        "books": { "min": 1, "max": 1 }
+      },
+      {
+        "id": "lookup",
+        "title": "补全豆瓣链接…",
+        "icon": "search",
+        "scope": "books",
+        "books": { "min": 1, "max": 1 }
+      }
+    ]
+  },
+  "permissions": {
+    "hosts": ["neodb.social"],
+    "library": "read"
+  }
+}

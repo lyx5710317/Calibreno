@@ -6,6 +6,11 @@
 const SITE = "https://neodb.social";
 const MAX = 12; // candidates returned
 
+/** The identifier from a Douban book's own page. @param {string} url */
+export function doubanSubjectID(url) {
+  return /^https?:\/\/book\.douban\.com\/subject\/([1-9][0-9]*)\/?(?:[?#][^\s]*)?$/i.exec(url.trim())?.[1];
+}
+
 /**
  * Candidates for the book, best first: by ISBN or NeoDB id when the book
  * has one, else by title and authors.
@@ -119,8 +124,10 @@ function candidate(b) {
   const identifiers = { neodb: b.uuid };
   if (b.isbn) identifiers.isbn = String(b.isbn);
   for (const { url } of b.external_resources ?? []) {
+    if (typeof url !== "string") continue;
+    const douban = doubanSubjectID(url);
     let m;
-    if ((m = /book\.douban\.com\/subject\/(\d+)/.exec(url))) identifiers.douban ??= m[1];
+    if (douban) identifiers.douban ??= douban;
     else if ((m = /goodreads\.com\/book\/show\/(\d+)/.exec(url))) identifiers.goodreads ??= m[1];
     else if ((m = /openlibrary\.org\/(?:books|works)\/(OL\w+)/.exec(url))) identifiers.openlibrary ??= m[1];
     else if ((m = /books\.google\.[a-z.]+\/books\?id=([\w-]+)/.exec(url))) identifiers.google ??= m[1];
