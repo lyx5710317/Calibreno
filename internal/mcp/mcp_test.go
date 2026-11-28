@@ -14,6 +14,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	sdk "github.com/modelcontextprotocol/go-sdk/mcp"
 
@@ -542,6 +543,16 @@ func TestBridge(t *testing.T) {
 	if name, when := s.LastUse(); name != "claude-code" || when.IsZero() {
 		t.Errorf("last use: %q %v", name, when)
 	}
+	s.SetAllowChanges(false)
+	until := time.Now().Add(connectTimeout)
+	for {
+		if names := toolNames(t, cs); len(names) == len(readTools) {
+			break
+		} else if time.Now().After(until) {
+			t.Fatalf("bridge stayed writable after read-only change: %v", names)
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
 
 	// The app doesn't run: the last library, read only.
 	srv.CloseClientConnections()
@@ -553,6 +564,60 @@ func TestBridge(t *testing.T) {
 	call(t, cs, "search_books", map[string]any{"query": "earthsea"}, &sr)
 	if sr.Total != 1 {
 		t.Fatalf("search without the app: %+v", sr)
+	}
+
+	// The desktop service is disabled: stdio goes straight to the saved library.
+	cs = bridge("", "old-token", lib.Root)
+	if got := strings.Join(toolNames(t, cs), " "); got != "get_book list_facets search_books" {
+		t.Errorf("desktop service disabled: %s", got)
+	}
+}
+
+func TestBridgeConnectionErrors(t *testing.T) {
+	lib := testLibrary(t)
+	s := New(&testHost{lib: lib}, "test", false)
+	s.SetToken("correct")
+	s.srv.AddReceivingMiddleware(func(next sdk.MethodHandler) sdk.MethodHandler {
+		return func(ctx context.Context, method string, req sdk.Request) (sdk.Result, error) {
+			if method == "tools/list" {
+				return nil, errors.New("tool list unavailable")
+			}
+			return next(ctx, method, req)
+		}
+	})
+	srv := httptest.NewServer(s.Handler())
+	defer srv.Close()
+	other := httptest.NewServer(http.NotFoundHandler())
+	defer other.Close()
+	otherMCP := sdk.NewServer(&sdk.Implementation{Name: "another-local-tool", Version: "1"}, nil)
+	otherMCPSrv := httptest.NewServer(sdk.NewStreamableHTTPHandler(func(*http.Request) *sdk.Server { return otherMCP }, nil))
+	defer otherMCPSrv.Close()
+
+	for _, tc := range []struct{ name, endpoint, token, want string }{
+		{"wrong token", srv.URL + Path, "wrong", "Unauthorized"},
+		{"missing token", srv.URL + Path, "", "token is missing"},
+		{"another service", other.URL + Path, "correct", "Not Found"},
+		{"another MCP server", otherMCPSrv.URL + Path, "correct", "serving a different MCP server"},
+		{"initial tool list", srv.URL + Path, "correct", "tool list unavailable"},
+		{"invalid endpoint", ":/", "correct", "invalid local Calibreno MCP endpoint"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			r, w := io.Pipe()
+			defer r.Close()
+			defer w.Close()
+			err := Bridge(t.Context(), tc.endpoint, tc.token, lib.Root, "test", io.NopCloser(strings.NewReader("")), w)
+			if err == nil || !strings.Contains(err.Error(), tc.want) {
+				t.Fatalf("bridge error = %v, want %q", err, tc.want)
+			}
+		})
+	}
+
+	r, w := io.Pipe()
+	defer r.Close()
+	defer w.Close()
+	err := Bridge(t.Context(), "", "", t.TempDir(), "test", io.NopCloser(strings.NewReader("")), w)
+	if !errors.Is(err, calibre.ErrNotLibrary) {
+		t.Fatalf("invalid saved library: %v", err)
 	}
 }
 

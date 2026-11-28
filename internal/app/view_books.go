@@ -492,16 +492,17 @@ func (a *App) bookMenu(b *calibre.Book) func(m *ui.Menu) {
 			above = true
 		}
 		if dev := a.connectedDevice(); dev != nil {
-			above = true
-			item := m.Item(locales.WirelessSendTo(dev.Info().Name)).Icon(icons.Menu(icons.Wifi))
-			if a.device.sending > 0 {
-				item.Disabled(true)
-			}
-			if item.Chosen() {
-				a.sendToDevice(ids)
+			info := dev.Info()
+			if !isKOReader(info.App) {
+				above = true
+				if m.Item(locales.WirelessSendTo(info.Name)).Icon(icons.Menu(icons.Wifi)).
+					Disabled(a.device.sending > 0 || a.busy != "" || a.loading).Chosen() {
+					a.sendToDevice(dev, ids)
+				}
 			}
 			if on := a.onDevice(ids); len(on) > 0 {
-				item := m.Item(locales.WirelessRemoveFrom(dev.Info().Name)).Icon(icons.Menu(icons.Trash))
+				above = true
+				item := m.Item(locales.WirelessRemoveFrom(info.Name)).Icon(icons.Menu(icons.Trash))
 				if a.device.sending > 0 {
 					item.Disabled(true)
 				}
@@ -513,10 +514,7 @@ func (a *App) bookMenu(b *calibre.Book) func(m *ui.Menu) {
 		if a.readerMenuItems(m, ids) {
 			above = true
 		}
-		if a.emailMenuItems(m, ids) {
-			above = true
-		}
-		a.readingTransferMenu(m, ids, "")
+		a.readingTransferMenu(m, ids)
 		if m.Item(locales.ExportMenu()).Icon(icons.Menu(icons.Download)).Disabled(a.busy != "").Chosen() {
 			a.openExport(ids)
 		}

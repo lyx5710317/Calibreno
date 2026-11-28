@@ -9,7 +9,8 @@ import (
 // An agent lists the plugins' actions and runs one: told the fields of
 // the form it asks, it answers them.
 func TestActionTools(t *testing.T) {
-	cs := connect(t, New(&testHost{lib: testLibrary(t)}, "test", true))
+	s := New(&testHost{lib: testLibrary(t)}, "test", true)
+	cs := connect(t, s)
 	var list actionsOut
 	if msg := call(t, cs, "list_actions", nil, &list); msg != "" {
 		t.Fatal(msg)
@@ -36,9 +37,9 @@ func TestActionTools(t *testing.T) {
 		t.Errorf("unknown plugin: %q", msg)
 	}
 
-	// Reading only, agents don't get them.
-	ro := connect(t, New(&testHost{lib: testLibrary(t)}, "test", false))
-	if names := toolNames(t, ro); slices.Contains(names, "run_action") || slices.Contains(names, "list_actions") {
+	// Disable changes while the session that discovered these tools is open.
+	s.SetAllowChanges(false)
+	if names := toolNames(t, cs); slices.Contains(names, "run_action") || slices.Contains(names, "list_actions") {
 		t.Errorf("read-only tools %v", names)
 	}
 }

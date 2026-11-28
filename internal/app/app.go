@@ -167,6 +167,7 @@ type App struct {
 	// settingsOpen shows the Settings window, on section.
 	settingsOpen bool
 	section      settingsSection
+	transferTab  transferTarget
 	catEdit      catalogEdit  // the Add or Edit catalog sheet
 	shareEdit    shareEdit    // Settings › OPDS's sharing fields
 	mcpEdit      mcpEdit      // Settings › MCP's port field

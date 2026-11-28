@@ -88,7 +88,7 @@ func (a *App) agentsPopover(c *ui.Context, st mcpStatus) {
 		}
 	}
 	on := cfg.On
-	a.sharingBlock(c, nameMCP, status, color, &on, sectionMCP, address, &a.agentsOpen)
+	a.sharingBlock(c, nameMCP, status, color, &on, func() { a.openSettings(sectionMCP) }, address, &a.agentsOpen)
 	if on != cfg.On {
 		a.setMCPOn(on)
 	}

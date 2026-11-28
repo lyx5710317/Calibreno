@@ -10,3 +10,7 @@ import (
 func IsAddressInUse(err error) bool {
 	return errors.Is(err, windows.WSAEADDRINUSE)
 }
+
+func isConnectionRefused(err error) bool {
+	return errors.Is(err, windows.WSAECONNREFUSED)
+}

@@ -173,7 +173,8 @@ func coverFile(lib *calibre.Library, b *calibre.Book) string {
 	if b == nil || !b.HasCover {
 		return ""
 	}
-	return lib.CoverPath(b)
+	path, _ := lib.ResolveLibraryFile(lib.CoverPath(b))
+	return path
 }
 
 // connectedDevice is the reader connected, nil when none is.
@@ -219,11 +220,11 @@ func (a *App) deviceStatus() (string, bool) {
 	return locales.WirelessWaiting(), false
 }
 
-// sendToDevice sends the books of ids to the reader connected, each in
-// the format it likes best of those the book has.
-func (a *App) sendToDevice(ids []int64) {
-	st, dev, lib := a.device, a.connectedDevice(), a.lib
-	if dev == nil || lib == nil || st.sending > 0 {
+// sendToDevice sends the books of ids to the selected wireless reader in
+// its preferred format, while that reader is still connected.
+func (a *App) sendToDevice(dev *smartdevice.Device, ids []int64) {
+	st, lib := a.device, a.lib
+	if dev == nil || a.connectedDevice() != dev || lib == nil || st.sending > 0 || a.busy != "" || a.loading {
 		return
 	}
 	var books []*calibre.Book
@@ -242,17 +243,12 @@ func (a *App) sendToDevice(ids []int64) {
 		var unreadable []string
 		for _, b := range books {
 			format := dev.Format(b.Formats)
-			path := ""
-			if format != "" {
-				if d, err := lib.Details(b); err == nil {
-					for _, f := range d.Files {
-						if f.Format == format {
-							path = f.Path
-						}
-					}
-				}
+			if format == "" {
+				unreadable = append(unreadable, b.Title)
+				continue
 			}
-			if path == "" {
+			_, path, err := libraryFormatPaths(lib, b, format)
+			if err != nil {
 				unreadable = append(unreadable, b.Title)
 				continue
 			}

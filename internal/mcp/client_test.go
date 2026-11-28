@@ -3,8 +3,10 @@ package mcp
 import (
 	"context"
 	"errors"
+	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 
 	plugsdk "dalibre/sdk"
@@ -52,5 +54,24 @@ func TestDial(t *testing.T) {
 	srv.Close()
 	if _, err := Dial(ctx, srv.URL+Path, "secret", "dalibre-plugin", "test"); !errors.Is(err, ErrNotRunning) {
 		t.Errorf("nothing listening: %v", err)
+	}
+}
+
+func TestDialDoesNotFollowRedirects(t *testing.T) {
+	var reached atomic.Bool
+	destination := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		reached.Store(true)
+		w.WriteHeader(http.StatusBadRequest)
+	}))
+	defer destination.Close()
+	local := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, destination.URL+Path, http.StatusTemporaryRedirect)
+	}))
+	defer local.Close()
+	if _, err := Dial(t.Context(), local.URL+Path, "secret", "test", "test"); err == nil {
+		t.Fatal("redirected endpoint was treated as an MCP server")
+	}
+	if reached.Load() {
+		t.Fatal("followed an MCP redirect")
 	}
 }

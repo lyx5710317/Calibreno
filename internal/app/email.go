@@ -14,8 +14,8 @@ import (
 
 // Emailing books to Kindles (Figma "26 · Send to Kindle by email"): a
 // stock Kindle reads no OPDS, so Amazon's Send to Kindle address is its
-// only wireless way in. Settings › Email holds the Kindles and the account
-// mail is sent from; the book menu has Email to each Kindle.
+// only wireless way in. Transfer settings holds the Kindles and the sending
+// account. The book menu offers a route for each configured Kindle.
 
 // emailSecret is the credential store's key for the sender's password.
 const emailSecret = "email-smtp"
@@ -36,7 +36,7 @@ var kindleFormats = []struct{ format, contentType string }{
 // kindleMaxSize is the largest file Send to Kindle takes.
 const kindleMaxSize = 50 << 20
 
-// emailEdit is Settings › Email's fields that aren't settings as they
+// emailEdit holds the Kindle email fields that aren't settings as they
 // are: the port as typed, and the password, read from the store once.
 type emailEdit struct {
 	loaded   bool
@@ -140,6 +140,10 @@ func kindleMessage(lib *calibre.Library, b *calibre.Book, to string) (m email.Me
 			if f.Format != kf.format {
 				continue
 			}
+			file, err := lib.ResolveLibraryFile(f.Path)
+			if err != nil {
+				continue
+			}
 			if f.Size > kindleMaxSize {
 				return m, false, true
 			}
@@ -152,7 +156,7 @@ func kindleMessage(lib *calibre.Library, b *calibre.Book, to string) (m email.Me
 				Name:        calibre.SafeFileName(name, 100) + ext,
 				ASCIIName:   calibre.ASCIIFilename(name) + ext,
 				ContentType: kf.contentType,
-				Path:        f.Path,
+				Path:        file,
 			}}, false, false
 		}
 	}
@@ -163,7 +167,7 @@ func kindleMessage(lib *calibre.Library, b *calibre.Book, to string) (m email.Me
 // own email, in the sidebar's busy row, which can stop it.
 func (a *App) emailBooks(k settings.Kindle, ids []int64) {
 	lib := a.lib
-	if lib == nil || a.busy != "" {
+	if lib == nil || a.busy != "" || a.loading {
 		return
 	}
 	var books []*calibre.Book

@@ -26,6 +26,8 @@ import (
 // Path is where the server answers on its port.
 const Path = "/mcp"
 
+const implementationName = "dalibre"
+
 // Host is what the app gives the server. Its methods may be called on
 // any goroutine.
 type Host interface {
@@ -116,7 +118,7 @@ const clientMeta = "dalibre/client"
 // New makes the server. With allowChanges it has the write tools too.
 func New(h Host, version string, allowChanges bool) *Server {
 	s := &Server{host: h, found: map[string]plugin.Result{}, agents: map[string]*Agent{}}
-	s.srv = sdk.NewServer(&sdk.Implementation{Name: "dalibre", Title: "Calibreno", Version: version}, &sdk.ServerOptions{
+	s.srv = sdk.NewServer(&sdk.Implementation{Name: implementationName, Title: "Calibreno", Version: version}, &sdk.ServerOptions{
 		Instructions: "Calibreno is the user's e-book library, a calibre library. Book ids come from search_books. " +
 			"To convert a book, convert the file get_book gives to a file outside the library, then add it with add_format. " +
 			"To write a plugin for Calibreno (metadata, file processing, or actions), read " + PluginDocs +

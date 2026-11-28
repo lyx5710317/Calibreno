@@ -165,8 +165,8 @@ func TestKOReaderPasswordAndSync(t *testing.T) {
 		pump()
 	}()
 
-	// Settings › KOReader: a password, applied.
-	a.openSettings(sectionWireless)
+	// Transfer settings › KOReader: a password, applied.
+	a.openTransferSettings(transferKOReader)
 	tt := ui.NewTester(a.View, 1440, 900)
 	tt.Frame()
 	if !tt.HasText(locales.WirelessRequirePassword()) || !tt.HasText(a.deviceAddress()) {
@@ -261,7 +261,7 @@ func TestSendToKOReader(t *testing.T) {
 		}
 	}
 	a.toasts = nil
-	a.sendToDevice(ids)
+	a.sendToDevice(a.connectedDevice(), ids)
 	pump()
 	k.mu.Lock()
 	got := k.got

@@ -1,4 +1,17 @@
-# Readers plugged in
+# 阅读设备与传输
+
+在书架或列表右键一本书，也可以打开书籍详情的「更多」菜单，再选择「传输」。四个目的地的配置都在「设置 → 传送设置」。如果 Kindle、BOOX 或 KOReader 还没有可用的连接，从传输菜单可以直接进入对应设置。
+
+| 目的地 | 传输方式与配置 |
+| --- | --- |
+| Kindle | 插入能识别为 USB 磁盘的 Kindle 后，可在「传输 → Kindle」选择 USB 直传。也可以在 Kindle 标签添加 Send to Kindle 收件地址和 SMTP 发件账户，再从同一菜单选择收件人。发件地址需要加入 Amazon 账户的认可发件人列表。[Amazon 说明](https://digprjsurvey.amazon.co.uk/csad/help/node/G7NECT4B4ZWHQ8WV) |
+| 微信读书 | Calibreno 打开官方书架并定位本地 EPUB。在网页选择「传书到手机」，登录后手动选取 EPUB。缺少 EPUB 时，若当前版本支持转换且存在可用源格式，Calibreno 会打开以 EPUB 为目标的转换对话框。[微信读书书架](https://weread.qq.com/web/shelf) |
+| BOOX | 电脑和 BOOX 接入同一网络。在设备上打开 BOOXDrop，把它显示的地址填到 BOOX 设置，测试连接并保存。设备未确认接收时，可先检查接收记录。直传不可用时，可以打开设备上传页手动传书。[BOOX 说明](https://help.boox.com/fa5fa/48481/36dc4) |
+| KOReader | 电脑和设备接入同一网络。在 Calibreno 的 KOReader 标签启用无线设备连接，可配置端口和密码。在阅读器的 Calibre 插件中选择「连接」，再回到 Calibreno 的传输菜单发送。首次连接可能需要在设备上选择接收目录。[KOReader 说明](https://github.com/koreader/koreader/wiki/Calibre) |
+
+KOReader 直传使用 Calibre 无线设备协议。工具栏的 OPDS 共享另提供书目浏览和按需下载，读者可以在设备上主动选择要下载的书。
+
+## Readers plugged in
 
 A reader plugged into the computer is a library of its own: it is listed
 in the library switcher, below the recent libraries, and choosing it shows
@@ -6,9 +19,9 @@ its books on the same shelf and list as the library's, with their own
 search, sort and format filter. The library stays open behind it, to send
 books from and to tell which of the reader's books it has.
 
-Today: Kindles that connect as a USB drive (USB mass storage, the Kindles
-before 2024), on Linux, macOS and Windows. The design takes MTP (Kindles
-since 2024) and other readers (Kobo) without changing the app.
+Calibreno supports Kindles that connect as a USB mass-storage drive on
+Linux, macOS and Windows. Kindle models that use MTP still need an MTP
+driver.
 
 ## What the user can do
 
@@ -16,7 +29,7 @@ since 2024) and other readers (Kobo) without changing the app.
   free space in the switcher, and in each book's detail whether the
   library has it (by calibre uuid, else by title and first author, as
   calibre matches).
-- **Send books** from the library's book menu (Send to Kindle), each in
+- **Send books** from the library's book menu (Transfer → Kindle), each in
   the first format the reader takes of those the book has (AZW3, MOBI,
   AZW, …; EPUB, FB2, CBZ and DJVU too on a Kindle with KOReader). Files can
   also be dropped on the reader's page.
@@ -40,23 +53,6 @@ since 2024) and other readers (Kobo) without changing the app.
   without a password on a desktop session, and shows its library. One
   that was ejected and stays plugged in is listed the same way; it is
   never mounted unless chosen.
-
-## BOOX and WeRead
-
-- For **BOOXDrop**, connect the computer and reader to the same network,
-  open BOOXDrop on the reader, and enter the address it displays in
-  Calibreno's **Settings → BOOX**. Test the connection and apply the
-  address, then use **Send to BOOX** from the library's book menu. The
-  app reports confirmed uploads and flags uncertain results so you can
-  check the device before resending. The settings pane and eligible
-  transfer errors offer the device's manual upload page.
-  [BOOX transfer guide](https://help.boox.com/fa5fa/48481/36dc4)
-- For **WeRead**, use **Import to WeRead…** on a library book. Calibreno
-  opens the official shelf and reveals the book's EPUB. Choose
-  **传书到手机** on the website, sign in if requested, and select the
-  EPUB. If the book needs an EPUB, the app opens the conversion dialog
-  with EPUB as the target.
-  [WeRead shelf](https://weread.qq.com/web/shelf)
 
 ## calibre compatibility
 
@@ -126,7 +122,7 @@ Three seams keep the next readers small:
 - **A `device.Driver` recognises a reader and opens it as a
   `device.Device`**, the interface the app uses.
 
-### Adding MTP (Kindles since 2024)
+### Adding Kindle MTP support
 
 1. Write an MTP `Storage` (over libusb through purego, keeping the build
    free of cgo, or over GNOME's gvfs mount on Linux as a first step), with

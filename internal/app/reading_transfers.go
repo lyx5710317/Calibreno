@@ -15,7 +15,6 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"dalibre/cmd/dalibre/locales"
-	"dalibre/internal/app/icons"
 	"dalibre/internal/bookconvert"
 	"dalibre/internal/boox"
 	"dalibre/internal/calibre"
@@ -140,46 +139,18 @@ func formatForBOOX(formats []string, preferred string) string {
 	return ""
 }
 
-func (a *App) readingTransferMenu(m *ui.Menu, ids []int64, preferred string) {
-	if slices.ContainsFunc(ids, func(id int64) bool {
-		b := a.byID[id]
-		return b != nil && formatForBOOX(b.Formats, preferred) != ""
-	}) {
-		label := locales.BooxSend()
-		if a.settings.BOOXAddress == "" {
-			label = locales.BooxConfigure()
-		}
-		if m.Item(label).Icon(icons.Menu(icons.Send)).Disabled(a.busy != "").Chosen() {
-			a.sendBooksToBOOX(ids, preferred)
-		}
-	}
-	if len(ids) != 1 || (preferred != "" && preferred != "EPUB") {
-		return
-	}
-	b := a.byID[ids[0]]
-	if b == nil {
-		return
-	}
-	epub := slices.Contains(b.Formats, "EPUB")
-	if epub || (a.conversionEnabled() && sourceForWeRead(b.Formats) != "") {
-		if m.Item(locales.WeReadImport()).Icon(icons.Menu(icons.Send)).Disabled(a.busy != "" || a.readingTransfers.preparing).Chosen() {
-			a.prepareWeRead(b)
-		}
-	}
-}
-
 func (a *App) sendBooksToBOOX(ids []int64, preferred string) {
 	lib, t := a.lib, &a.readingTransfers
-	if lib == nil || a.busy != "" || a.loading {
+	if a.settings.BOOXAddress == "" {
+		a.openTransferSettings(transferBOOX)
 		return
 	}
-	if a.settings.BOOXAddress == "" {
-		a.openSettings(sectionBOOX)
+	if lib == nil || a.busy != "" || a.loading {
 		return
 	}
 	address, err := boox.NormalizeAddress(a.settings.BOOXAddress)
 	if err != nil {
-		a.openSettings(sectionBOOX)
+		a.openTransferSettings(transferBOOX)
 		t.booxEdit.address, t.booxEdit.savedAddress = a.settings.BOOXAddress, a.settings.BOOXAddress
 		a.setBOOXStatus(locales.BooxInvalidAddress(), true)
 		return
@@ -353,8 +324,8 @@ func (a *App) prepareWeRead(b *calibre.Book) {
 	if !slices.Contains(b.Formats, "EPUB") {
 		if source := sourceForWeRead(b.Formats); source != "" && a.conversionEnabled() {
 			a.openBookConversion(b, source)
-			a.toast("%s", locales.WeReadNeedsEPUB())
 		}
+		a.toast("%s", locales.WeReadNeedsEPUB())
 		return
 	}
 	t.preparing = true

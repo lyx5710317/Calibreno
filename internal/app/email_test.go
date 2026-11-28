@@ -12,6 +12,7 @@ import (
 
 	"github.com/egoist/mygo/ui"
 
+	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/calibre"
 )
 
@@ -76,7 +77,7 @@ func (mb *mailbox) to(addr string) []string {
 	return mb.got[addr]
 }
 
-// TestEmailToKindle sets up a Kindle and the sender in Settings › Email,
+// TestEmailToKindle sets up a Kindle and the sender in the transfer settings,
 // sends a test email to the sender, then emails a book from its menu.
 func TestEmailToKindle(t *testing.T) {
 	mb := newMailbox(t)
@@ -94,7 +95,7 @@ func TestEmailToKindle(t *testing.T) {
 	}
 	tt.CloseMenu()
 
-	a.openSettings(sectionEmail)
+	a.openTransferSettings(transferKindle)
 	tt.Frame()
 	if err := tt.Click("Add Kindle"); err != nil {
 		t.Fatal(err)
@@ -135,7 +136,7 @@ func TestEmailToKindle(t *testing.T) {
 		t.Fatal(err)
 	}
 	shot(t, tt, "email-menu")
-	if err := tt.ChooseMenuItem("Email to Paperwhite"); err != nil {
+	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferKindle(), locales.EmailTo("Paperwhite")); err != nil {
 		t.Fatalf("menu %q: %v", tt.Menu(), err)
 	}
 	tt.Frame()

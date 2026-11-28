@@ -15,7 +15,7 @@ import (
 	"dalibre/internal/settings"
 )
 
-// ---- Settings › Email
+// ---- Settings › Transfer › Kindle
 
 func (a *App) emailPane(c *ui.Context) {
 	e := &a.settings.Email
@@ -39,9 +39,11 @@ func (a *App) emailPane(c *ui.Context) {
 		}
 	}
 	pane(c, func() {
+		a.kindleUSBSettings(c)
+		widgets.Hairline(c)
 		ui.Column(c).Gap(theme.Space10).AlignItems(ui.Stretch).Children(func() {
 			ui.Row(c).Gap(theme.Space16).AlignItems(ui.Start).Children(func() {
-				heading(c, locales.EmailKindlesTitle(), locales.EmailKindlesBody())
+				heading(c, locales.TransferKindleEmail(), locales.EmailKindlesBody())
 				if widgets.ButtonSized(c, widgets.Secondary, icons.Plus, locales.EmailAddKindle(), theme.ControlS).Clicked() {
 					e.Kindles = append(e.Kindles, &settings.Kindle{})
 					a.saveSettings()
@@ -160,7 +162,7 @@ func (a *App) emailSecuritySelect(c *ui.Context) {
 func (a *App) emailMenuItems(m *ui.Menu, ids []int64) bool {
 	ks := a.emailKindles()
 	for _, k := range ks {
-		if m.Item(locales.EmailTo(kindleName(*k))).Icon(icons.Menu(icons.Send)).Disabled(a.busy != "").Chosen() {
+		if m.Item(locales.EmailTo(kindleName(*k))).Disabled(a.busy != "" || a.loading).Chosen() {
 			a.emailBooks(*k, ids)
 		}
 	}

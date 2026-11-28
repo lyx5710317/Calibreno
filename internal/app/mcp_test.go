@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"net"
 	"net/http"
 	"os"
@@ -108,27 +107,6 @@ func TestMCPServer(t *testing.T) {
 		t.Fatalf("new token: %v", err)
 	}
 	cs2.Close()
-
-	snippets := a.mcpSnippets()
-	if len(snippets) != 3 || !strings.Contains(snippets[0].Text, "--transport http dalibre "+a.mcpEndpoint()+` --header "Authorization: Bearer `+a.mcpToken()+`"`) {
-		t.Fatalf("snippets %+v", snippets)
-	}
-	var desktop, cursor struct {
-		MCPServers map[string]struct {
-			Command string            `json:"command"`
-			Args    []string          `json:"args"`
-			URL     string            `json:"url"`
-			Headers map[string]string `json:"headers"`
-		} `json:"mcpServers"`
-	}
-	json.Unmarshal([]byte(snippets[1].Text), &desktop)
-	json.Unmarshal([]byte(snippets[2].Text), &cursor)
-	if d := desktop.MCPServers["dalibre"]; d.Command == "" || !slices.Equal(d.Args, []string{"mcp"}) || strings.Contains(snippets[1].Text, a.mcpToken()) {
-		t.Errorf("Claude Desktop %s", snippets[1].Text)
-	}
-	if c := cursor.MCPServers["dalibre"]; c.URL != a.mcpEndpoint() || c.Headers["Authorization"] != "Bearer "+a.mcpToken() {
-		t.Errorf("Cursor %s", snippets[2].Text)
-	}
 }
 
 func TestMCPPortInUse(t *testing.T) {

@@ -6907,11 +6907,11 @@ func (msgs Messages) SharingOff() string {
 	return Catalog.Format(msgs.locale, "sharingOff", nil)
 }
 
-// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while Calibreno is…"
+// McpBody says "AI agents on this computer can search and read this library over MCP while Calibreno is open."
 // in the language the app shows.
 func McpBody() string { return In(i18n.Locale()).McpBody() }
 
-// McpBody says "AI agents on this computer, like Claude Code and Cursor, can search and read this library over MCP while Calibreno is…"
+// McpBody says "AI agents on this computer can search and read this library over MCP while Calibreno is open."
 // in the language of msgs.
 func (msgs Messages) McpBody() string {
 	return Catalog.Format(msgs.locale, "mcpBody", nil)
@@ -7047,6 +7047,16 @@ func (msgs Messages) McpCopiedSetup(client string) string {
 	return Catalog.Format(msgs.locale, "mcpCopiedSetup", map[string]any{"client": client})
 }
 
+// McpCopySetupFailed says "Could not copy the setup for {client}"
+// in the language the app shows.
+func McpCopySetupFailed(client string) string { return In(i18n.Locale()).McpCopySetupFailed(client) }
+
+// McpCopySetupFailed says "Could not copy the setup for {client}"
+// in the language of msgs.
+func (msgs Messages) McpCopySetupFailed(client string) string {
+	return Catalog.Format(msgs.locale, "mcpCopySetupFailed", map[string]any{"client": client})
+}
+
 // McpHintClaudeCode says "Run it in a terminal."
 // in the language the app shows.
 func McpHintClaudeCode() string { return In(i18n.Locale()).McpHintClaudeCode() }
@@ -7075,6 +7085,96 @@ func McpHintCursor() string { return In(i18n.Locale()).McpHintCursor() }
 // in the language of msgs.
 func (msgs Messages) McpHintCursor() string {
 	return Catalog.Format(msgs.locale, "mcpHintCursor", nil)
+}
+
+// McpHintTrae says "In TRAE, open Settings › MCP › Add › Add manually. Use a local session."
+// in the language the app shows.
+func McpHintTrae() string { return In(i18n.Locale()).McpHintTrae() }
+
+// McpHintTrae says "In TRAE, open Settings › MCP › Add › Add manually. Use a local session."
+// in the language of msgs.
+func (msgs Messages) McpHintTrae() string {
+	return Catalog.Format(msgs.locale, "mcpHintTrae", nil)
+}
+
+// McpHintTraeWork says "In TraeWork Desktop, open Settings › MCP. Select Local, then Create › Set up manually."
+// in the language the app shows.
+func McpHintTraeWork() string { return In(i18n.Locale()).McpHintTraeWork() }
+
+// McpHintTraeWork says "In TraeWork Desktop, open Settings › MCP. Select Local, then Create › Set up manually."
+// in the language of msgs.
+func (msgs Messages) McpHintTraeWork() string {
+	return Catalog.Format(msgs.locale, "mcpHintTraeWork", nil)
+}
+
+// McpHintQoder says "In Qoder, open Connectors › Add Connector › JSON. For the CLI, merge into ~/.qoder/settings.json."
+// in the language the app shows.
+func McpHintQoder() string { return In(i18n.Locale()).McpHintQoder() }
+
+// McpHintQoder says "In Qoder, open Connectors › Add Connector › JSON. For the CLI, merge into ~/.qoder/settings.json."
+// in the language of msgs.
+func (msgs Messages) McpHintQoder() string {
+	return Catalog.Format(msgs.locale, "mcpHintQoder", nil)
+}
+
+// McpHintQoderWork says "In QoderWork, open Settings › Connectors › Add › Import from JSON."
+// in the language the app shows.
+func McpHintQoderWork() string { return In(i18n.Locale()).McpHintQoderWork() }
+
+// McpHintQoderWork says "In QoderWork, open Settings › Connectors › Add › Import from JSON."
+// in the language of msgs.
+func (msgs Messages) McpHintQoderWork() string {
+	return Catalog.Format(msgs.locale, "mcpHintQoderWork", nil)
+}
+
+// McpHintKimiCode says "Merge into ~/.kimi-code/mcp.json. Open a new Kimi Code session and run /mcp."
+// in the language the app shows.
+func McpHintKimiCode() string { return In(i18n.Locale()).McpHintKimiCode() }
+
+// McpHintKimiCode says "Merge into ~/.kimi-code/mcp.json. Open a new Kimi Code session and run /mcp."
+// in the language of msgs.
+func (msgs Messages) McpHintKimiCode() string {
+	return Catalog.Format(msgs.locale, "mcpHintKimiCode", nil)
+}
+
+// McpHintQwenCode says "Merge into ~/.qwen/settings.json. Reopen Qwen Code and run /mcp."
+// in the language the app shows.
+func McpHintQwenCode() string { return In(i18n.Locale()).McpHintQwenCode() }
+
+// McpHintQwenCode says "Merge into ~/.qwen/settings.json. Reopen Qwen Code and run /mcp."
+// in the language of msgs.
+func (msgs Messages) McpHintQwenCode() string {
+	return Catalog.Format(msgs.locale, "mcpHintQwenCode", nil)
+}
+
+// McpHintCodeBuddyIDE says "In CodeBuddy IDE, open Settings › MCP › Add MCP and merge the JSON into the file."
+// in the language the app shows.
+func McpHintCodeBuddyIDE() string { return In(i18n.Locale()).McpHintCodeBuddyIDE() }
+
+// McpHintCodeBuddyIDE says "In CodeBuddy IDE, open Settings › MCP › Add MCP and merge the JSON into the file."
+// in the language of msgs.
+func (msgs Messages) McpHintCodeBuddyIDE() string {
+	return Catalog.Format(msgs.locale, "mcpHintCodeBuddyIDE", nil)
+}
+
+// McpHintCodeBuddy says "Run the command in a terminal to add Calibreno to your user configuration."
+// in the language the app shows.
+func McpHintCodeBuddy() string { return In(i18n.Locale()).McpHintCodeBuddy() }
+
+// McpHintCodeBuddy says "Run the command in a terminal to add Calibreno to your user configuration."
+// in the language of msgs.
+func (msgs Messages) McpHintCodeBuddy() string {
+	return Catalog.Format(msgs.locale, "mcpHintCodeBuddy", nil)
+}
+
+// McpHintCherryStudio says "In Cherry Studio, open Settings › MCP › MCP Servers › Add › Import from JSON."
+// in the language the app shows.
+func McpHintCherryStudio() string { return In(i18n.Locale()).McpHintCherryStudio() }
+
+// McpHintCherryStudio says "In Cherry Studio, open Settings › MCP › MCP Servers › Add › Import from JSON."
+// in the language of msgs.
+func (msgs Messages) McpHintCherryStudio() string {
+	return Catalog.Format(msgs.locale, "mcpHintCherryStudio", nil)
 }
 
 // McpNote says "Only apps on this computer can connect, with the token."
@@ -10187,6 +10287,168 @@ func ConversionPDFFit() string { return In(i18n.Locale()).ConversionPDFFit() }
 // in the language of msgs.
 func (msgs Messages) ConversionPDFFit() string {
 	return Catalog.Format(msgs.locale, "conversionPDFFit", nil)
+}
+
+// SettingsSectionTransfer says "Transfer settings"
+// in the language the app shows.
+func SettingsSectionTransfer() string { return In(i18n.Locale()).SettingsSectionTransfer() }
+
+// SettingsSectionTransfer says "Transfer settings"
+// in the language of msgs.
+func (msgs Messages) SettingsSectionTransfer() string {
+	return Catalog.Format(msgs.locale, "settingsSectionTransfer", nil)
+}
+
+// TransferMenu says "Transfer"
+// in the language the app shows.
+func TransferMenu() string { return In(i18n.Locale()).TransferMenu() }
+
+// TransferMenu says "Transfer"
+// in the language of msgs.
+func (msgs Messages) TransferMenu() string {
+	return Catalog.Format(msgs.locale, "transferMenu", nil)
+}
+
+// TransferKindle says "Kindle"
+// in the language the app shows.
+func TransferKindle() string { return In(i18n.Locale()).TransferKindle() }
+
+// TransferKindle says "Kindle"
+// in the language of msgs.
+func (msgs Messages) TransferKindle() string {
+	return Catalog.Format(msgs.locale, "transferKindle", nil)
+}
+
+// TransferWeRead says "WeRead"
+// in the language the app shows.
+func TransferWeRead() string { return In(i18n.Locale()).TransferWeRead() }
+
+// TransferWeRead says "WeRead"
+// in the language of msgs.
+func (msgs Messages) TransferWeRead() string {
+	return Catalog.Format(msgs.locale, "transferWeRead", nil)
+}
+
+// TransferBOOX says "BOOX"
+// in the language the app shows.
+func TransferBOOX() string { return In(i18n.Locale()).TransferBOOX() }
+
+// TransferBOOX says "BOOX"
+// in the language of msgs.
+func (msgs Messages) TransferBOOX() string {
+	return Catalog.Format(msgs.locale, "transferBOOX", nil)
+}
+
+// TransferKOReader says "KOReader"
+// in the language the app shows.
+func TransferKOReader() string { return In(i18n.Locale()).TransferKOReader() }
+
+// TransferKOReader says "KOReader"
+// in the language of msgs.
+func (msgs Messages) TransferKOReader() string {
+	return Catalog.Format(msgs.locale, "transferKOReader", nil)
+}
+
+// TransferSingleBook says "One book at a time"
+// in the language the app shows.
+func TransferSingleBook() string { return In(i18n.Locale()).TransferSingleBook() }
+
+// TransferSingleBook says "One book at a time"
+// in the language of msgs.
+func (msgs Messages) TransferSingleBook() string {
+	return Catalog.Format(msgs.locale, "transferSingleBook", nil)
+}
+
+// TransferKindleUSB says "Send via USB"
+// in the language the app shows.
+func TransferKindleUSB() string { return In(i18n.Locale()).TransferKindleUSB() }
+
+// TransferKindleUSB says "Send via USB"
+// in the language of msgs.
+func (msgs Messages) TransferKindleUSB() string {
+	return Catalog.Format(msgs.locale, "transferKindleUSB", nil)
+}
+
+// TransferKindleUSBTo says "Send via USB to {reader}"
+// in the language the app shows.
+func TransferKindleUSBTo(reader string) string { return In(i18n.Locale()).TransferKindleUSBTo(reader) }
+
+// TransferKindleUSBTo says "Send via USB to {reader}"
+// in the language of msgs.
+func (msgs Messages) TransferKindleUSBTo(reader string) string {
+	return Catalog.Format(msgs.locale, "transferKindleUSBTo", map[string]any{"reader": reader})
+}
+
+// TransferKindleUSBHelp says "Connect a Kindle that mounts as a USB drive. Calibreno detects it automatically."
+// in the language the app shows.
+func TransferKindleUSBHelp() string { return In(i18n.Locale()).TransferKindleUSBHelp() }
+
+// TransferKindleUSBHelp says "Connect a Kindle that mounts as a USB drive. Calibreno detects it automatically."
+// in the language of msgs.
+func (msgs Messages) TransferKindleUSBHelp() string {
+	return Catalog.Format(msgs.locale, "transferKindleUSBHelp", nil)
+}
+
+// TransferKindleUSBNotConnected says "No USB Kindle detected"
+// in the language the app shows.
+func TransferKindleUSBNotConnected() string { return In(i18n.Locale()).TransferKindleUSBNotConnected() }
+
+// TransferKindleUSBNotConnected says "No USB Kindle detected"
+// in the language of msgs.
+func (msgs Messages) TransferKindleUSBNotConnected() string {
+	return Catalog.Format(msgs.locale, "transferKindleUSBNotConnected", nil)
+}
+
+// TransferKindleUSBConnected says "{reader} connected via USB"
+// in the language the app shows.
+func TransferKindleUSBConnected(reader string) string {
+	return In(i18n.Locale()).TransferKindleUSBConnected(reader)
+}
+
+// TransferKindleUSBConnected says "{reader} connected via USB"
+// in the language of msgs.
+func (msgs Messages) TransferKindleUSBConnected(reader string) string {
+	return Catalog.Format(msgs.locale, "transferKindleUSBConnected", map[string]any{"reader": reader})
+}
+
+// TransferKindleEmail says "Send by email"
+// in the language the app shows.
+func TransferKindleEmail() string { return In(i18n.Locale()).TransferKindleEmail() }
+
+// TransferKindleEmail says "Send by email"
+// in the language of msgs.
+func (msgs Messages) TransferKindleEmail() string {
+	return Catalog.Format(msgs.locale, "transferKindleEmail", nil)
+}
+
+// TransferWeReadHelp says "Open the official WeRead shelf, sign in if asked, then choose Transfer to phone and select an EPUB. From a book’s T…"
+// in the language the app shows.
+func TransferWeReadHelp() string { return In(i18n.Locale()).TransferWeReadHelp() }
+
+// TransferWeReadHelp says "Open the official WeRead shelf, sign in if asked, then choose Transfer to phone and select an EPUB. From a book’s T…"
+// in the language of msgs.
+func (msgs Messages) TransferWeReadHelp() string {
+	return Catalog.Format(msgs.locale, "transferWeReadHelp", nil)
+}
+
+// TransferWeReadOpen says "Open WeRead shelf"
+// in the language the app shows.
+func TransferWeReadOpen() string { return In(i18n.Locale()).TransferWeReadOpen() }
+
+// TransferWeReadOpen says "Open WeRead shelf"
+// in the language of msgs.
+func (msgs Messages) TransferWeReadOpen() string {
+	return Catalog.Format(msgs.locale, "transferWeReadOpen", nil)
+}
+
+// TransferWeReadOpenFailed says "Couldn’t open the WeRead shelf"
+// in the language the app shows.
+func TransferWeReadOpenFailed() string { return In(i18n.Locale()).TransferWeReadOpenFailed() }
+
+// TransferWeReadOpenFailed says "Couldn’t open the WeRead shelf"
+// in the language of msgs.
+func (msgs Messages) TransferWeReadOpenFailed() string {
+	return Catalog.Format(msgs.locale, "transferWeReadOpenFailed", nil)
 }
 
 // BooxName says "BOOX"

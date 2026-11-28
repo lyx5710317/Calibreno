@@ -2,12 +2,11 @@ package mcp
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
-	"net"
 	"net/http"
-	"net/url"
 	"sync"
-	"time"
 
 	sdk "github.com/modelcontextprotocol/go-sdk/mcp"
 
@@ -36,70 +35,62 @@ func (b bearer) RoundTrip(r *http.Request) (*http.Response, error) {
 
 // Bridge serves MCP on in and out, for clients that only start stdio
 // servers. While the app serves endpoint it passes everything on to the
-// app with token; otherwise it serves the read tools of the library in
-// root, opened read-only.
+// app with token. An empty endpoint, or a port with no listener, lets
+// the bridge serve the library in root read-only.
 func Bridge(ctx context.Context, endpoint, token, root, version string, in io.ReadCloser, out io.WriteCloser) error {
 	t := &sdk.IOTransport{Reader: in, Writer: out}
-	if token != "" && answers(endpoint) {
-		if s, close, err := proxy(ctx, endpoint, token, version); err == nil {
-			defer close()
+	if endpoint != "" {
+		s, closeSession, err := proxy(ctx, endpoint, token, version)
+		switch {
+		case err == nil:
+			defer closeSession()
 			return s.Run(ctx, t)
+		case !errors.Is(err, ErrNotRunning):
+			return fmt.Errorf("connect to Calibreno’s MCP server: %w", err)
 		}
 	}
 	var h readOnly
 	if root != "" {
-		if lib, err := calibre.OpenReadOnly(root); err == nil {
-			defer lib.Close()
-			h.lib = lib
+		lib, err := calibre.OpenReadOnly(root)
+		if err != nil {
+			return fmt.Errorf("open the saved Calibreno library read-only: %w", err)
 		}
+		defer lib.Close()
+		h.lib = lib
 	}
 	return New(h, version, false).MCP().Run(ctx, t)
 }
 
-// answers reports whether something listens at endpoint.
-func answers(endpoint string) bool {
-	u, err := url.Parse(endpoint)
-	if err != nil {
-		return false
-	}
-	c, err := net.DialTimeout("tcp", u.Host, time.Second)
-	if err != nil {
-		return false
-	}
-	c.Close()
-	return true
-}
-
 // proxy connects to the app's server and makes a server with its tools
-// that calls them there, naming the agent it serves. close ends the
-// connection.
-func proxy(ctx context.Context, endpoint, token, version string) (srv *sdk.Server, close func(), err error) {
+// that calls them there, naming the agent it serves. The returned function
+// ends the connection.
+func proxy(ctx context.Context, endpoint, token, version string) (*sdk.Server, func(), error) {
 	var (
 		mu    sync.Mutex
 		names []string
-		cs    *sdk.ClientSession
+		srv   *sdk.Server
 	)
-	call := func(ctx context.Context, req *sdk.CallToolRequest) (*sdk.CallToolResult, error) {
-		p := &sdk.CallToolParams{Name: req.Params.Name, Arguments: req.Params.Arguments}
-		if req.Session != nil {
-			if ip := req.Session.InitializeParams(); ip != nil && ip.ClientInfo != nil {
-				p.Meta = sdk.Meta{clientMeta: forward(ip.ClientInfo)}
-			}
-		}
-		return cs.CallTool(ctx, p)
-	}
-	refresh := func(ctx context.Context) {
-		var tools []*sdk.Tool
-		for t, err := range cs.Tools(ctx, nil) {
-			if err != nil {
-				return
-			}
-			tools = append(tools, t)
-		}
+	refresh := func(ctx context.Context, cs *sdk.ClientSession) error {
 		mu.Lock()
 		defer mu.Unlock()
 		if srv == nil {
-			return
+			return nil
+		}
+		var tools []*sdk.Tool
+		for t, err := range cs.Tools(ctx, nil) {
+			if err != nil {
+				return err
+			}
+			tools = append(tools, t)
+		}
+		call := func(ctx context.Context, req *sdk.CallToolRequest) (*sdk.CallToolResult, error) {
+			p := &sdk.CallToolParams{Name: req.Params.Name, Arguments: req.Params.Arguments}
+			if req.Session != nil {
+				if ip := req.Session.InitializeParams(); ip != nil && ip.ClientInfo != nil {
+					p.Meta = sdk.Meta{clientMeta: forward(ip.ClientInfo)}
+				}
+			}
+			return cs.CallTool(ctx, p)
 		}
 		srv.RemoveTools(names...)
 		names = names[:0]
@@ -107,16 +98,20 @@ func proxy(ctx context.Context, endpoint, token, version string) (srv *sdk.Serve
 			srv.AddTool(t, call)
 			names = append(names, t.Name)
 		}
+		return nil
 	}
 	client := sdk.NewClient(&sdk.Implementation{Name: "dalibre-bridge", Version: version}, &sdk.ClientOptions{
-		ToolListChangedHandler: func(ctx context.Context, _ *sdk.ToolListChangedRequest) {
-			go refresh(context.WithoutCancel(ctx))
+		ToolListChangedHandler: func(_ context.Context, req *sdk.ToolListChangedRequest) {
+			go func() {
+				refreshCtx, cancel := context.WithTimeout(ctx, connectTimeout)
+				defer cancel()
+				_ = refresh(refreshCtx, req.Session)
+			}()
 		},
 	})
-	cs, err = client.Connect(ctx, &sdk.StreamableClientTransport{
-		Endpoint:   endpoint,
-		HTTPClient: &http.Client{Transport: bearer{token, http.DefaultTransport}},
-	}, nil)
+	connectCtx, cancel := context.WithTimeout(ctx, connectTimeout)
+	defer cancel()
+	cs, err := connectApp(connectCtx, client, endpoint, token)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -125,9 +120,12 @@ func proxy(ctx context.Context, endpoint, token, version string) (srv *sdk.Serve
 		opts.Instructions = r.Instructions
 	}
 	mu.Lock()
-	srv = sdk.NewServer(&sdk.Implementation{Name: "dalibre", Title: "Calibreno", Version: version}, opts)
+	srv = sdk.NewServer(&sdk.Implementation{Name: implementationName, Title: "Calibreno", Version: version}, opts)
 	mu.Unlock()
-	refresh(ctx)
+	if err := refresh(connectCtx, cs); err != nil {
+		cs.Close()
+		return nil, nil, fmt.Errorf("load MCP tools: %w", err)
+	}
 	return srv, func() { cs.Close() }, nil
 }
 

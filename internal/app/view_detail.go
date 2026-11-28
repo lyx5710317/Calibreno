@@ -118,7 +118,7 @@ func (a *App) bookDetail(c *ui.Context, b *calibre.Book) {
 						a.addFormat(b.ID)
 					}
 					a.conversionMenuItem(m, b, "")
-					a.readingTransferMenu(m, []int64{b.ID}, "")
+					a.readingTransferMenu(m, []int64{b.ID})
 					if m.Item(locales.ExportMenu()).Icon(icons.Menu(icons.Download)).Disabled(a.busy != "").Chosen() {
 						a.openExport([]int64{b.ID})
 					}
@@ -261,7 +261,7 @@ func (a *App) bookDetail(c *ui.Context, b *calibre.Book) {
 					a.editBook(b, f.Format)
 				}
 				a.conversionMenuItem(m, b, f.Format)
-				a.readingTransferMenu(m, []int64{b.ID}, f.Format)
+				a.readingFormatTransferMenu(m, b, f.Format)
 				if shareSupported && m.Item(locales.DetailShare()).Chosen() {
 					shareFiles(a.win, []string{f.Path})
 				}

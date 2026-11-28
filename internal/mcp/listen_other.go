@@ -11,3 +11,7 @@ import (
 func IsAddressInUse(err error) bool {
 	return errors.Is(err, syscall.EADDRINUSE)
 }
+
+func isConnectionRefused(err error) bool {
+	return errors.Is(err, syscall.ECONNREFUSED)
+}

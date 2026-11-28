@@ -6,12 +6,17 @@ shows, so write them for readers of the app. `mygo build` needs a
 
 ## Unreleased
 
+## 0.8.1
+
 - 桌面应用名称更新为 Calibreno，并补齐简体中文界面、插件入口和常用提示。
+- 更新应用图标和侧栏标志。
 - 新增「待整理」与批次结果。导入后可以复核重复项、批量补资料，并在重新打开应用后继续处理。
 - 批量元数据支持 NeoDB 查询、字段预览和失败项单独重试。
 - 新增只读「全库查重」，按格式和文件内容找出完全相同的文件。
 - Windows x64 新增桌面格式转换，支持 Kindle 格式、EPUB 横竖排和 PDF 逐页 OCR。
 - 支持 BOOXDrop 局域网传书和微信读书网页辅助导入，USB Kindle 可以在发送时按需转换 EPUB。
+- Kindle、微信读书、BOOX 和 KOReader 的传书配置统一移至「传送设置」，书籍菜单新增「传输」子菜单。
+- MCP 设置新增 TRAE、TraeWork、Qoder、QoderWork、Kimi Code、Qwen Code、CodeBuddy 和 Cherry Studio 的可复制配置。
 - 移除内置古登堡书源和下载书籍的插件支持。旧书源插件停止运行，已导入的书籍继续可用。
 - 在「设置 → OPDS」添加目录后，可从书库侧栏浏览和导入选中的书。添加可搜索的目录后会显示「获取书籍」，连接失败时可重试。
 - 插件市场改用 Calibreno 的发布目录，首推「在网上搜书」，并显示插件来源。精选目录可由发布清单维护。

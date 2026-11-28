@@ -12,6 +12,7 @@ import (
 	"github.com/egoist/mygo/ui"
 	sdk "github.com/modelcontextprotocol/go-sdk/mcp"
 
+	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/app/theme"
 	"dalibre/internal/settings"
 )
@@ -139,12 +140,27 @@ func TestAgentsPopoverAndMCPSettings(t *testing.T) {
 		tt.Scroll(r.X, r.Y, 0, -400)
 		tt.Frame()
 	}
+	if err := tt.Click(locales.McpAgentsHeading()); err != nil {
+		t.Fatal(err)
+	}
 	if err := tt.Click("Claude Desktop"); err != nil {
 		t.Fatal(err)
 	}
 	tt.Frame()
-	if !tt.HasText("Add it to claude_desktop_config.json, then restart Claude Desktop.") {
+	if !tt.HasText(locales.McpHintClaudeDesktop()) {
 		t.Fatalf("Claude Desktop: %q", tt.Texts())
+	}
+	if err := tt.Click(locales.McpAgentsHeading()); err != nil {
+		t.Fatal(err)
+	}
+	if err := tt.Click("Qwen Code"); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	contents := strings.Join(tt.Texts(), "\n")
+	if !tt.HasText(locales.McpHintQwenCode()) || !strings.Contains(contents, `"httpUrl"`) ||
+		!strings.Contains(contents, "Bearer "+strings.Repeat("•", 16)) || strings.Contains(contents, a.mcpToken()) {
+		t.Fatal("Qwen Code did not show its hint and HTTP configuration with the token masked")
 	}
 	old := a.mcpToken()
 	if err := tt.Click("New token"); err != nil {
@@ -170,8 +186,15 @@ func TestSharingPopover(t *testing.T) {
 }
 
 func TestAgentNameAndPortInUse(t *testing.T) {
-	if agentName("claude-code") != "Claude Code" || agentName("zed") != "zed" || agentName("") != "An agent" {
-		t.Error("agent names")
+	for name, want := range map[string]string{
+		"claude-code":                   "Claude Code",
+		"qwen-cli-mcp-client-calibreno": "Qwen Code",
+		"zed":                           "zed",
+		"":                              "An agent",
+	} {
+		if got := agentName(name); got != want {
+			t.Errorf("agentName(%q) = %q, want %q", name, got, want)
+		}
 	}
 	a := newTestApp(t)
 	port := freePort(t)

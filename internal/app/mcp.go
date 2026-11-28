@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -150,33 +149,6 @@ func (a *App) regenerateMCPToken() {
 	a.saveSettings()
 	if st := a.mcpSrv; st != nil && st.mcp != nil {
 		st.mcp.SetToken(a.settings.MCP.Token)
-	}
-}
-
-// mcpSnippet is how one agent is set up to use the server.
-type mcpSnippet struct {
-	Client string // "Claude Code"
-	Text   string
-}
-
-// mcpSnippets set up Claude Code, Claude Desktop and Cursor. Claude
-// Desktop starts stdio servers only, so it runs this app's stdio bridge,
-// which reads the token from the settings.
-func (a *App) mcpSnippets() []mcpSnippet {
-	url, token := a.mcpEndpoint(), a.mcpToken()
-	exe, err := os.Executable()
-	if err != nil {
-		exe = Name
-	}
-	indent := func(v any) string {
-		b, _ := json.MarshalIndent(v, "", "  ")
-		return string(b)
-	}
-	type obj = map[string]any
-	return []mcpSnippet{
-		{"Claude Code", `claude mcp add --transport http dalibre ` + url + ` --header "Authorization: Bearer ` + token + `"`},
-		{"Claude Desktop", indent(obj{"mcpServers": obj{"dalibre": obj{"command": exe, "args": []string{"mcp"}}}})},
-		{"Cursor", indent(obj{"mcpServers": obj{"dalibre": obj{"url": url, "headers": obj{"Authorization": "Bearer " + token}}}})},
 	}
 }
 

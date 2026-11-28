@@ -25,7 +25,11 @@ func serveMCP() {
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
-	err := mcp.Bridge(ctx, mcp.Endpoint(s.MCP.ServerPort()), s.MCP.Token, root, mygo.App.Version(), os.Stdin, os.Stdout)
+	endpoint := ""
+	if s.MCP.On {
+		endpoint = mcp.Endpoint(s.MCP.ServerPort())
+	}
+	err := mcp.Bridge(ctx, endpoint, s.MCP.Token, root, mygo.App.Version(), os.Stdin, os.Stdout)
 	if err != nil && ctx.Err() == nil {
 		log.Fatal(err)
 	}

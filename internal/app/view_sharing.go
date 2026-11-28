@@ -1,6 +1,7 @@
 package app
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -72,7 +73,7 @@ func popoverPanel(panel, anchor ui.Element, width float32) ui.Element {
 // sharingBlock is a server's head in its popover: its name and status,
 // its Settings section, its switch, and its address while it runs; close
 // closes the popover.
-func (a *App) sharingBlock(c *ui.Context, title, status string, statusColor ui.Color, on *bool, section settingsSection, address string, close *bool) {
+func (a *App) sharingBlock(c *ui.Context, title, status string, statusColor ui.Color, on *bool, openSettings func(), address string, close *bool) {
 	ui.Column(c.Key(title)).Padding(theme.Space12, theme.Space12, theme.Space12, theme.Space16).Gap(theme.Space10).AlignItems(ui.Stretch).Children(func() {
 		ui.Row(c).Gap(theme.Space10).AlignItems(ui.Center).Children(func() {
 			ui.Column(c).Grow(1).MinWidth(0).Gap(theme.Space2).Children(func() {
@@ -81,7 +82,7 @@ func (a *App) sharingBlock(c *ui.Context, title, status string, statusColor ui.C
 			})
 			if widgets.IconButton(c, icons.Settings, locales.SharingSettingsTooltip(title), false).Clicked() {
 				*close = false
-				a.openSettings(section)
+				openSettings()
 			}
 			ui.Switch(c, on).Label(title)
 		})
@@ -117,7 +118,7 @@ func (a *App) shareBlock(c *ui.Context) {
 		}
 	}
 	on := sh.On
-	a.sharingBlock(c, nameOPDS, status, color, &on, sectionOPDS, address, &a.sharingOpen)
+	a.sharingBlock(c, nameOPDS, status, color, &on, func() { a.openSettings(sectionOPDS) }, address, &a.sharingOpen)
 	if on != sh.On {
 		sh.On = on
 		a.saveSettings()
@@ -139,7 +140,7 @@ func (a *App) wirelessBlock(c *ui.Context) {
 		color = pal().TextSecondary
 	}
 	on := w.On
-	a.sharingBlock(c, locales.WirelessName(), status, color, &on, sectionWireless, a.deviceAddress(), &a.sharingOpen)
+	a.sharingBlock(c, locales.WirelessName(), status, color, &on, func() { a.openTransferSettings(transferKOReader) }, a.deviceAddress(), &a.sharingOpen)
 	if on != w.On {
 		w.On = on
 		a.saveSettings()
@@ -147,9 +148,9 @@ func (a *App) wirelessBlock(c *ui.Context) {
 	}
 }
 
-// ---- Settings › Wireless devices
+// ---- Settings › Transfer › KOReader
 
-// wirelessEdit is Settings › Wireless devices' fields while they are edited.
+// wirelessEdit is the wireless connection's fields while they are edited.
 type wirelessEdit struct {
 	loaded   bool
 	port, pw string
@@ -287,7 +288,11 @@ func (a *App) mcpStatusLine(running bool) (string, ui.Color, string) {
 // agentName is how people know the agent that gave name in its MCP
 // handshake.
 func agentName(name string) string {
-	switch strings.ToLower(name) {
+	id := strings.ToLower(name)
+	if strings.HasPrefix(id, "qwen-cli-mcp-client-") {
+		return "Qwen Code"
+	}
+	switch id {
 	case "":
 		return locales.McpAnAgent()
 	case "claude-code":
@@ -333,10 +338,6 @@ type mcpEdit struct {
 	loaded bool
 	port   string
 }
-
-// mcpClientHints say where each agent's setup goes, in the order
-// of mcpSnippets.
-var mcpClientHints = []func() string{locales.McpHintClaudeCode, locales.McpHintClaudeDesktop, locales.McpHintCursor}
 
 func (a *App) mcpPane(c *ui.Context) {
 	cfg := &a.settings.MCP
@@ -427,7 +428,12 @@ func (a *App) mcpConnect(c *ui.Context) {
 	}
 	ui.Column(c).Gap(theme.Space12).AlignItems(ui.Stretch).Children(func() {
 		ui.Text(c, locales.McpConnect()).FontSize(13).FontWeight(600)
-		ui.Tabs(c, &a.mcpTab, names...)
+		selected := names[a.mcpTab]
+		if ui.Select(c, &selected, names).Width(220).Label(locales.McpAgentsHeading()).Changed() {
+			if i := slices.Index(names, selected); i >= 0 {
+				a.mcpTab = i
+			}
+		}
 		s := snippets[a.mcpTab]
 		shown := s.Text
 		if t := a.mcpToken(); t != "" {
@@ -436,11 +442,14 @@ func (a *App) mcpConnect(c *ui.Context) {
 		ui.Row(c).Padding(theme.Space10, theme.Space6, theme.Space10, theme.Space12).Gap(theme.Space10).Radius(theme.RadiusMD).Background(pal().Subtle).AlignItems(ui.Start).Children(func() {
 			ui.Text(c, shown).Font(theme.FontMono).FontSize(12).FixedLineHeight(18).Grow(1).MinWidth(0)
 			if widgets.IconButton(c, icons.Copy, locales.McpCopySetup(s.Client), false).Clicked() {
-				mygo.Clipboard.Write(transfer.TextData(s.Text))
-				a.toast("%s", locales.McpCopiedSetup(s.Client))
+				if err := mygo.Clipboard.Write(transfer.TextData(s.Text)); err != nil {
+					a.toasts = append(a.toasts, toastMsg{text: locales.McpCopySetupFailed(s.Client), error: true})
+				} else {
+					a.toast("%s", locales.McpCopiedSetup(s.Client))
+				}
 			}
 		})
-		ui.Text(c, mcpClientHints[a.mcpTab]()).FontSize(12).TextColor(pal().TextTertiary)
+		ui.Text(c, s.Hint()).FontSize(12).TextColor(pal().TextTertiary)
 	})
 }
 

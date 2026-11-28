@@ -168,6 +168,7 @@ func (a *App) sidebar(c *ui.Context) {
 			}
 		}
 		ui.Box(c).Height(top).DragWindow()
+		sidebarBrand(c)
 		ui.Box(c).Padding(0, theme.Space8, theme.Space8, theme.Space8).Children(func() { a.librarySwitcher(c) })
 		ui.Scroll(c).Grow(1).Padding(theme.Space8, theme.Space8, theme.Space16, theme.Space8).Gap(theme.Space20).AlignItems(ui.Stretch).Children(func() {
 			if a.lib == nil {
@@ -343,13 +344,11 @@ func (a *App) librarySwitcher(c *ui.Context) {
 		}
 	})
 	b.Children(func() {
-		ui.Box(c).Size(28, 28).Radius(theme.RadiusSM).Background(pal().Inverse).Center().Children(func() {
-			if dv != nil {
+		if dv != nil {
+			ui.Box(c).Size(28, 28).Radius(theme.RadiusSM).Background(pal().Inverse).Center().Children(func() {
 				ui.Icon(c, icons.Tablet).FontSize(16).TextColor(pal().TextOnInverse)
-				return
-			}
-			ui.Text(c, "C").FontWeight(700).FontSize(16).TextColor(pal().TextOnInverse)
-		})
+			})
+		}
 		ui.Column(c).Grow(1).MinWidth(0).Children(func() {
 			ui.Text(c, name).FontSize(13).FontWeight(500).SingleLine()
 			ui.Text(c, sub).FontSize(12).TextColor(pal().TextTertiary).SingleLine()

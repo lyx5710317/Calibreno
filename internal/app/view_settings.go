@@ -28,9 +28,7 @@ const (
 	sectionLibrary
 	sectionOPDS
 	sectionMCP
-	sectionWireless
-	sectionEmail
-	sectionBOOX
+	sectionTransfer
 )
 
 // sections lists the Settings sections. id is the stable key; the title
@@ -45,9 +43,7 @@ var sections = []struct {
 	{sectionLibrary, "Library", locales.CommonLibrary, icons.Library},
 	{sectionOPDS, "OPDS", locales.SettingsSectionOPDS, icons.Rss},
 	{sectionMCP, "MCP", locales.SettingsSectionMCP, icons.Bot},
-	{sectionWireless, "Wireless", locales.WirelessName, icons.Wifi},
-	{sectionEmail, "Email", locales.SettingsSectionEmail, icons.Send},
-	{sectionBOOX, "BOOX", locales.BooxName, icons.BookOpen},
+	{sectionTransfer, "Transfer", locales.SettingsSectionTransfer, icons.Send},
 }
 
 // settingsWidth is the Settings window's width: Plugins' list and plugin
@@ -83,16 +79,12 @@ func (a *App) settingsDialog(c *ui.Context) {
 				a.opdsPane(c)
 			case sectionMCP:
 				a.mcpPane(c)
-			case sectionWireless:
-				a.wirelessPane(c)
-			case sectionEmail:
-				a.emailPane(c)
-			case sectionBOOX:
-				a.booxSettingsPane(c)
+			case sectionTransfer:
+				a.transferSettingsPane(c)
 			}
 		})
 	}, func() {
-		if a.section == sectionBOOX {
+		if a.section == sectionTransfer && a.transferTab != transferKindle {
 			ui.Spacer(c)
 		} else {
 			ui.Text(c, locales.SettingsChangesApplyNote()).FontSize(12).TextColor(pal().TextTertiary).Grow(1)

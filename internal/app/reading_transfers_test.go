@@ -40,11 +40,11 @@ func TestBOOXBookMenuConfiguresThenSends(t *testing.T) {
 	if err := tt.RightClick("Dune"); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.ChooseMenuItem(locales.BooxConfigure()); err != nil {
+	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferBOOX()); err != nil {
 		t.Fatal(err)
 	}
 	tt.Frame()
-	if !a.settingsOpen || a.section != sectionBOOX || !tt.HasText(locales.BooxAddress()) {
+	if !a.settingsOpen || a.section != sectionTransfer || a.transferTab != transferBOOX || !tt.HasText(locales.BooxAddress()) {
 		t.Fatal("setup did not open the BOOX settings pane")
 	}
 	shot(t, tt, "boox-settings")
@@ -57,7 +57,7 @@ func TestBOOXBookMenuConfiguresThenSends(t *testing.T) {
 	if err := tt.RightClick("Dune"); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.ChooseMenuItem(locales.BooxSend()); err != nil {
+	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferBOOX()); err != nil {
 		t.Fatal(err)
 	}
 	if sent == "" || a.busy != "" {
@@ -119,7 +119,7 @@ func TestWeReadBookMenuHandsOffAnExistingEPUB(t *testing.T) {
 	if err := tt.RightClick(title); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.ChooseMenuItem(locales.WeReadImport()); err != nil {
+	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferWeRead()); err != nil {
 		t.Fatal(err)
 	}
 	want, _, err := libraryFormatPaths(a.lib, a.byID[id], "EPUB")

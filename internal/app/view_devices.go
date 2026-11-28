@@ -423,19 +423,22 @@ func (a *App) deviceDetail(c *ui.Context, v *deviceView) {
 	})
 }
 
-// readerMenuItems are the library's book menu's items for the readers
-// plugged in: Send to, and Remove from those that have the books. It
-// reports whether it added any.
+// readerMenuItems keeps removal and other USB reader drivers' sends in
+// the library menu. Kindle sends are in the Transfer submenu.
 func (a *App) readerMenuItems(m *ui.Menu, ids []int64) bool {
-	devs := a.devices()
 	busy := a.dev != nil && a.dev.busy != "" || a.busy != ""
-	for _, d := range devs {
-		name := d.Info().Name
-		if m.Item(locales.WirelessSendTo(name)).Icon(icons.Menu(icons.Tablet)).Disabled(busy).Chosen() {
-			a.sendToReader(d, ids)
+	added := false
+	for _, d := range a.devices() {
+		info := d.Info()
+		if info.Kind != "kindle" {
+			added = true
+			if m.Item(locales.WirelessSendTo(info.Name)).Icon(icons.Menu(icons.Tablet)).Disabled(busy).Chosen() {
+				a.sendToReader(d, ids)
+			}
 		}
 		if on := a.readerBooksOf(d, ids); len(on) > 0 {
-			if m.Item(locales.WirelessRemoveFrom(name)).Icon(icons.Menu(icons.Trash)).Disabled(busy).Chosen() {
+			added = true
+			if m.Item(locales.WirelessRemoveFrom(info.Name)).Icon(icons.Menu(icons.Trash)).Disabled(busy).Chosen() {
 				title := ""
 				if b := a.byID[ids[0]]; len(ids) == 1 && b != nil {
 					title = b.Title
@@ -444,7 +447,7 @@ func (a *App) readerMenuItems(m *ui.Menu, ids []int64) bool {
 			}
 		}
 	}
-	return len(devs) > 0
+	return added
 }
 
 // deviceDropOverlay says where dropped files go on a reader's page.

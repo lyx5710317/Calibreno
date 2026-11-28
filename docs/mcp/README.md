@@ -10,6 +10,7 @@ How it is built is in [design.md](design.md).
 
 - [Turn it on](#turn-it-on)
 - [Connect an agent](#connect-an-agent)
+- [国内客户端](#国内客户端)
 - [Examples](#examples)
 - [Tools](#tools)
 - [Read only](#read-only)
@@ -24,8 +25,9 @@ send its token can connect.
 
 ## Connect an agent
 
-Settings › MCP › Connect an agent has the setup for each agent, with the
-token in it; **Copy** copies it.
+Open Settings › MCP › Connect an agent, select your client, and click
+**Copy**. The preview masks the token. The copied HTTP setup includes
+the current port and token.
 
 **Claude Code**: run it in a terminal.
 
@@ -48,8 +50,10 @@ Calibreno's own bridge, `Calibreno mcp`, which needs no token. Add it to
 }
 ```
 
-When Calibreno isn't running, the bridge still answers the read tools from
-the last library, read-only.
+When Calibreno is closed or its HTTP MCP service is turned off, the bridge
+serves the last library in read-only mode. If a configured listener accepts
+the connection but authentication or the MCP handshake fails, the bridge
+reports the error to the client.
 
 **Cursor**: add it to `~/.cursor/mcp.json`.
 
@@ -66,6 +70,24 @@ the last library, read-only.
 
 **New token** in Settings › MCP makes a new token at once; agents set up
 with the old one need the new setup.
+
+## 国内客户端
+
+在 Calibreno 打开「设置 › MCP」，启用服务，在「连接 Agent」选择客户端并点击复制。HTTP 预设使用 Streamable HTTP。客户端和 Calibreno 需要运行在同一台电脑，TraeWork 等提供云端和本地选项的应用请选择本地。
+
+| 客户端 | 粘贴或执行配置的位置 |
+| --- | --- |
+| TRAE 中国版 | 「设置 › MCP › 添加 › 手动添加」。[TRAE 文档](https://docs.trae.cn/ide_add-mcp-servers) |
+| TraeWork 桌面版 | 「设置 › MCP › 本地 › 创建 › 手动配置」。[TraeWork 文档](https://docs.trae.cn/work_remote-mcp-server) |
+| Qoder | 「连接器 › 添加连接器 › JSON」。Qoder CLI 用户可合并到 `~/.qoder/settings.json`。[Qoder 文档](https://docs.qoder.com/qoder/connectors) · [CLI 文档](https://docs.qoder.com/cli/mcp-reference) |
+| QoderWork | 「设置 › 连接器 › 添加 › 从 JSON 导入」。[QoderWork 文档](https://docs.qoder.com/qoderwork/connectors) |
+| Kimi Code CLI | 合并到 `~/.kimi-code/mcp.json`，打开新会话后运行 `/mcp`。旧版 Kimi CLI 使用 `~/.kimi/mcp.json`。[Kimi Code 文档](https://www.kimi.com/code/docs/kimi-code-cli/customization/mcp.html) · [旧版 Kimi CLI 文档](https://github.com/MoonshotAI/kimi-cli/blob/main/docs/en/customization/mcp.md) |
+| Qwen Code | 合并到 `~/.qwen/settings.json`，重新打开 Qwen Code 后运行 `/mcp`。[Qwen Code 文档](https://qwenlm.github.io/qwen-code-docs/en/users/features/mcp/) |
+| CodeBuddy IDE | 「设置 › MCP › 添加 MCP」，将配置合并到打开的 JSON 文件。[CodeBuddy IDE 文档](https://www.codebuddy.cn/docs/ide/User-guide/MCP) · [HTTP 配置示例](https://cloud.tencent.com/document/product/1267/138986) |
+| CodeBuddy CLI | 在终端运行复制的命令，配置会加入当前用户的 MCP 服务。[CodeBuddy CLI 文档](https://www.codebuddy.cn/docs/cli/mcp) |
+| Cherry Studio | 「设置 › MCP › MCP 服务器 › 添加 › 从 JSON 导入」，然后给需要的助手启用该服务。[Cherry Studio 文档](https://cherryai.com.cn/docs/zh-cn/advanced-basic/extensions/mcp/) |
+
+如果配置文件已有 `mcpServers`，只把复制配置中的 `calibreno` 项合并进去。连接后可让智能体「在 Calibreno 里查找《三体》，只返回书名和作者」，再到 Calibreno 的 MCP 活动中查看调用。仅需查书时，可以关闭「允许 Agent 编辑、添加和删除书籍」。更换端口或令牌后，重新复制并更新客户端配置。
 
 ## Examples
 
