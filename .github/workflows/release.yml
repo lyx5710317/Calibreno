@@ -1,5 +1,6 @@
 # Builds Calibreno for every platform when a version tag such as v0.2.0 is
 # pushed, then attaches packages to the draft release in this repository.
+# A manual run builds Windows installers for an existing release draft.
 #
 # Optional macOS signing secrets:
 #   MACOS_CERTIFICATE            the Developer ID Application certificate with its
@@ -18,35 +19,58 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag, such as v0.8.1
+        required: true
+        type: string
 
 permissions:
   contents: write # the draft release, and the uploads to it
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
 
 jobs:
   draft-release:
     runs-on: ubuntu-latest
     steps:
+      - name: Check the requested tag
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [[ "$RELEASE_TAG" != v?* ]] || ! git check-ref-format "refs/tags/$RELEASE_TAG"; then
+            echo "::error::Provide an existing release tag beginning with v"
+            exit 1
+          fi
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', env.RELEASE_TAG) || github.sha }}
       - name: Check that the tag is the version in mygo.json
         run: |
           version="$(jq -r .version cmd/dalibre/mygo.json)"
-          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
-            echo "::error::tag $GITHUB_REF_NAME does not match version $version in cmd/dalibre/mygo.json"
+          if [ "$RELEASE_TAG" != "v$version" ]; then
+            echo "::error::tag $RELEASE_TAG does not match version $version in cmd/dalibre/mygo.json"
             exit 1
           fi
       - name: Check that CHANGELOG.md has notes for the version
         run: |
-          grep -Eq "^## \[?${GITHUB_REF_NAME#v}\]?( |$)" CHANGELOG.md || {
-            echo "::error::CHANGELOG.md has no \"## ${GITHUB_REF_NAME#v}\" section"
+          grep -Eq "^## \[?${RELEASE_TAG#v}\]?( |$)" CHANGELOG.md || {
+            echo "::error::CHANGELOG.md has no \"## ${RELEASE_TAG#v}\" section"
             exit 1
           }
-      - name: Create the draft release
+      - name: Prepare the draft release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if ! gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
-            gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" \
-              --draft --verify-tag --title "Calibreno $GITHUB_REF_NAME" --generate-notes
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            if [ "$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" != true ]; then
+              echo "::error::An existing draft release is required for $RELEASE_TAG"
+              exit 1
+            fi
+          elif ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --draft --verify-tag --title "Calibreno $RELEASE_TAG" --generate-notes
           fi
 
   build:
@@ -56,12 +80,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { name: macOS, os: macos-latest, platform: "darwin/arm64,darwin/amd64" }
-          - { name: Windows, os: windows-latest, platform: "windows/amd64,windows/arm64" }
-          - { name: Linux, os: ubuntu-latest, platform: "linux/amd64,linux/arm64" }
+        include: >-
+          ${{ fromJSON(github.event_name == 'workflow_dispatch'
+            && '[{"name":"Windows","os":"windows-latest","platform":"windows/amd64,windows/arm64"}]'
+            || '[{"name":"macOS","os":"macos-latest","platform":"darwin/arm64,darwin/amd64"},{"name":"Windows","os":"windows-latest","platform":"windows/amd64,windows/arm64"},{"name":"Linux","os":"ubuntu-latest","platform":"linux/amd64,linux/arm64"}]') }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', env.RELEASE_TAG) || github.sha }}
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
@@ -147,10 +173,22 @@ jobs:
               $files.FullName
             }
           )
-          gh release upload "$env:GITHUB_REF_NAME" --repo "$env:GITHUB_REPOSITORY" --clobber @packages
+          if ($env:GITHUB_EVENT_NAME -eq 'workflow_dispatch') {
+            $existing = @(gh release view "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --json assets --jq '.assets[].name')
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            $packages = @($packages | Where-Object { (Split-Path -Leaf $_) -notin $existing })
+            if ($packages.Count -eq 0) {
+              Write-Output 'The draft already contains both Windows installers.'
+              exit 0
+            }
+            gh release upload "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" @packages
+          } else {
+            gh release upload "$env:RELEASE_TAG" --repo "$env:GITHUB_REPOSITORY" --clobber @packages
+          }
 
   plugin-tool:
     needs: draft-release
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: write
