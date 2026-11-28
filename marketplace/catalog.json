@@ -21,6 +21,7 @@
     "manage-series": { "category": "library", "origin": "upstream", "calibre": "Manage Series" },
     "search-internet": { "category": "library", "origin": "upstream", "calibre": "Search The Internet" },
     "zh-metadata-review": { "category": "metadata", "origin": "calibreno" },
+    "douban-book-links": { "category": "metadata", "origin": "calibreno" },
     "extract-isbn": { "category": "metadata", "origin": "upstream", "calibre": "Extract ISBN" },
     "chinese-convert": { "category": "language", "origin": "upstream", "calibre": "Chinese Text Conversion" },
     "japanese-furigana": { "category": "language", "origin": "calibreno" },
