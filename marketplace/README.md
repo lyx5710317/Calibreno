@@ -9,25 +9,22 @@ Settings › OPDS to browse or import books from that catalog.
 
 ## Plugins
 
-| Plugin | Does | Ported from |
+| Plugin | Does | Origin |
 |---|---|---|
 | [Search the Internet](plugins/search-internet) | Opens a book's search on Douban, Goodreads or another chosen site | calibre's Search The Internet |
+| [中文书目校对](plugins/zh-metadata-review) | Reviews selected books' Chinese metadata offline and previews suggested corrections | Calibreno |
 | [Chinese Text Conversion](plugins/chinese-convert) | Converts EPUBs between Simplified and Traditional Chinese | calibre's Chinese Text Conversion |
 | [Extract ISBN](plugins/extract-isbn) | Finds the ISBN printed in a book and sets it | calibre's Extract ISBN |
 | [Find Duplicates](plugins/find-duplicates) | Finds books that look like the same book, by title and author or by ISBN | calibre's Find Duplicates |
 | [Quality Check](plugins/quality-check) | Finds books with missing or messy metadata | calibre's Quality Check |
 | [Clean Metadata](plugins/clean-metadata) | Cleans up titles, authors and series | calibre's Clean Metadata |
 | [Manage Series](plugins/manage-series) | Puts books in a series and numbers them | calibre's Manage Series |
-| [Count Pages](plugins/count-pages) | Counts words and estimates pages | calibre's Count Pages |
-| [Apple Books covers](plugins/apple-books) | High-resolution covers from the Apple Books store | calibre's Apple Books covers |
-| [Wikidata](plugins/wikidata) | Book details and covers from Wikidata | calibre's Wikidata |
 | [EPUB Merge](plugins/epub-merge) | Merges EPUBs into one new book | calibre's EpubMerge |
 | [EPUB Split](plugins/epub-split) | Splits sections of an EPUB off into new books | calibre's EpubSplit |
 | [Modify ePub](plugins/modify-epub) | Fixes and cleans up EPUBs in place | calibre's Modify ePub |
 | [KePub](plugins/kepub) | Converts EPUBs to Kobo's KePub | kepubify, calibre's KoboTouchExtended |
 
-Each plugin's README names the files it was ported from and what it
-doesn't do yet.
+Each plugin's README describes its capabilities and credits its sources.
 
 ## List your plugin
 

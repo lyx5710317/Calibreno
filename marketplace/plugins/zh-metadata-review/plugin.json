@@ -1,0 +1,31 @@
+{
+  "$schema": "../../../sdk/plugin.schema.json",
+  "id": "io.github.lyx5710317.calibreno.zh-metadata-review",
+  "name": "中文书目校对",
+  "version": "0.1.0",
+  "api": 1,
+  "dalibre": ">=0.8.1",
+  "author": "Calibreno",
+  "homepage": "https://github.com/lyx5710317/Calibreno/tree/main/marketplace/plugins/zh-metadata-review",
+  "license": "GPL-3.0-or-later",
+  "main": "main.js",
+  "description": "离线清理书名和作者的格式问题，预览后确认修改，并提示复核版次、卷次、译者和异常 ISBN。",
+  "icon": "book-open",
+  "capabilities": {
+    "actions": [
+      {
+        "id": "review",
+        "title": "中文书目校对…",
+        "icon": "check-circle",
+        "scope": "books",
+        "books": {
+          "min": 1
+        }
+      }
+    ]
+  },
+  "permissions": {
+    "hosts": [],
+    "library": "read"
+  }
+}
