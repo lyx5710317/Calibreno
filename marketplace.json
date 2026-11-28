@@ -1,5 +1,5 @@
 {
-  "name": "Dalibre Marketplace",
+  "name": "Calibreno Marketplace",
   "categories": [
     {
       "id": "library",
@@ -16,278 +16,16 @@
     {
       "id": "language",
       "title": "Language"
-    },
-    {
-      "id": "sources",
-      "title": "Book sources"
     }
   ],
+  "featured": [
+    "org.randynamic.dalibre.search-internet",
+    "org.randynamic.dalibre.chinese-convert",
+    "org.randynamic.dalibre.extract-isbn",
+    "org.randynamic.dalibre.epub-merge",
+    "org.randynamic.dalibre.epub-split"
+  ],
   "plugins": [
-    {
-      "id": "org.randynamic.dalibre.apple-books",
-      "name": "Apple Books covers",
-      "version": "1.0.0",
-      "description": "High-resolution covers from the Apple Books store",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "book-open",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/apple-books",
-      "dalibre": ">=0.4.0",
-      "category": "metadata",
-      "calibre": "Apple Books covers",
-      "downloads": 2907,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.apple-books-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "metadata": {
-          "fields": [
-            "cover"
-          ]
-        }
-      },
-      "permissions": {
-        "hosts": [
-          "itunes.apple.com",
-          "*.mzstatic.com"
-        ],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.chinese-convert",
-      "name": "Chinese Text Conversion",
-      "version": "1.0.1",
-      "description": "Converts EPUBs between Simplified and Traditional Chinese, and their text direction",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "layers",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/chinese-convert",
-      "dalibre": ">=0.5.0",
-      "category": "language",
-      "calibre": "Chinese Text Conversion",
-      "downloads": 3759,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.chinese-convert-1.0.1.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "convert",
-            "title": "Convert Chinese…",
-            "icon": "replace",
-            "scope": "books",
-            "books": {
-              "min": 1
-            },
-            "formats": [
-              "EPUB"
-            ],
-            "files": true
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.clean-metadata",
-      "name": "Clean Metadata",
-      "version": "1.0.0",
-      "description": "Cleans up titles, authors and series",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "library",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/clean-metadata",
-      "dalibre": ">=0.4.0",
-      "category": "library",
-      "calibre": "Clean Metadata",
-      "downloads": 3556,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.clean-metadata-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "clean",
-            "title": "Clean metadata…",
-            "icon": "sparkle",
-            "scope": "books",
-            "books": {
-              "min": 1
-            }
-          },
-          {
-            "id": "clean-library",
-            "title": "Clean metadata…",
-            "icon": "sparkle",
-            "scope": "library"
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.count-pages",
-      "name": "Count Pages",
-      "version": "1.0.0",
-      "description": "Counts words and estimates pages",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "library",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/count-pages",
-      "dalibre": ">=0.4.0",
-      "category": "library",
-      "calibre": "Count Pages",
-      "downloads": 8536,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.count-pages-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "count",
-            "title": "Count pages…",
-            "icon": "file",
-            "scope": "books",
-            "books": {
-              "min": 1
-            },
-            "formats": [
-              "EPUB",
-              "KEPUB",
-              "TXT",
-              "HTMLZ",
-              "FB2"
-            ],
-            "files": true
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.epub-merge",
-      "name": "EPUB Merge",
-      "version": "1.0.0",
-      "description": "Merge EPUBs into one new book, after calibre's EpubMerge",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "layers",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/epub-merge",
-      "dalibre": ">=0.4.0",
-      "category": "epub",
-      "calibre": "EpubMerge",
-      "downloads": 9356,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.epub-merge-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "merge",
-            "title": "Merge EPUBs…",
-            "icon": "layers",
-            "scope": "books",
-            "books": {
-              "min": 2
-            },
-            "formats": [
-              "EPUB"
-            ],
-            "files": true,
-            "covers": true
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.epub-split",
-      "name": "EPUB Split",
-      "version": "1.0.0",
-      "description": "Split sections of an EPUB off into new books, after calibre's EpubSplit",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "layers",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/epub-split",
-      "dalibre": ">=0.4.0",
-      "category": "epub",
-      "calibre": "EpubSplit",
-      "downloads": 8752,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.epub-split-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "split",
-            "title": "Split EPUB…",
-            "icon": "copy",
-            "scope": "books",
-            "books": {
-              "min": 1,
-              "max": 1
-            },
-            "formats": [
-              "EPUB"
-            ],
-            "files": true,
-            "covers": true
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.extract-isbn",
-      "name": "Extract ISBN",
-      "version": "1.0.0",
-      "description": "Finds the ISBN printed in a book and sets it",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "database",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/extract-isbn",
-      "dalibre": ">=0.4.0",
-      "category": "metadata",
-      "calibre": "Extract ISBN",
-      "downloads": 4094,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.extract-isbn-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "extract",
-            "title": "Extract ISBN",
-            "icon": "search",
-            "scope": "books",
-            "books": {
-              "min": 1
-            },
-            "formats": [
-              "EPUB",
-              "KEPUB",
-              "TXT",
-              "HTMLZ",
-              "FB2"
-            ],
-            "files": true
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
     {
       "id": "org.randynamic.dalibre.find-duplicates",
       "name": "Find Duplicates",
@@ -299,10 +37,11 @@
       "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/find-duplicates",
       "dalibre": ">=0.4.0",
       "category": "library",
+      "origin": "upstream",
       "calibre": "Find Duplicates",
-      "downloads": 11808,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.find-duplicates-1.0.0.dalibre-plugin",
+      "downloads": 11819,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.find-duplicates-1.0.0.dalibre-plugin",
       "capabilities": {
         "actions": [
           {
@@ -341,34 +80,68 @@
       }
     },
     {
-      "id": "org.randynamic.dalibre.kepub",
-      "name": "KePub",
+      "id": "org.randynamic.dalibre.quality-check",
+      "name": "Quality Check",
       "version": "1.0.0",
-      "description": "Convert EPUBs to Kobo's KePub, after kepubify and calibre's KoboTouchExtended",
+      "description": "Finds books with missing or messy metadata",
       "author": "Randy",
-      "license": "MIT",
-      "icon": "book-open",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/kepub",
+      "license": "GPL-3.0-or-later",
+      "icon": "library",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/quality-check",
       "dalibre": ">=0.4.0",
-      "category": "epub",
-      "calibre": "KoboTouchExtended",
-      "downloads": 8251,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.kepub-1.0.0.dalibre-plugin",
+      "category": "library",
+      "origin": "upstream",
+      "calibre": "Quality Check",
+      "downloads": 7308,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.quality-check-1.0.0.dalibre-plugin",
       "capabilities": {
         "actions": [
           {
-            "id": "kepub",
-            "title": "Convert to KePub…",
-            "icon": "replace",
+            "id": "check",
+            "title": "Quality check…",
+            "icon": "check-circle",
+            "scope": "library"
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
+      "id": "org.randynamic.dalibre.clean-metadata",
+      "name": "Clean Metadata",
+      "version": "1.0.0",
+      "description": "Cleans up titles, authors and series",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "library",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/clean-metadata",
+      "dalibre": ">=0.4.0",
+      "category": "library",
+      "origin": "upstream",
+      "calibre": "Clean Metadata",
+      "downloads": 3559,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.clean-metadata-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "clean",
+            "title": "Clean metadata…",
+            "icon": "sparkle",
             "scope": "books",
             "books": {
               "min": 1
-            },
-            "formats": [
-              "EPUB"
-            ],
-            "files": true
+            }
+          },
+          {
+            "id": "clean-library",
+            "title": "Clean metadata…",
+            "icon": "sparkle",
+            "scope": "library"
           }
         ]
       },
@@ -388,10 +161,11 @@
       "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/manage-series",
       "dalibre": ">=0.4.0",
       "category": "library",
+      "origin": "upstream",
       "calibre": "Manage Series",
-      "downloads": 3026,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.manage-series-1.0.0.dalibre-plugin",
+      "downloads": 3028,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.manage-series-1.0.0.dalibre-plugin",
       "capabilities": {
         "actions": [
           {
@@ -420,74 +194,6 @@
       }
     },
     {
-      "id": "org.randynamic.dalibre.modify-epub",
-      "name": "Modify ePub",
-      "version": "1.0.0",
-      "description": "Fix and clean up EPUBs in place, after calibre's Modify ePub",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "book-open",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/modify-epub",
-      "dalibre": ">=0.4.0",
-      "category": "epub",
-      "calibre": "Modify ePub",
-      "downloads": 5835,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.modify-epub-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "modify",
-            "title": "Modify ePub…",
-            "icon": "pencil",
-            "scope": "books",
-            "books": {
-              "min": 1
-            },
-            "formats": [
-              "EPUB"
-            ],
-            "files": true,
-            "covers": true
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
-    {
-      "id": "org.randynamic.dalibre.quality-check",
-      "name": "Quality Check",
-      "version": "1.0.0",
-      "description": "Finds books with missing or messy metadata",
-      "author": "Randy",
-      "license": "GPL-3.0-or-later",
-      "icon": "library",
-      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/quality-check",
-      "dalibre": ">=0.4.0",
-      "category": "library",
-      "calibre": "Quality Check",
-      "downloads": 7302,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.quality-check-1.0.0.dalibre-plugin",
-      "capabilities": {
-        "actions": [
-          {
-            "id": "check",
-            "title": "Quality check…",
-            "icon": "check-circle",
-            "scope": "library"
-          }
-        ]
-      },
-      "permissions": {
-        "hosts": [],
-        "library": "read"
-      }
-    },
-    {
       "id": "org.randynamic.dalibre.search-internet",
       "name": "Search the Internet",
       "version": "1.2.1",
@@ -498,10 +204,11 @@
       "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/search-internet",
       "dalibre": ">=0.6.4",
       "category": "library",
+      "origin": "upstream",
       "calibre": "Search The Internet",
-      "downloads": 3577,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.search-internet-1.2.1.dalibre-plugin",
+      "downloads": 3581,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.search-internet-1.2.1.dalibre-plugin",
       "capabilities": {
         "actions": [
           {
@@ -580,6 +287,159 @@
       }
     },
     {
+      "id": "org.randynamic.dalibre.count-pages",
+      "name": "Count Pages",
+      "version": "1.0.0",
+      "description": "Counts words and estimates pages",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "library",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/count-pages",
+      "dalibre": ">=0.4.0",
+      "category": "library",
+      "origin": "upstream",
+      "calibre": "Count Pages",
+      "downloads": 8543,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.count-pages-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "count",
+            "title": "Count pages…",
+            "icon": "file",
+            "scope": "books",
+            "books": {
+              "min": 1
+            },
+            "formats": [
+              "EPUB",
+              "KEPUB",
+              "TXT",
+              "HTMLZ",
+              "FB2"
+            ],
+            "files": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
+      "id": "org.randynamic.dalibre.extract-isbn",
+      "name": "Extract ISBN",
+      "version": "1.0.0",
+      "description": "Finds the ISBN printed in a book and sets it",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "database",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/extract-isbn",
+      "dalibre": ">=0.4.0",
+      "category": "metadata",
+      "origin": "upstream",
+      "calibre": "Extract ISBN",
+      "downloads": 4097,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.extract-isbn-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "extract",
+            "title": "Extract ISBN",
+            "icon": "search",
+            "scope": "books",
+            "books": {
+              "min": 1
+            },
+            "formats": [
+              "EPUB",
+              "KEPUB",
+              "TXT",
+              "HTMLZ",
+              "FB2"
+            ],
+            "files": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
+      "id": "org.randynamic.dalibre.chinese-convert",
+      "name": "Chinese Text Conversion",
+      "version": "1.0.1",
+      "description": "Converts EPUBs between Simplified and Traditional Chinese, and their text direction",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "layers",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/chinese-convert",
+      "dalibre": ">=0.5.0",
+      "category": "language",
+      "origin": "upstream",
+      "calibre": "Chinese Text Conversion",
+      "downloads": 3766,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.chinese-convert-1.0.1.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "convert",
+            "title": "Convert Chinese…",
+            "icon": "replace",
+            "scope": "books",
+            "books": {
+              "min": 1
+            },
+            "formats": [
+              "EPUB"
+            ],
+            "files": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
+      "id": "org.randynamic.dalibre.apple-books",
+      "name": "Apple Books covers",
+      "version": "1.0.0",
+      "description": "High-resolution covers from the Apple Books store",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "book-open",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/apple-books",
+      "dalibre": ">=0.4.0",
+      "category": "metadata",
+      "origin": "upstream",
+      "calibre": "Apple Books covers",
+      "downloads": 2915,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.apple-books-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "metadata": {
+          "fields": [
+            "cover"
+          ]
+        }
+      },
+      "permissions": {
+        "hosts": [
+          "itunes.apple.com",
+          "*.mzstatic.com"
+        ],
+        "library": "read"
+      }
+    },
+    {
       "id": "org.randynamic.dalibre.wikidata",
       "name": "Wikidata",
       "version": "1.0.0",
@@ -590,10 +450,11 @@
       "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/wikidata",
       "dalibre": ">=0.4.0",
       "category": "metadata",
+      "origin": "upstream",
       "calibre": "Wikidata",
-      "downloads": 2568,
-      "repo": "djyde/dalibre",
-      "package": "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/packages/org.randynamic.dalibre.wikidata-1.0.0.dalibre-plugin",
+      "downloads": 2570,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.wikidata-1.0.0.dalibre-plugin",
       "capabilities": {
         "metadata": {
           "fields": [
@@ -617,6 +478,162 @@
       }
     },
     {
+      "id": "org.randynamic.dalibre.epub-merge",
+      "name": "EPUB Merge",
+      "version": "1.0.0",
+      "description": "Merge EPUBs into one new book, after calibre's EpubMerge",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "layers",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/epub-merge",
+      "dalibre": ">=0.4.0",
+      "category": "epub",
+      "origin": "upstream",
+      "calibre": "EpubMerge",
+      "downloads": 9363,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.epub-merge-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "merge",
+            "title": "Merge EPUBs…",
+            "icon": "layers",
+            "scope": "books",
+            "books": {
+              "min": 2
+            },
+            "formats": [
+              "EPUB"
+            ],
+            "files": true,
+            "covers": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
+      "id": "org.randynamic.dalibre.epub-split",
+      "name": "EPUB Split",
+      "version": "1.0.0",
+      "description": "Split sections of an EPUB off into new books, after calibre's EpubSplit",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "layers",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/epub-split",
+      "dalibre": ">=0.4.0",
+      "category": "epub",
+      "origin": "upstream",
+      "calibre": "EpubSplit",
+      "downloads": 8760,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.epub-split-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "split",
+            "title": "Split EPUB…",
+            "icon": "copy",
+            "scope": "books",
+            "books": {
+              "min": 1,
+              "max": 1
+            },
+            "formats": [
+              "EPUB"
+            ],
+            "files": true,
+            "covers": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
+      "id": "org.randynamic.dalibre.modify-epub",
+      "name": "Modify ePub",
+      "version": "1.0.0",
+      "description": "Fix and clean up EPUBs in place, after calibre's Modify ePub",
+      "author": "Randy",
+      "license": "GPL-3.0-or-later",
+      "icon": "book-open",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/modify-epub",
+      "dalibre": ">=0.4.0",
+      "category": "epub",
+      "origin": "upstream",
+      "calibre": "Modify ePub",
+      "downloads": 5839,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.modify-epub-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "modify",
+            "title": "Modify ePub…",
+            "icon": "pencil",
+            "scope": "books",
+            "books": {
+              "min": 1
+            },
+            "formats": [
+              "EPUB"
+            ],
+            "files": true,
+            "covers": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
+      "id": "org.randynamic.dalibre.kepub",
+      "name": "KePub",
+      "version": "1.0.0",
+      "description": "Convert EPUBs to Kobo's KePub, after kepubify and calibre's KoboTouchExtended",
+      "author": "Randy",
+      "license": "MIT",
+      "icon": "book-open",
+      "homepage": "https://github.com/djyde/dalibre/tree/main/marketplace/plugins/kepub",
+      "dalibre": ">=0.4.0",
+      "category": "epub",
+      "origin": "upstream",
+      "calibre": "KoboTouchExtended",
+      "downloads": 8256,
+      "repo": "lyx5710317/Calibreno",
+      "package": "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/packages/org.randynamic.dalibre.kepub-1.0.0.dalibre-plugin",
+      "capabilities": {
+        "actions": [
+          {
+            "id": "kepub",
+            "title": "Convert to KePub…",
+            "icon": "replace",
+            "scope": "books",
+            "books": {
+              "min": 1
+            },
+            "formats": [
+              "EPUB"
+            ],
+            "files": true
+          }
+        ]
+      },
+      "permissions": {
+        "hosts": [],
+        "library": "read"
+      }
+    },
+    {
       "id": "io.github.bellussi1.hardcover",
       "name": "Hardcover",
       "version": "1.0.1",
@@ -627,6 +644,7 @@
       "homepage": "https://github.com/bellussi1/dalibre-hardcover",
       "dalibre": ">=0.4.0",
       "category": "metadata",
+      "origin": "community",
       "repo": "bellussi1/dalibre-hardcover",
       "community": true,
       "package": "https://github.com/bellussi1/dalibre-hardcover/releases/download/v1.0.1/io.github.bellussi1.hardcover-1.0.1.dalibre-plugin",
@@ -682,6 +700,7 @@
       "homepage": "https://github.com/bellussi1/dalibre-isbn-brasil",
       "dalibre": ">=0.6.0",
       "category": "metadata",
+      "origin": "community",
       "repo": "bellussi1/dalibre-isbn-brasil",
       "community": true,
       "package": "https://github.com/bellussi1/dalibre-isbn-brasil/releases/download/v1.0.1/io.github.bellussi1.isbn-brasil-1.0.1.dalibre-plugin",
@@ -724,6 +743,7 @@
       "homepage": "https://github.com/bellussi1/dalibre-openlibrary",
       "dalibre": ">=0.4.0",
       "category": "metadata",
+      "origin": "community",
       "repo": "bellussi1/dalibre-openlibrary",
       "community": true,
       "package": "https://github.com/bellussi1/dalibre-openlibrary/releases/download/v1.0.1/io.github.bellussi1.openlibrary-1.0.1.dalibre-plugin",
