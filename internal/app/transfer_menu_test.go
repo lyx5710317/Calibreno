@@ -39,6 +39,7 @@ func TestTransferMenuOffersAllDestinationsBeforeSetup(t *testing.T) {
 	}{
 		{"Kindle USB", []string{locales.TransferKindle(), locales.TransferKindleUSB()}, transferKindle},
 		{"Kindle email", []string{locales.TransferKindle(), locales.TransferKindleEmail()}, transferKindle},
+		{"WeRead", []string{locales.TransferWeRead(), locales.WeReadSettings()}, transferWeRead},
 		{"BOOX", []string{locales.TransferBOOX()}, transferBOOX},
 		{"KOReader", []string{locales.TransferKOReader()}, transferKOReader},
 	} {
@@ -61,7 +62,7 @@ func TestTransferMenuOffersAllDestinationsBeforeSetup(t *testing.T) {
 	if err := tt.RightClick(title); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferWeRead()); err != nil {
+	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferWeRead(), locales.WeReadManualAction()); err != nil {
 		t.Fatal(err)
 	}
 	if opened != weread.UploadPage || !strings.HasSuffix(revealed, ".epub") {

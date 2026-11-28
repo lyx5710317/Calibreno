@@ -22,15 +22,17 @@ type filterPicker struct {
 	label       string // the picker's search field, for assistive tech
 	icon        *ui.SVG
 	items       []catalog.Count
+	display     map[string]string
 }
 
 func (a *App) filterPickers() []filterPicker {
 	return []filterPicker{
-		{catalog.ByAuthor, locales.CommonAuthor(), locales.FiltersSearchAuthors(), locales.FiltersSearchAuthorsLabel(), icons.User, a.counts.Authors},
-		{catalog.BySeries, locales.CommonSeries(), locales.FiltersSearchSeries(), locales.FiltersSearchSeriesLabel(), icons.Layers, a.counts.Series},
-		{catalog.ByTag, locales.CommonTag(), locales.FiltersSearchTags(), locales.FiltersSearchTagsLabel(), icons.Tag, a.counts.Tags},
-		{catalog.ByPublisher, locales.CommonPublisher(), locales.FiltersSearchPublishers(), locales.FiltersSearchPublishersLabel(), icons.Building, a.counts.Publishers},
-		{catalog.ByLanguage, locales.CommonLanguage(), locales.FiltersSearchLanguages(), locales.FiltersSearchLanguagesLabel(), icons.Globe, a.counts.Languages},
+		{catalog.ByAuthor, locales.CommonAuthor(), locales.FiltersSearchAuthors(), locales.FiltersSearchAuthorsLabel(), icons.User, a.counts.Authors, nil},
+		{catalog.BySeries, locales.CommonSeries(), locales.FiltersSearchSeries(), locales.FiltersSearchSeriesLabel(), icons.Layers, a.counts.Series, nil},
+		{catalog.ByTag, locales.CommonTag(), locales.FiltersSearchTags(), locales.FiltersSearchTagsLabel(), icons.Tag, a.counts.Tags, nil},
+		{catalog.ByPublisher, locales.CommonPublisher(), locales.FiltersSearchPublishers(), locales.FiltersSearchPublishersLabel(), icons.Building, a.counts.Publishers, nil},
+		{catalog.ByLanguage, locales.CommonLanguage(), locales.FiltersSearchLanguages(), locales.FiltersSearchLanguagesLabel(), icons.Globe, a.counts.Languages, nil},
+		a.bookTypePicker(),
 	}
 }
 
@@ -74,7 +76,7 @@ func (a *App) filterChip(c *ui.Context, p filterPicker) {
 	open := &a.pickerOpen[p.kind]
 	label := p.name
 	if active {
-		label = locales.FiltersChipValue(p.name, valueLabel(p.kind, f.Value))
+		label = locales.FiltersChipValue(p.name, p.valueLabel(f.Value))
 	}
 	chip := ui.ButtonBase(c).Height(28).MaxWidth(280).Radius(theme.RadiusFull).Padding(0, theme.Space6, 0, theme.Space10).Gap(theme.Space4).AlignItems(ui.Center).Label(label)
 	bg, fg, border := ui.Transparent, pal().TextSecondary, pal().BorderSubtle
@@ -112,7 +114,7 @@ func (a *App) filterChip(c *ui.Context, p filterPicker) {
 			ui.Scroll(c).MaxHeight(340).Gap(theme.Space2).AlignItems(ui.Stretch).Children(func() {
 				n := 0
 				for _, it := range p.items {
-					label := valueLabel(p.kind, it.Value)
+					label := p.valueLabel(it.Value)
 					if needle != "" && !strings.Contains(strings.ToLower(label), needle) && !strings.Contains(strings.ToLower(it.Value), needle) {
 						continue
 					}
@@ -152,8 +154,11 @@ func (a *App) pickerRow(c *ui.Context, label string, count int, selected bool, o
 	})
 }
 
-func valueLabel(k catalog.FilterKind, v string) string {
-	if k == catalog.ByLanguage {
+func (p filterPicker) valueLabel(v string) string {
+	if label, ok := p.display[v]; ok {
+		return label
+	}
+	if p.kind == catalog.ByLanguage {
 		return languageName(v)
 	}
 	return v

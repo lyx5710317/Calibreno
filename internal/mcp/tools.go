@@ -73,6 +73,7 @@ type BookSummary struct {
 	Series      string   `json:"series,omitempty"`
 	SeriesIndex float64  `json:"series_index,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
+	BookTypeIDs []string `json:"book_type_ids" jsonschema:"assigned book type IDs from list_book_types; empty for uncategorized books"`
 	Formats     []string `json:"formats,omitempty"`
 	Rating      float64  `json:"rating,omitempty" jsonschema:"stars, 0 to 5"`
 	Added       string   `json:"added"`
@@ -81,7 +82,8 @@ type BookSummary struct {
 func summary(b *calibre.Book) BookSummary {
 	s := BookSummary{
 		ID: b.ID, Title: b.Title, Authors: nonNil(b.Authors), Tags: b.Tags, Formats: b.Formats,
-		Rating: float64(b.Rating) / 2, Added: b.Timestamp.Format(time.RFC3339),
+		BookTypeIDs: nonNil(b.BookTypeIDs),
+		Rating:      float64(b.Rating) / 2, Added: b.Timestamp.Format(time.RFC3339),
 	}
 	if b.Series != "" {
 		s.Series, s.SeriesIndex = b.Series, b.SeriesIndex
@@ -182,18 +184,20 @@ func textToHTML(s string) string {
 // ---- Read tools
 
 type searchIn struct {
-	Query     string `json:"query,omitempty" jsonschema:"words that must all appear in the title, authors, series, tags, publisher or formats"`
-	Author    string `json:"author,omitempty" jsonschema:"an author's name, exactly"`
-	Series    string `json:"series,omitempty" jsonschema:"a series' name, exactly"`
-	Tag       string `json:"tag,omitempty" jsonschema:"a tag, exactly"`
-	Publisher string `json:"publisher,omitempty" jsonschema:"a publisher, exactly"`
-	Language  string `json:"language,omitempty" jsonschema:"a language code, as eng or en"`
-	Format    string `json:"format,omitempty" jsonschema:"a format, as EPUB"`
-	Recent    bool   `json:"recent,omitempty" jsonschema:"only books added in the last 30 days"`
-	Sort      string `json:"sort,omitempty" jsonschema:"added (the default), title, author, series, rating, published, size or modified"`
-	Desc      *bool  `json:"desc,omitempty" jsonschema:"descending order; the default when sorting by added"`
-	Limit     int    `json:"limit,omitempty" jsonschema:"at most this many books; 50 when not given"`
-	Offset    int    `json:"offset,omitempty" jsonschema:"books to skip, for the next page"`
+	Query         string `json:"query,omitempty" jsonschema:"words that must all appear in the title, authors, series, tags, publisher or formats"`
+	Author        string `json:"author,omitempty" jsonschema:"an author's name, exactly"`
+	Series        string `json:"series,omitempty" jsonschema:"a series' name, exactly"`
+	Tag           string `json:"tag,omitempty" jsonschema:"a tag, exactly"`
+	Publisher     string `json:"publisher,omitempty" jsonschema:"a publisher, exactly"`
+	Language      string `json:"language,omitempty" jsonschema:"a language code, as eng or en"`
+	Format        string `json:"format,omitempty" jsonschema:"a format, as EPUB"`
+	BookTypeID    string `json:"book_type_id,omitempty" jsonschema:"match books with this exact ID from list_book_types; use uncategorized separately"`
+	Uncategorized bool   `json:"uncategorized,omitempty" jsonschema:"only books with no assigned book types; cannot be combined with book_type_id"`
+	Recent        bool   `json:"recent,omitempty" jsonschema:"only books added in the last 30 days"`
+	Sort          string `json:"sort,omitempty" jsonschema:"added (the default), title, author, series, rating, published, size or modified"`
+	Desc          *bool  `json:"desc,omitempty" jsonschema:"descending order; the default when sorting by added"`
+	Limit         int    `json:"limit,omitempty" jsonschema:"at most this many books; 50 when not given"`
+	Offset        int    `json:"offset,omitempty" jsonschema:"books to skip, for the next page"`
 }
 
 type searchOut struct {
@@ -226,10 +230,15 @@ type facetsOut struct {
 	Values []Facet `json:"values"`
 }
 
+type bookTypesOut struct {
+	BookTypes []calibre.BookType `json:"book_types"`
+}
+
 func (s *Server) addReadTools() {
 	sdk.AddTool(s.srv, readTool("search_books", "Searches and filters the library's books. Each book comes with its id, for get_book and the other tools."), s.searchBooks)
 	sdk.AddTool(s.srv, readTool("get_book", "All of a book's metadata, and the path and size of each of its files and of its cover."), s.getBook)
 	sdk.AddTool(s.srv, readTool("list_facets", "The library's authors, series, tags, publishers, languages or formats, with how many books have each."), s.listFacets)
+	sdk.AddTool(s.srv, readTool("list_book_types", "Lists the library's built-in and custom book types, including types that are not assigned to any books. Use their IDs with search_books and update_books."), s.listBookTypes)
 }
 
 func (s *Server) searchBooks(ctx context.Context, _ *sdk.CallToolRequest, in searchIn) (*sdk.CallToolResult, searchOut, error) {
@@ -240,6 +249,18 @@ func (s *Server) searchBooks(ctx context.Context, _ *sdk.CallToolRequest, in sea
 	key, ok := sortKeys[strings.ToLower(in.Sort)]
 	if !ok {
 		return nil, searchOut{}, fmt.Errorf("unknown sort %q", in.Sort)
+	}
+	if in.BookTypeID != "" && in.Uncategorized {
+		return nil, searchOut{}, errors.New("book_type_id and uncategorized cannot be combined")
+	}
+	if in.BookTypeID != "" {
+		types, err := lib.BookTypes()
+		if err != nil {
+			return nil, searchOut{}, err
+		}
+		if !slices.ContainsFunc(types, func(t calibre.BookType) bool { return t.ID == in.BookTypeID }) {
+			return nil, searchOut{}, fmt.Errorf("unknown book type ID %q; use list_book_types to find valid IDs", in.BookTypeID)
+		}
 	}
 	books, err := lib.Books()
 	if err != nil {
@@ -260,6 +281,9 @@ func (s *Server) searchBooks(ctx context.Context, _ *sdk.CallToolRequest, in sea
 		}
 	}
 	q := catalog.Query{Search: in.Query, Sort: key, Descending: key == catalog.SortDateAdded}
+	if in.BookTypeID != "" || in.Uncategorized {
+		q.Filter = catalog.Filter{Kind: catalog.ByBookType, Value: in.BookTypeID}
+	}
 	if in.Desc != nil {
 		q.Descending = *in.Desc
 	}
@@ -307,6 +331,18 @@ func (s *Server) getBook(ctx context.Context, _ *sdk.CallToolRequest, in idIn) (
 	return nil, out, err
 }
 
+func (s *Server) listBookTypes(_ context.Context, _ *sdk.CallToolRequest, _ struct{}) (*sdk.CallToolResult, bookTypesOut, error) {
+	lib, err := s.library()
+	if err != nil {
+		return nil, bookTypesOut{}, err
+	}
+	types, err := lib.BookTypes()
+	if err != nil {
+		return nil, bookTypesOut{}, err
+	}
+	return nil, bookTypesOut{BookTypes: types}, nil
+}
+
 func (s *Server) listFacets(ctx context.Context, _ *sdk.CallToolRequest, in facetsIn) (*sdk.CallToolResult, facetsOut, error) {
 	lib, err := s.library()
 	if err != nil {
@@ -345,19 +381,26 @@ func (s *Server) listFacets(ctx context.Context, _ *sdk.CallToolRequest, in face
 
 // Patch is what update_books changes; fields left out keep their value.
 type Patch struct {
-	Title       *string           `json:"title,omitempty"`
-	Authors     []string          `json:"authors,omitempty"`
-	Series      *string           `json:"series,omitempty" jsonschema:"empty removes the book from its series"`
-	SeriesIndex *float64          `json:"series_index,omitempty"`
-	Tags        []string          `json:"tags,omitempty" jsonschema:"replaces all of the book's tags; an empty list removes them"`
-	AddTags     []string          `json:"add_tags,omitempty"`
-	RemoveTags  []string          `json:"remove_tags,omitempty"`
-	Publisher   *string           `json:"publisher,omitempty"`
-	Rating      *float64          `json:"rating,omitempty" jsonschema:"stars, 0 to 5 in halves; 0 removes the rating"`
-	Languages   []string          `json:"languages,omitempty" jsonschema:"language codes, as eng or en"`
-	Published   *string           `json:"published,omitempty" jsonschema:"as 2006-01-02, 2006-01 or 2006; empty clears it"`
-	Identifiers map[string]string `json:"identifiers,omitempty" jsonschema:"merged into the book's, as isbn; an empty value removes one"`
-	Comments    *string           `json:"comments,omitempty" jsonschema:"plain text, paragraphs separated by blank lines"`
+	Title          *string           `json:"title,omitempty"`
+	Authors        []string          `json:"authors,omitempty"`
+	Series         *string           `json:"series,omitempty" jsonschema:"empty removes the book from its series"`
+	SeriesIndex    *float64          `json:"series_index,omitempty"`
+	Tags           []string          `json:"tags,omitempty" jsonschema:"replaces all of the book's tags; an empty list removes them"`
+	AddTags        []string          `json:"add_tags,omitempty"`
+	RemoveTags     []string          `json:"remove_tags,omitempty"`
+	AddBookTypeIDs []string          `json:"add_book_type_ids,omitempty" jsonschema:"adds these IDs from list_book_types, retaining existing book types; unknown IDs are errors and duplicates are ignored"`
+	Publisher      *string           `json:"publisher,omitempty"`
+	Rating         *float64          `json:"rating,omitempty" jsonschema:"stars, 0 to 5 in halves; 0 removes the rating"`
+	Languages      []string          `json:"languages,omitempty" jsonschema:"language codes, as eng or en"`
+	Published      *string           `json:"published,omitempty" jsonschema:"as 2006-01-02, 2006-01 or 2006; empty clears it"`
+	Identifiers    map[string]string `json:"identifiers,omitempty" jsonschema:"merged into the book's, as isbn; an empty value removes one"`
+	Comments       *string           `json:"comments,omitempty" jsonschema:"plain text, paragraphs separated by blank lines"`
+}
+
+func (p Patch) changesMetadata() bool {
+	return p.Title != nil || p.Authors != nil || p.Series != nil || p.SeriesIndex != nil ||
+		p.Tags != nil || len(p.AddTags) != 0 || len(p.RemoveTags) != 0 || p.Publisher != nil ||
+		p.Rating != nil || p.Languages != nil || p.Published != nil || len(p.Identifiers) != 0 || p.Comments != nil
 }
 
 func (p *Patch) apply(m *calibre.Metadata) {
@@ -492,7 +535,7 @@ type removeFormatIn struct {
 }
 
 func (s *Server) addWriteTools() {
-	sdk.AddTool(s.srv, writeTool("update_books", "Changes books' metadata: only the fields in patch change, on every book in ids. add_tags and remove_tags tag many books at once.", true, true), s.updateBooks)
+	sdk.AddTool(s.srv, writeTool("update_books", "Changes books' metadata: only the fields in patch change, on every book in ids. add_book_type_ids adds book types from list_book_types; add_tags and remove_tags update regular tags.", true, true), s.updateBooks)
 	sdk.AddTool(s.srv, writeTool("set_cover", "Replaces a book's cover with an image file or the image at a URL.", true, true), s.setCover)
 	sdk.AddTool(s.srv, writeTool("add_books", "Adds e-book files to the library as new books, reading their metadata from the files. Files of books the library has are reported, not added.", false, false), s.addBooks)
 	sdk.AddTool(s.srv, writeTool("remove_books", "Removes books from the library; their folders go to the Recycle Bin.", true, false), s.removeBooks)
@@ -509,6 +552,8 @@ func (s *Server) updateBooks(ctx context.Context, _ *sdk.CallToolRequest, in upd
 		return nil, updateOut{}, errors.New("no ids")
 	}
 	out := updateOut{Updated: []BookSummary{}}
+	hasBookTypePatch := in.Patch.AddBookTypeIDs != nil
+	changesMetadata := !hasBookTypePatch || in.Patch.changesMetadata()
 	var changed []int64
 	for _, id := range in.IDs {
 		err := func() error {
@@ -516,13 +561,22 @@ func (s *Server) updateBooks(ctx context.Context, _ *sdk.CallToolRequest, in upd
 			if err != nil {
 				return err
 			}
-			d, err := lib.Details(b)
-			if err != nil {
-				return err
+			var metadata *calibre.Metadata
+			if changesMetadata {
+				d, err := lib.Details(b)
+				if err != nil {
+					return err
+				}
+				m := b.Metadata(d)
+				in.Patch.apply(&m)
+				metadata = &m
 			}
-			m := b.Metadata(d)
-			in.Patch.apply(&m)
-			if err := lib.UpdateMetadata(id, m); err != nil {
+			if hasBookTypePatch {
+				err = lib.UpdateMetadataAddingBookTypes(b, metadata, in.Patch.AddBookTypeIDs)
+			} else {
+				err = lib.UpdateMetadata(id, *metadata)
+			}
+			if err != nil {
 				return err
 			}
 			changed = append(changed, id)

@@ -33,15 +33,11 @@ func (a *App) readingTransferMenu(m *ui.Menu, ids []int64) {
 				a.openTransferSettings(transferKindle)
 			}
 		})
-		weread := m.Item(locales.TransferWeRead()).Disabled(busy || len(ids) != 1 || a.readingTransfers.preparing)
-		if len(ids) != 1 {
-			weread.Trailing(locales.TransferSingleBook())
+		var book *calibre.Book
+		if len(ids) == 1 {
+			book = a.byID[ids[0]]
 		}
-		if len(ids) == 1 && weread.Chosen() {
-			if b := a.byID[ids[0]]; b != nil {
-				a.prepareWeRead(b)
-			}
-		}
+		a.weReadTransferMenu(m, book, busy)
 		if m.Item(locales.TransferBOOX()).Disabled(busy && a.settings.BOOXAddress != "").Chosen() {
 			a.sendBooksToBOOX(ids, "")
 		}
@@ -73,8 +69,27 @@ func (a *App) readingFormatTransferMenu(m *ui.Menu, b *calibre.Book, format stri
 		if boox && m.Item(locales.TransferBOOX()).Disabled(busy && a.settings.BOOXAddress != "").Chosen() {
 			a.sendBooksToBOOX([]int64{b.ID}, format)
 		}
-		if weread && m.Item(locales.TransferWeRead()).Disabled(busy || a.readingTransfers.preparing).Chosen() {
-			a.prepareWeRead(b)
+		if weread {
+			a.weReadTransferMenu(m, b, busy)
 		}
 	}).Icon(icons.Menu(icons.Send))
+}
+
+func (a *App) weReadTransferMenu(m *ui.Menu, book *calibre.Book, busy bool) {
+	m.Submenu(locales.TransferWeRead(), func(m *ui.Menu) {
+		disabled := busy || book == nil || a.weRead.busy
+		send := m.Item(locales.WeReadSendAction()).Disabled(disabled)
+		if book == nil {
+			send.Trailing(locales.TransferSingleBook())
+		}
+		if send.Chosen() {
+			a.prepareWeRead(book)
+		}
+		if m.Item(locales.WeReadManualAction()).Disabled(disabled).Chosen() {
+			a.manualWeRead(book)
+		}
+		if m.Item(locales.WeReadSettings()).Chosen() {
+			a.openTransferSettings(transferWeRead)
+		}
+	})
 }

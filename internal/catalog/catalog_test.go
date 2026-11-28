@@ -1,6 +1,7 @@
 package catalog
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -72,5 +73,30 @@ func TestTally(t *testing.T) {
 	}
 	if len(c.Authors) != 2 || c.Authors[1].Value != "Liu Cixin" || c.Authors[1].N != 2 {
 		t.Errorf("authors %v", c.Authors)
+	}
+}
+
+func TestBookTypeFiltersAndCounts(t *testing.T) {
+	library := books()
+	library[0].BookTypeIDs = []string{"fiction", "scienceFiction"}
+	library[1].BookTypeIDs = []string{"fiction", "custom:reference"}
+	library[2].Tags = []string{"scienceFiction"}
+	counts := Tally(library, now)
+	if counts.Uncategorized != 1 || !slices.Equal(counts.BookTypes, []Count{
+		{Value: "custom:reference", N: 1}, {Value: "fiction", N: 2}, {Value: "scienceFiction", N: 1},
+	}) {
+		t.Fatalf("book types = %v; uncategorized = %d", counts.BookTypes, counts.Uncategorized)
+	}
+	for _, tc := range []struct {
+		value string
+		want  []int64
+	}{
+		{"", []int64{3}}, {"scienceFiction", []int64{1}}, {"fiction", []int64{2, 1}},
+		{"custom:reference", []int64{2}}, {"SCIENCEFICTION", nil},
+	} {
+		got := ids(Apply(library, Query{Filter: Filter{Kind: ByBookType, Value: tc.value}}, now))
+		if !slices.Equal(got, tc.want) {
+			t.Errorf("book type %q yielded %v, want %v", tc.value, got, tc.want)
+		}
 	}
 }

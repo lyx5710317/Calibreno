@@ -37,6 +37,318 @@ type Messages struct{ locale string }
 // source language.
 func In(locale string) Messages { return Messages{locale} }
 
+// BookTypesTitle says "Book types"
+// in the language the app shows.
+func BookTypesTitle() string { return In(i18n.Locale()).BookTypesTitle() }
+
+// BookTypesTitle says "Book types"
+// in the language of msgs.
+func (msgs Messages) BookTypesTitle() string {
+	return Catalog.Format(msgs.locale, "bookTypesTitle", nil)
+}
+
+// BookTypesUncategorized says "Uncategorized"
+// in the language the app shows.
+func BookTypesUncategorized() string { return In(i18n.Locale()).BookTypesUncategorized() }
+
+// BookTypesUncategorized says "Uncategorized"
+// in the language of msgs.
+func (msgs Messages) BookTypesUncategorized() string {
+	return Catalog.Format(msgs.locale, "bookTypesUncategorized", nil)
+}
+
+// BookTypesHelp says "Choose one or more types."
+// in the language the app shows.
+func BookTypesHelp() string { return In(i18n.Locale()).BookTypesHelp() }
+
+// BookTypesHelp says "Choose one or more types."
+// in the language of msgs.
+func (msgs Messages) BookTypesHelp() string {
+	return Catalog.Format(msgs.locale, "bookTypesHelp", nil)
+}
+
+// BookTypesAddCustom says "Add custom type"
+// in the language the app shows.
+func BookTypesAddCustom() string { return In(i18n.Locale()).BookTypesAddCustom() }
+
+// BookTypesAddCustom says "Add custom type"
+// in the language of msgs.
+func (msgs Messages) BookTypesAddCustom() string {
+	return Catalog.Format(msgs.locale, "bookTypesAddCustom", nil)
+}
+
+// BookTypesCreate says "Add type"
+// in the language the app shows.
+func BookTypesCreate() string { return In(i18n.Locale()).BookTypesCreate() }
+
+// BookTypesCreate says "Add type"
+// in the language of msgs.
+func (msgs Messages) BookTypesCreate() string {
+	return Catalog.Format(msgs.locale, "bookTypesCreate", nil)
+}
+
+// BookTypesName says "Type name"
+// in the language the app shows.
+func BookTypesName() string { return In(i18n.Locale()).BookTypesName() }
+
+// BookTypesName says "Type name"
+// in the language of msgs.
+func (msgs Messages) BookTypesName() string {
+	return Catalog.Format(msgs.locale, "bookTypesName", nil)
+}
+
+// BookTypesSearch says "Search book types…"
+// in the language the app shows.
+func BookTypesSearch() string { return In(i18n.Locale()).BookTypesSearch() }
+
+// BookTypesSearch says "Search book types…"
+// in the language of msgs.
+func (msgs Messages) BookTypesSearch() string {
+	return Catalog.Format(msgs.locale, "bookTypesSearch", nil)
+}
+
+// BookTypesInvalidName says "Enter a valid type name."
+// in the language the app shows.
+func BookTypesInvalidName() string { return In(i18n.Locale()).BookTypesInvalidName() }
+
+// BookTypesInvalidName says "Enter a valid type name."
+// in the language of msgs.
+func (msgs Messages) BookTypesInvalidName() string {
+	return Catalog.Format(msgs.locale, "bookTypesInvalidName", nil)
+}
+
+// BookTypesDuplicate says "This type already exists. Select it from the list."
+// in the language the app shows.
+func BookTypesDuplicate() string { return In(i18n.Locale()).BookTypesDuplicate() }
+
+// BookTypesDuplicate says "This type already exists. Select it from the list."
+// in the language of msgs.
+func (msgs Messages) BookTypesDuplicate() string {
+	return Catalog.Format(msgs.locale, "bookTypesDuplicate", nil)
+}
+
+// BookTypesChanged says "Book types changed elsewhere. Reopen Edit metadata and try again."
+// in the language the app shows.
+func BookTypesChanged() string { return In(i18n.Locale()).BookTypesChanged() }
+
+// BookTypesChanged says "Book types changed elsewhere. Reopen Edit metadata and try again."
+// in the language of msgs.
+func (msgs Messages) BookTypesChanged() string {
+	return Catalog.Format(msgs.locale, "bookTypesChanged", nil)
+}
+
+// BookTypesUnavailable says "Book types are unavailable in this library."
+// in the language the app shows.
+func BookTypesUnavailable() string { return In(i18n.Locale()).BookTypesUnavailable() }
+
+// BookTypesUnavailable says "Book types are unavailable in this library."
+// in the language of msgs.
+func (msgs Messages) BookTypesUnavailable() string {
+	return Catalog.Format(msgs.locale, "bookTypesUnavailable", nil)
+}
+
+// BookTypesUnknown says "This book type is unavailable. Reopen Edit metadata and try again."
+// in the language the app shows.
+func BookTypesUnknown() string { return In(i18n.Locale()).BookTypesUnknown() }
+
+// BookTypesUnknown says "This book type is unavailable. Reopen Edit metadata and try again."
+// in the language of msgs.
+func (msgs Messages) BookTypesUnknown() string {
+	return Catalog.Format(msgs.locale, "bookTypesUnknown", nil)
+}
+
+// McpToolListBookTypes says "List built-in and custom book types and their IDs."
+// in the language the app shows.
+func McpToolListBookTypes() string { return In(i18n.Locale()).McpToolListBookTypes() }
+
+// McpToolListBookTypes says "List built-in and custom book types and their IDs."
+// in the language of msgs.
+func (msgs Messages) McpToolListBookTypes() string {
+	return Catalog.Format(msgs.locale, "mcpToolListBookTypes", nil)
+}
+
+// BookTypeFiction says "Fiction"
+// in the language the app shows.
+func BookTypeFiction() string { return In(i18n.Locale()).BookTypeFiction() }
+
+// BookTypeFiction says "Fiction"
+// in the language of msgs.
+func (msgs Messages) BookTypeFiction() string {
+	return Catalog.Format(msgs.locale, "bookTypeFiction", nil)
+}
+
+// BookTypeScienceFiction says "Science fiction"
+// in the language the app shows.
+func BookTypeScienceFiction() string { return In(i18n.Locale()).BookTypeScienceFiction() }
+
+// BookTypeScienceFiction says "Science fiction"
+// in the language of msgs.
+func (msgs Messages) BookTypeScienceFiction() string {
+	return Catalog.Format(msgs.locale, "bookTypeScienceFiction", nil)
+}
+
+// BookTypeMystery says "Mystery"
+// in the language the app shows.
+func BookTypeMystery() string { return In(i18n.Locale()).BookTypeMystery() }
+
+// BookTypeMystery says "Mystery"
+// in the language of msgs.
+func (msgs Messages) BookTypeMystery() string {
+	return Catalog.Format(msgs.locale, "bookTypeMystery", nil)
+}
+
+// BookTypeRomance says "Romance"
+// in the language the app shows.
+func BookTypeRomance() string { return In(i18n.Locale()).BookTypeRomance() }
+
+// BookTypeRomance says "Romance"
+// in the language of msgs.
+func (msgs Messages) BookTypeRomance() string {
+	return Catalog.Format(msgs.locale, "bookTypeRomance", nil)
+}
+
+// BookTypeLiterature says "Literature"
+// in the language the app shows.
+func BookTypeLiterature() string { return In(i18n.Locale()).BookTypeLiterature() }
+
+// BookTypeLiterature says "Literature"
+// in the language of msgs.
+func (msgs Messages) BookTypeLiterature() string {
+	return Catalog.Format(msgs.locale, "bookTypeLiterature", nil)
+}
+
+// BookTypeWomen says "Women"
+// in the language the app shows.
+func BookTypeWomen() string { return In(i18n.Locale()).BookTypeWomen() }
+
+// BookTypeWomen says "Women"
+// in the language of msgs.
+func (msgs Messages) BookTypeWomen() string {
+	return Catalog.Format(msgs.locale, "bookTypeWomen", nil)
+}
+
+// BookTypePoetry says "Poetry"
+// in the language the app shows.
+func BookTypePoetry() string { return In(i18n.Locale()).BookTypePoetry() }
+
+// BookTypePoetry says "Poetry"
+// in the language of msgs.
+func (msgs Messages) BookTypePoetry() string {
+	return Catalog.Format(msgs.locale, "bookTypePoetry", nil)
+}
+
+// BookTypeDrama says "Drama"
+// in the language the app shows.
+func BookTypeDrama() string { return In(i18n.Locale()).BookTypeDrama() }
+
+// BookTypeDrama says "Drama"
+// in the language of msgs.
+func (msgs Messages) BookTypeDrama() string {
+	return Catalog.Format(msgs.locale, "bookTypeDrama", nil)
+}
+
+// BookTypeSocialSciencesHumanities says "Social sciences and humanities"
+// in the language the app shows.
+func BookTypeSocialSciencesHumanities() string {
+	return In(i18n.Locale()).BookTypeSocialSciencesHumanities()
+}
+
+// BookTypeSocialSciencesHumanities says "Social sciences and humanities"
+// in the language of msgs.
+func (msgs Messages) BookTypeSocialSciencesHumanities() string {
+	return Catalog.Format(msgs.locale, "bookTypeSocialSciencesHumanities", nil)
+}
+
+// BookTypeNonfiction says "Nonfiction"
+// in the language the app shows.
+func BookTypeNonfiction() string { return In(i18n.Locale()).BookTypeNonfiction() }
+
+// BookTypeNonfiction says "Nonfiction"
+// in the language of msgs.
+func (msgs Messages) BookTypeNonfiction() string {
+	return Catalog.Format(msgs.locale, "bookTypeNonfiction", nil)
+}
+
+// BookTypePsychology says "Psychology"
+// in the language the app shows.
+func BookTypePsychology() string { return In(i18n.Locale()).BookTypePsychology() }
+
+// BookTypePsychology says "Psychology"
+// in the language of msgs.
+func (msgs Messages) BookTypePsychology() string {
+	return Catalog.Format(msgs.locale, "bookTypePsychology", nil)
+}
+
+// BookTypeHistory says "History"
+// in the language the app shows.
+func BookTypeHistory() string { return In(i18n.Locale()).BookTypeHistory() }
+
+// BookTypeHistory says "History"
+// in the language of msgs.
+func (msgs Messages) BookTypeHistory() string {
+	return Catalog.Format(msgs.locale, "bookTypeHistory", nil)
+}
+
+// BookTypePhilosophy says "Philosophy"
+// in the language the app shows.
+func BookTypePhilosophy() string { return In(i18n.Locale()).BookTypePhilosophy() }
+
+// BookTypePhilosophy says "Philosophy"
+// in the language of msgs.
+func (msgs Messages) BookTypePhilosophy() string {
+	return Catalog.Format(msgs.locale, "bookTypePhilosophy", nil)
+}
+
+// BookTypeBiography says "Biography"
+// in the language the app shows.
+func BookTypeBiography() string { return In(i18n.Locale()).BookTypeBiography() }
+
+// BookTypeBiography says "Biography"
+// in the language of msgs.
+func (msgs Messages) BookTypeBiography() string {
+	return Catalog.Format(msgs.locale, "bookTypeBiography", nil)
+}
+
+// BookTypeReligionSpirituality says "Religion and spirituality"
+// in the language the app shows.
+func BookTypeReligionSpirituality() string { return In(i18n.Locale()).BookTypeReligionSpirituality() }
+
+// BookTypeReligionSpirituality says "Religion and spirituality"
+// in the language of msgs.
+func (msgs Messages) BookTypeReligionSpirituality() string {
+	return Catalog.Format(msgs.locale, "bookTypeReligionSpirituality", nil)
+}
+
+// BookTypeScienceTechnology says "Science and technology"
+// in the language the app shows.
+func BookTypeScienceTechnology() string { return In(i18n.Locale()).BookTypeScienceTechnology() }
+
+// BookTypeScienceTechnology says "Science and technology"
+// in the language of msgs.
+func (msgs Messages) BookTypeScienceTechnology() string {
+	return Catalog.Format(msgs.locale, "bookTypeScienceTechnology", nil)
+}
+
+// BookTypePersonalGrowth says "Personal growth"
+// in the language the app shows.
+func BookTypePersonalGrowth() string { return In(i18n.Locale()).BookTypePersonalGrowth() }
+
+// BookTypePersonalGrowth says "Personal growth"
+// in the language of msgs.
+func (msgs Messages) BookTypePersonalGrowth() string {
+	return Catalog.Format(msgs.locale, "bookTypePersonalGrowth", nil)
+}
+
+// BookTypeComics says "Comics"
+// in the language the app shows.
+func BookTypeComics() string { return In(i18n.Locale()).BookTypeComics() }
+
+// BookTypeComics says "Comics"
+// in the language of msgs.
+func (msgs Messages) BookTypeComics() string {
+	return Catalog.Format(msgs.locale, "bookTypeComics", nil)
+}
+
 // ErrorDetails says "Technical details"
 // in the language the app shows.
 func ErrorDetails() string { return In(i18n.Locale()).ErrorDetails() }
@@ -10421,11 +10733,11 @@ func (msgs Messages) TransferKindleEmail() string {
 	return Catalog.Format(msgs.locale, "transferKindleEmail", nil)
 }
 
-// TransferWeReadHelp says "Open the official WeRead shelf, sign in if asked, then choose Transfer to phone and select an EPUB. From a book’s T…"
+// TransferWeReadHelp says "Sign in on the official WeRead website to send EPUBs from Calibreno. You can also import manually from the WeRead shelf."
 // in the language the app shows.
 func TransferWeReadHelp() string { return In(i18n.Locale()).TransferWeReadHelp() }
 
-// TransferWeReadHelp says "Open the official WeRead shelf, sign in if asked, then choose Transfer to phone and select an EPUB. From a book’s T…"
+// TransferWeReadHelp says "Sign in on the official WeRead website to send EPUBs from Calibreno. You can also import manually from the WeRead shelf."
 // in the language of msgs.
 func (msgs Messages) TransferWeReadHelp() string {
 	return Catalog.Format(msgs.locale, "transferWeReadHelp", nil)
@@ -10781,6 +11093,236 @@ func WeReadCopiedPath() string { return In(i18n.Locale()).WeReadCopiedPath() }
 // in the language of msgs.
 func (msgs Messages) WeReadCopiedPath() string {
 	return Catalog.Format(msgs.locale, "weReadCopiedPath", nil)
+}
+
+// WeReadSettings says "WeRead settings"
+// in the language the app shows.
+func WeReadSettings() string { return In(i18n.Locale()).WeReadSettings() }
+
+// WeReadSettings says "WeRead settings"
+// in the language of msgs.
+func (msgs Messages) WeReadSettings() string {
+	return Catalog.Format(msgs.locale, "weReadSettings", nil)
+}
+
+// WeReadSendAction says "Send to WeRead"
+// in the language the app shows.
+func WeReadSendAction() string { return In(i18n.Locale()).WeReadSendAction() }
+
+// WeReadSendAction says "Send to WeRead"
+// in the language of msgs.
+func (msgs Messages) WeReadSendAction() string {
+	return Catalog.Format(msgs.locale, "weReadSendAction", nil)
+}
+
+// WeReadManualAction says "Import EPUB manually"
+// in the language the app shows.
+func WeReadManualAction() string { return In(i18n.Locale()).WeReadManualAction() }
+
+// WeReadManualAction says "Import EPUB manually"
+// in the language of msgs.
+func (msgs Messages) WeReadManualAction() string {
+	return Catalog.Format(msgs.locale, "weReadManualAction", nil)
+}
+
+// WeReadReviewAction says "Open WeRead to verify"
+// in the language the app shows.
+func WeReadReviewAction() string { return In(i18n.Locale()).WeReadReviewAction() }
+
+// WeReadReviewAction says "Open WeRead to verify"
+// in the language of msgs.
+func (msgs Messages) WeReadReviewAction() string {
+	return Catalog.Format(msgs.locale, "weReadReviewAction", nil)
+}
+
+// WeReadSignIn says "Sign in to WeRead"
+// in the language the app shows.
+func WeReadSignIn() string { return In(i18n.Locale()).WeReadSignIn() }
+
+// WeReadSignIn says "Sign in to WeRead"
+// in the language of msgs.
+func (msgs Messages) WeReadSignIn() string {
+	return Catalog.Format(msgs.locale, "weReadSignIn", nil)
+}
+
+// WeReadCheckConnection says "Check connection"
+// in the language the app shows.
+func WeReadCheckConnection() string { return In(i18n.Locale()).WeReadCheckConnection() }
+
+// WeReadCheckConnection says "Check connection"
+// in the language of msgs.
+func (msgs Messages) WeReadCheckConnection() string {
+	return Catalog.Format(msgs.locale, "weReadCheckConnection", nil)
+}
+
+// WeReadRetryAfterQR says "I scanned the code, check again"
+// in the language the app shows.
+func WeReadRetryAfterQR() string { return In(i18n.Locale()).WeReadRetryAfterQR() }
+
+// WeReadRetryAfterQR says "I scanned the code, check again"
+// in the language of msgs.
+func (msgs Messages) WeReadRetryAfterQR() string {
+	return Catalog.Format(msgs.locale, "weReadRetryAfterQR", nil)
+}
+
+// WeReadLoginHelp says "Scan the QR code in the WeRead window. If no code is shown, click Log in on the page. Then return here to check the c…"
+// in the language the app shows.
+func WeReadLoginHelp() string { return In(i18n.Locale()).WeReadLoginHelp() }
+
+// WeReadLoginHelp says "Scan the QR code in the WeRead window. If no code is shown, click Log in on the page. Then return here to check the c…"
+// in the language of msgs.
+func (msgs Messages) WeReadLoginHelp() string {
+	return Catalog.Format(msgs.locale, "weReadLoginHelp", nil)
+}
+
+// WeReadStatusReady says "Connected to WeRead"
+// in the language the app shows.
+func WeReadStatusReady() string { return In(i18n.Locale()).WeReadStatusReady() }
+
+// WeReadStatusReady says "Connected to WeRead"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusReady() string {
+	return Catalog.Format(msgs.locale, "weReadStatusReady", nil)
+}
+
+// WeReadStatusLoginRequired says "QR sign-in required"
+// in the language the app shows.
+func WeReadStatusLoginRequired() string { return In(i18n.Locale()).WeReadStatusLoginRequired() }
+
+// WeReadStatusLoginRequired says "QR sign-in required"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusLoginRequired() string {
+	return Catalog.Format(msgs.locale, "weReadStatusLoginRequired", nil)
+}
+
+// WeReadStatusManual says "Manual import available"
+// in the language the app shows.
+func WeReadStatusManual() string { return In(i18n.Locale()).WeReadStatusManual() }
+
+// WeReadStatusManual says "Manual import available"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusManual() string {
+	return Catalog.Format(msgs.locale, "weReadStatusManual", nil)
+}
+
+// WeReadStatusSending says "Sending…"
+// in the language the app shows.
+func WeReadStatusSending() string { return In(i18n.Locale()).WeReadStatusSending() }
+
+// WeReadStatusSending says "Sending…"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusSending() string {
+	return Catalog.Format(msgs.locale, "weReadStatusSending", nil)
+}
+
+// WeReadStatusImported says "Imported"
+// in the language the app shows.
+func WeReadStatusImported() string { return In(i18n.Locale()).WeReadStatusImported() }
+
+// WeReadStatusImported says "Imported"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusImported() string {
+	return Catalog.Format(msgs.locale, "weReadStatusImported", nil)
+}
+
+// WeReadStatusConfirmed says "Import verified"
+// in the language the app shows.
+func WeReadStatusConfirmed() string { return In(i18n.Locale()).WeReadStatusConfirmed() }
+
+// WeReadStatusConfirmed says "Import verified"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusConfirmed() string {
+	return Catalog.Format(msgs.locale, "weReadStatusConfirmed", nil)
+}
+
+// WeReadStatusPending says "Needs verification"
+// in the language the app shows.
+func WeReadStatusPending() string { return In(i18n.Locale()).WeReadStatusPending() }
+
+// WeReadStatusPending says "Needs verification"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusPending() string {
+	return Catalog.Format(msgs.locale, "weReadStatusPending", nil)
+}
+
+// WeReadStatusFailed says "Failed to send to WeRead"
+// in the language the app shows.
+func WeReadStatusFailed() string { return In(i18n.Locale()).WeReadStatusFailed() }
+
+// WeReadStatusFailed says "Failed to send to WeRead"
+// in the language of msgs.
+func (msgs Messages) WeReadStatusFailed() string {
+	return Catalog.Format(msgs.locale, "weReadStatusFailed", nil)
+}
+
+// WeReadDuplicate says "This EPUB already has a transfer record. Check the shelf before resending."
+// in the language the app shows.
+func WeReadDuplicate() string { return In(i18n.Locale()).WeReadDuplicate() }
+
+// WeReadDuplicate says "This EPUB already has a transfer record. Check the shelf before resending."
+// in the language of msgs.
+func (msgs Messages) WeReadDuplicate() string {
+	return Catalog.Format(msgs.locale, "weReadDuplicate", nil)
+}
+
+// WeReadResend says "Confirm resend"
+// in the language the app shows.
+func WeReadResend() string { return In(i18n.Locale()).WeReadResend() }
+
+// WeReadResend says "Confirm resend"
+// in the language of msgs.
+func (msgs Messages) WeReadResend() string {
+	return Catalog.Format(msgs.locale, "weReadResend", nil)
+}
+
+// WeReadSending says "Sending to WeRead"
+// in the language the app shows.
+func WeReadSending() string { return In(i18n.Locale()).WeReadSending() }
+
+// WeReadSending says "Sending to WeRead"
+// in the language of msgs.
+func (msgs Messages) WeReadSending() string {
+	return Catalog.Format(msgs.locale, "weReadSending", nil)
+}
+
+// WeReadHistory says "Recent transfers"
+// in the language the app shows.
+func WeReadHistory() string { return In(i18n.Locale()).WeReadHistory() }
+
+// WeReadHistory says "Recent transfers"
+// in the language of msgs.
+func (msgs Messages) WeReadHistory() string {
+	return Catalog.Format(msgs.locale, "weReadHistory", nil)
+}
+
+// WeReadHistoryEmpty says "No transfers yet"
+// in the language the app shows.
+func WeReadHistoryEmpty() string { return In(i18n.Locale()).WeReadHistoryEmpty() }
+
+// WeReadHistoryEmpty says "No transfers yet"
+// in the language of msgs.
+func (msgs Messages) WeReadHistoryEmpty() string {
+	return Catalog.Format(msgs.locale, "weReadHistoryEmpty", nil)
+}
+
+// WeReadHistoryError says "Couldn’t read or save the WeRead transfer history."
+// in the language the app shows.
+func WeReadHistoryError() string { return In(i18n.Locale()).WeReadHistoryError() }
+
+// WeReadHistoryError says "Couldn’t read or save the WeRead transfer history."
+// in the language of msgs.
+func (msgs Messages) WeReadHistoryError() string {
+	return Catalog.Format(msgs.locale, "weReadHistoryError", nil)
+}
+
+// WeReadConfirm says "Confirm imported"
+// in the language the app shows.
+func WeReadConfirm() string { return In(i18n.Locale()).WeReadConfirm() }
+
+// WeReadConfirm says "Confirm imported"
+// in the language of msgs.
+func (msgs Messages) WeReadConfirm() string {
+	return Catalog.Format(msgs.locale, "weReadConfirm", nil)
 }
 
 // DeviceKindleConverting says "Converting “{title}” to AZW3"

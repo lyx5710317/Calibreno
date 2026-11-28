@@ -101,7 +101,7 @@ func TestBOOXDoesNotRetryUnconfirmedAndOffersManualFallback(t *testing.T) {
 	}
 }
 
-func TestWeReadBookMenuHandsOffAnExistingEPUB(t *testing.T) {
+func TestWeReadManualImportHandsOffAnExistingEPUB(t *testing.T) {
 	a := newTestApp(t)
 	title := "WeRead sample"
 	file := sampleEPUB(t, t.TempDir(), importSample{title: title, author: "Sample Author"})
@@ -119,7 +119,7 @@ func TestWeReadBookMenuHandsOffAnExistingEPUB(t *testing.T) {
 	if err := tt.RightClick(title); err != nil {
 		t.Fatal(err)
 	}
-	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferWeRead()); err != nil {
+	if err := tt.ChooseMenuItem(locales.TransferMenu(), locales.TransferWeRead(), locales.WeReadManualAction()); err != nil {
 		t.Fatal(err)
 	}
 	want, _, err := libraryFormatPaths(a.lib, a.byID[id], "EPUB")
@@ -130,7 +130,7 @@ func TestWeReadBookMenuHandsOffAnExistingEPUB(t *testing.T) {
 		t.Fatalf("unexpected handoff: opened = %q, revealed = %q, copied = %q", opened, revealed, copied)
 	}
 	a.toasts = nil
-	a.prepareWeRead(a.byID[id])
+	a.manualWeRead(a.byID[id])
 	if len(a.toasts) != 1 || a.toasts[0].text != locales.WeReadOpened() {
 		t.Fatalf("unexpected WeRead status: %+v", a.toasts)
 	}
@@ -140,13 +140,98 @@ func TestWeReadBookMenuHandsOffAnExistingEPUB(t *testing.T) {
 	}
 	a.readingTransfers.copyPath = func(string) error { return errors.New("clipboard is busy") }
 	a.toasts = nil
-	a.prepareWeRead(a.byID[id])
+	a.manualWeRead(a.byID[id])
 	if len(a.toasts) != 1 || a.toasts[0].onAction == nil {
 		t.Fatalf("missing clipboard action: %+v", a.toasts)
 	}
 	a.toasts[0].onAction()
 	if got := a.toasts[len(a.toasts)-1]; !got.error || got.text == locales.WeReadCopiedPath() {
 		t.Fatalf("failed clipboard write reported %+v", got)
+	}
+}
+
+type weReadSendTestClient struct {
+	send    func(string) (weread.Status, error)
+	reviews int
+}
+
+func (*weReadSendTestClient) Check(context.Context) (weread.Status, error) {
+	return weread.StatusReady, nil
+}
+
+func (c *weReadSendTestClient) Send(_ context.Context, file string) (weread.Status, error) {
+	return c.send(file)
+}
+
+func (c *weReadSendTestClient) OpenShelf(context.Context) error {
+	c.reviews++
+	return nil
+}
+
+func (*weReadSendTestClient) Close() {}
+
+func TestWeReadUploadsSelectedBookAndDoesNotRetryPending(t *testing.T) {
+	a := newTestApp(t)
+	const title = "WeRead upload sample"
+	file := sampleEPUB(t, t.TempDir(), importSample{title: title, author: "Sample Author"})
+	id, err := a.lib.AddBook(calibre.NewBook{File: file, Metadata: calibre.Metadata{Title: title}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.reload(nil)
+	book := a.byID[id]
+	_, want, err := libraryFormatPaths(a.lib, book, "EPUB")
+	if err != nil {
+		t.Fatal(err)
+	}
+	stages := []weread.Status{weread.StatusLoginRequired, weread.StatusPending, weread.StatusImported, weread.StatusFailed}
+	calls := 0
+	client := &weReadSendTestClient{send: func(file string) (weread.Status, error) {
+		if file != want || calls >= len(stages) {
+			t.Fatalf("unexpected upload of %q, call %d, want %q", file, calls+1, want)
+		}
+		stage := stages[calls]
+		calls++
+		return stage, nil
+	}}
+	a.weRead.client = client
+	view := ui.NewTester(a.View, 1440, 900)
+	view.Frame()
+	if err := view.RightClick(title); err != nil {
+		t.Fatal(err)
+	}
+	if err := view.ChooseMenuItem(locales.TransferMenu(), locales.TransferWeRead(), locales.WeReadSendAction()); err != nil {
+		t.Fatal(err)
+	}
+	if calls != 1 || a.weRead.status != weread.StatusLoginRequired {
+		t.Fatalf("expected sign-in, calls=%d status=%q", calls, a.weRead.status)
+	}
+	a.prepareWeRead(book)
+	if calls != 2 || a.weRead.status != weread.StatusPending || len(a.weRead.records) != 2 {
+		t.Fatalf("expected pending, calls=%d state=%+v", calls, a.weRead)
+	}
+	review := a.toasts[len(a.toasts)-1]
+	if review.action != locales.WeReadReviewAction() || review.onAction == nil {
+		t.Fatalf("pending transfer has no review action: %+v", review)
+	}
+	review.onAction()
+	a.prepareWeRead(book)
+	if client.reviews != 1 || calls != 2 || a.weRead.duplicate == nil {
+		t.Fatalf("expected review and duplicate prompt without reupload: reviews=%d calls=%d", client.reviews, calls)
+	}
+	pendingID := a.weRead.duplicate.ID
+	a.confirmWeRead(pendingID)
+	if calls != 2 || a.weRead.records[0].Status != weread.StatusImported || a.weRead.records[0].ConfirmedAt.IsZero() {
+		t.Fatalf("manual confirmation did not update the pending record: %+v", a.weRead.records)
+	}
+	a.resendWeRead()
+	if calls != 3 || a.weRead.duplicate != nil || a.weRead.records[0].Status != weread.StatusImported {
+		t.Fatalf("explicit resend did not record import: calls=%d state=%+v", calls, a.weRead)
+	}
+	a.prepareWeRead(book)
+	a.resendWeRead()
+	if calls != 4 || a.weRead.status != weread.StatusFailed || !a.toasts[len(a.toasts)-1].error {
+		t.Fatal("expected a clear failure after explicit website rejection")
 	}
 }
 
@@ -183,16 +268,39 @@ func TestWeReadBookWithoutEPUBOpensConversion(t *testing.T) {
 	}
 	a := newTestApp(t)
 	a.conversionHome = t.TempDir()
-	b := a.books[0]
-	b.Formats = []string{"MOBI"}
-	a.readingTransfers.openURL = func(string) error {
-		t.Fatal("the browser opened before an EPUB was available")
-		return nil
+	const title = "Convert to send"
+	source := filepath.Join(t.TempDir(), "source.mobi")
+	if err := os.WriteFile(source, []byte("placeholder"), 0o600); err != nil {
+		t.Fatal(err)
 	}
-	a.prepareWeRead(b)
+	id, err := a.lib.AddBook(calibre.NewBook{File: source, Metadata: calibre.Metadata{Title: title}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	a.reload(nil)
+	var sent string
+	a.weRead.client = &weReadSendTestClient{send: func(path string) (weread.Status, error) {
+		sent = path
+		return weread.StatusImported, nil
+	}}
+	a.prepareWeRead(a.byID[id])
 	s := a.conversion
 	if s == nil || !s.form.open || s.form.selectedSource() != "MOBI" ||
-		s.form.selectedTarget(bookconvert.OutputFormats) != "EPUB" {
+		s.form.selectedTarget(bookconvert.OutputFormats) != "EPUB" || sent != "" {
 		t.Fatal("expected MOBI to EPUB conversion")
+	}
+	file := sampleEPUB(t, t.TempDir(), importSample{title: title, author: "Sample Author"})
+	if err := a.lib.AddFormat(id, file); err != nil {
+		t.Fatal(err)
+	}
+	a.completeConversion(s, "EPUB", "", false)
+	toast := a.toasts[len(a.toasts)-1]
+	if toast.action != locales.WeReadSendAction() || toast.onAction == nil || sent != "" {
+		t.Fatalf("conversion must ask before sending: %+v", toast)
+	}
+	toast.onAction()
+	_, want, err := libraryFormatPaths(a.lib, a.byID[id], "EPUB")
+	if err != nil || sent != want || sent == "" {
+		t.Fatalf("send converted EPUB: path=%q, want %q, error=%v", sent, want, err)
 	}
 }

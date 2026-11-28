@@ -4,6 +4,7 @@ import (
 	"context"
 	"net"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"testing"
@@ -92,6 +93,34 @@ func TestAgentsPopoverAndMCPSettings(t *testing.T) {
 	if !tt.HasText("{\n  \"query\": \"Dune\"\n}") {
 		t.Fatalf("arguments: %q", tt.Texts())
 	}
+	res, err := cs.CallTool(context.Background(), &sdk.CallToolParams{Name: "list_book_types", Arguments: map[string]any{}})
+	if err != nil || res.IsError {
+		t.Fatalf("list book types: %v %+v", err, res)
+	}
+	tt.Frame()
+	if !tt.HasText(locales.McpListed(locales.BookTypesTitle())) {
+		t.Fatalf("book types activity: %q", tt.Texts())
+	}
+	var duneID int64
+	for _, b := range a.books {
+		if b.Title == "Dune" {
+			duneID = b.ID
+			break
+		}
+	}
+	if duneID == 0 || len(a.byID[duneID].BookTypeIDs) != 0 {
+		t.Fatal("expected Dune to start unclassified")
+	}
+	res, err = cs.CallTool(context.Background(), &sdk.CallToolParams{Name: "update_books", Arguments: map[string]any{
+		"ids": []int64{duneID}, "patch": map[string]any{"add_book_type_ids": []string{"fiction", "scienceFiction"}},
+	}})
+	if err != nil || res.IsError {
+		t.Fatalf("assign book types: %v %+v", err, res)
+	}
+	tt.Frame()
+	if !slices.Equal(a.byID[duneID].BookTypeIDs, []string{"fiction", "scienceFiction"}) || a.counts.Uncategorized != len(a.books)-1 {
+		t.Fatalf("window did not refresh: %v types, %d unclassified", a.byID[duneID].BookTypeIDs, a.counts.Uncategorized)
+	}
 	// Read only says so, and Allow changes ends it.
 	a.settings.MCP.ReadOnly = true
 	a.applyMCP()
@@ -122,7 +151,7 @@ func TestAgentsPopoverAndMCPSettings(t *testing.T) {
 	if a.agentsOpen || !a.settingsOpen || a.section != sectionMCP {
 		t.Fatalf("open %v, settings %v %v", a.agentsOpen, a.settingsOpen, a.section)
 	}
-	for _, s := range []string{"Let agents edit, add and remove books", "Connect an agent", "Run it in a terminal.", "Tools", "Agents can use 21 of 21", "search_books", "find_metadata", "Move books to the Trash."} {
+	for _, s := range []string{"Let agents edit, add and remove books", "Connect an agent", "Run it in a terminal.", "Tools", "Agents can use 22 of 22", "search_books", "list_book_types", locales.McpToolListBookTypes(), "find_metadata", "Move books to the Trash."} {
 		if !tt.HasText(s) {
 			t.Fatalf("Settings › MCP misses %q: %q", s, tt.Texts())
 		}

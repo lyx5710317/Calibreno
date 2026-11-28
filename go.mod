@@ -4,6 +4,8 @@ go 1.27.3
 
 require (
 	github.com/MoeForge/moejs v0.1.0
+	github.com/chromedp/cdproto v0.160.1
+	github.com/chromedp/chromedp v0.24.0
 	github.com/ebitengine/purego v0.11.1
 	github.com/egoist/mygo v0.8.3
 	github.com/google/uuid v1.6.0
@@ -19,6 +21,7 @@ require (
 require (
 	github.com/MoeForge/moego v0.1.0-alpha.1 // indirect
 	github.com/dustin/go-humanize v1.1.0 // indirect
+	github.com/go-json-experiment/json v0.0.0-20260213210345-44df1a37e875 // indirect
 	github.com/go-text/typesetting v0.3.5 // indirect
 	github.com/google/jsonschema-go v0.4.3 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect

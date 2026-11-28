@@ -233,15 +233,15 @@ func (l *Library) UpdateMetadata(id int64, m Metadata) error {
 	if err != nil {
 		return err
 	}
-	return l.updateMetadata(old, m, false)
+	return l.updateMetadata(old, m, false, nil)
 }
 
 // UpdateMetadataChecked refuses edits based on a stale preview.
 func (l *Library) UpdateMetadataChecked(old *Book, m Metadata) error {
-	return l.updateMetadata(old, m, true)
+	return l.updateMetadata(old, m, true, nil)
 }
 
-func (l *Library) updateMetadata(old *Book, m Metadata, check bool) error {
+func (l *Library) updateMetadata(old *Book, m Metadata, check bool, types *bookTypeWrite) error {
 	m.normalize()
 	id := old.ID
 	tx, err := l.db.Begin()
@@ -251,6 +251,11 @@ func (l *Library) updateMetadata(old *Book, m Metadata, check bool) error {
 	defer tx.Rollback()
 	if check {
 		if err := checkBookVersion(tx, old); err != nil {
+			return err
+		}
+	}
+	if types != nil {
+		if err := types.apply(tx, old); err != nil {
 			return err
 		}
 	}
@@ -542,9 +547,9 @@ func (l *Library) SetCover(id int64, img []byte) error {
 const TrashDir = ".dalibre-trash"
 
 // hasTable reports whether the library's database has table name.
-func hasTable(tx *sql.Tx, name string) (bool, error) {
+func hasTable(db queryRower, name string) (bool, error) {
 	var n int
-	err := tx.QueryRow(`SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = ?`, name).Scan(&n)
+	err := db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = ?`, name).Scan(&n)
 	return n > 0, err
 }
 

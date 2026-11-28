@@ -194,7 +194,7 @@ func TestReadTools(t *testing.T) {
 	s := New(&testHost{lib: lib}, "test", false)
 	cs := connect(t, s)
 
-	if got := strings.Join(toolNames(t, cs), " "); got != "get_book list_facets search_books" {
+	if got := strings.Join(toolNames(t, cs), " "); got != "get_book list_book_types list_facets search_books" {
 		t.Fatalf("read-only tools: %s", got)
 	}
 	for tool, _ := range cs.Tools(context.Background(), nil) {
@@ -237,11 +237,11 @@ func TestReadTools(t *testing.T) {
 
 	// Write tools appear when changes are allowed.
 	s.SetAllowChanges(true)
-	if n := len(toolNames(t, cs)); n != 21 {
+	if n := len(toolNames(t, cs)); n != 22 {
 		t.Errorf("with changes: %d tools", n)
 	}
 	s.SetAllowChanges(false)
-	if n := len(toolNames(t, cs)); n != 3 {
+	if n := len(toolNames(t, cs)); n != 4 {
 		t.Errorf("read-only again: %d tools", n)
 	}
 }
@@ -532,13 +532,19 @@ func TestBridge(t *testing.T) {
 
 	// The app runs: every tool, and the app sees who called.
 	cs := bridge(srv.URL+Path, "secret", "")
-	if n := len(toolNames(t, cs)); n != 21 {
+	if n := len(toolNames(t, cs)); n != 22 {
 		t.Errorf("through the app: %d tools", n)
 	}
 	var sr searchOut
 	call(t, cs, "search_books", map[string]any{"query": "emma"}, &sr)
 	if sr.Total != 1 {
 		t.Fatalf("search through the app: %+v", sr)
+	}
+	var up updateOut
+	if msg := call(t, cs, "update_books", map[string]any{
+		"ids": []int64{sr.Books[0].ID}, "patch": map[string]any{"add_book_type_ids": []string{"fiction"}},
+	}, &up); msg != "" || len(up.Updated) != 1 || len(up.Failed) != 0 {
+		t.Fatalf("classify through the app: %+v, %s", up, msg)
 	}
 	if name, when := s.LastUse(); name != "claude-code" || when.IsZero() {
 		t.Errorf("last use: %q %v", name, when)
@@ -558,17 +564,24 @@ func TestBridge(t *testing.T) {
 	srv.CloseClientConnections()
 	srv.Close()
 	cs = bridge(srv.URL+Path, "secret", lib.Root)
-	if got := strings.Join(toolNames(t, cs), " "); got != "get_book list_facets search_books" {
+	if got := strings.Join(toolNames(t, cs), " "); got != "get_book list_book_types list_facets search_books" {
 		t.Errorf("without the app: %s", got)
 	}
 	call(t, cs, "search_books", map[string]any{"query": "earthsea"}, &sr)
 	if sr.Total != 1 {
 		t.Fatalf("search without the app: %+v", sr)
 	}
+	var types bookTypesOut
+	if msg := call(t, cs, "list_book_types", map[string]any{}, &types); msg != "" || !slices.ContainsFunc(types.BookTypes, func(typ calibre.BookType) bool { return typ.ID == "fiction" }) {
+		t.Fatalf("book types without the app: %+v, %s", types, msg)
+	}
+	if msg := call(t, cs, "search_books", map[string]any{"book_type_id": "fiction"}, &sr); msg != "" || sr.Total != 1 || sr.Books[0].Title != "Emma" || !slices.Equal(sr.Books[0].BookTypeIDs, []string{"fiction"}) {
+		t.Fatalf("book type search without the app: %+v, %s", sr, msg)
+	}
 
 	// The desktop service is disabled: stdio goes straight to the saved library.
 	cs = bridge("", "old-token", lib.Root)
-	if got := strings.Join(toolNames(t, cs), " "); got != "get_book list_facets search_books" {
+	if got := strings.Join(toolNames(t, cs), " "); got != "get_book list_book_types list_facets search_books" {
 		t.Errorf("desktop service disabled: %s", got)
 	}
 }

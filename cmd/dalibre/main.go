@@ -70,6 +70,7 @@ func main() {
 	err := mygo.App.Run()
 	a.ShutdownConversion()
 	a.ShutdownUSBTransfer()
+	a.ShutdownWeRead()
 	if err != nil {
 		log.Fatal(err)
 	}

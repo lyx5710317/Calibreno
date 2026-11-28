@@ -120,6 +120,7 @@ func New(h Host, version string, allowChanges bool) *Server {
 	s := &Server{host: h, found: map[string]plugin.Result{}, agents: map[string]*Agent{}}
 	s.srv = sdk.NewServer(&sdk.Implementation{Name: implementationName, Title: "Calibreno", Version: version}, &sdk.ServerOptions{
 		Instructions: "Calibreno is the user's e-book library, a calibre library. Book ids come from search_books. " +
+			"For book classification, use list_book_types for IDs, search_books with uncategorized to find unclassified books, and update_books with add_book_type_ids to assign types. " +
 			"To convert a book, convert the file get_book gives to a file outside the library, then add it with add_format. " +
 			"To write a plugin for Calibreno (metadata, file processing, or actions), read " + PluginDocs +
 			" first, then use create_plugin, add_plugin and test_plugin; reload_plugins after an edit. " +

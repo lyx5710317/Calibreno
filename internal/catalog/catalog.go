@@ -30,6 +30,7 @@ const (
 	ByTag
 	ByPublisher
 	ByLanguage
+	ByBookType
 )
 
 // Filter narrows the books to those with a value.
@@ -127,6 +128,11 @@ func matchFilter(b *calibre.Book, f Filter) bool {
 		return strings.EqualFold(b.Publisher, f.Value)
 	case ByLanguage:
 		return containsFold(b.Languages, f.Value)
+	case ByBookType:
+		if f.Value == "" {
+			return len(b.BookTypeIDs) == 0
+		}
+		return slices.Contains(b.BookTypeIDs, f.Value)
 	}
 	return true
 }
@@ -181,12 +187,14 @@ type Count struct {
 // Counts are the sidebar's numbers.
 type Counts struct {
 	All, Recent                 int
+	Uncategorized               int
 	Formats, Authors, Series    []Count
 	Tags, Publishers, Languages []Count
+	BookTypes                   []Count
 }
 
-// Tally counts the books by format, author, series, tag, publisher and
-// language. Formats are ordered EPUB, PDF, MOBI, AZW3 first.
+// Tally counts books for the sidebar filters. Formats are ordered EPUB, PDF,
+// MOBI, AZW3 first.
 func Tally(books []*calibre.Book, now time.Time) Counts {
 	c := Counts{All: len(books)}
 	maps := map[string]map[string]int{}
@@ -214,6 +222,12 @@ func Tally(books []*calibre.Book, now time.Time) Counts {
 		add("series", b.Series)
 		for _, t := range b.Tags {
 			add("tag", t)
+		}
+		if len(b.BookTypeIDs) == 0 {
+			c.Uncategorized++
+		}
+		for _, id := range b.BookTypeIDs {
+			add("bookType", id)
 		}
 		add("publisher", b.Publisher)
 		for _, l := range b.Languages {
@@ -243,5 +257,6 @@ func Tally(books []*calibre.Book, now time.Time) Counts {
 	})
 	c.Authors, c.Series, c.Tags = sorted("author"), sorted("series"), sorted("tag")
 	c.Publishers, c.Languages = sorted("publisher"), sorted("language")
+	c.BookTypes = sorted("bookType")
 	return c
 }

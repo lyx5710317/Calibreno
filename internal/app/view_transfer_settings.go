@@ -4,10 +4,8 @@ import (
 	"github.com/egoist/mygo/ui"
 
 	"dalibre/cmd/dalibre/locales"
-	"dalibre/internal/app/icons"
 	"dalibre/internal/app/theme"
 	"dalibre/internal/app/widgets"
-	"dalibre/internal/weread"
 )
 
 type transferTarget int
@@ -59,18 +57,5 @@ func (a *App) kindleUSBSettings(c *ui.Context) {
 		if !hasKindle {
 			ui.Text(c, locales.TransferKindleUSBNotConnected()).FontSize(12).TextColor(pal().TextTertiary)
 		}
-	})
-}
-
-func (a *App) weReadSettingsPane(c *ui.Context) {
-	pane(c, func() {
-		ui.Column(c).Gap(theme.Space12).AlignItems(ui.Start).Children(func() {
-			heading(c, locales.TransferWeRead(), locales.TransferWeReadHelp())
-			if widgets.ButtonSized(c, widgets.Secondary, icons.External, locales.TransferWeReadOpen(), theme.ControlS).Clicked() {
-				if err := a.readingTransfers.openURL(weread.UploadPage); err != nil {
-					a.toastErrorSummary(locales.TransferWeReadOpenFailed(), err)
-				}
-			}
-		})
 	})
 }

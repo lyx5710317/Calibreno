@@ -456,7 +456,8 @@ func (a *App) mcpConnect(c *ui.Context) {
 // mcpToolInfo says what each tool does, for Settings › MCP.
 var mcpToolInfo = map[string]func() string{
 	"search_books": locales.McpToolSearchBooks, "get_book": locales.McpToolGetBook, "list_facets": locales.McpToolListFacets,
-	"update_books": locales.McpToolUpdateBooks, "set_cover": locales.McpToolSetCover, "add_books": locales.McpToolAddBooks,
+	"list_book_types": locales.McpToolListBookTypes,
+	"update_books":    locales.McpToolUpdateBooks, "set_cover": locales.McpToolSetCover, "add_books": locales.McpToolAddBooks,
 	"add_format": locales.McpToolAddFormat, "remove_format": locales.McpToolRemoveFormat, "remove_books": locales.McpToolRemoveBooks,
 	"find_books": locales.McpToolFindBooks, "download_book": locales.McpToolDownloadBook, "find_metadata": locales.McpToolFindMetadata,
 	"list_plugins": locales.McpToolListPlugins, "create_plugin": locales.McpToolCreatePlugin, "add_plugin": locales.McpToolAddPlugin,

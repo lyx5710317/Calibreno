@@ -138,6 +138,7 @@ type Book struct {
 	SeriesIndex  float64
 	Rating       int // 0–10, calibre stores half stars as odd numbers
 	Tags         []string
+	BookTypeIDs  []string
 	Publisher    string
 	Languages    []string
 	Formats      []string // upper case, as "EPUB"
@@ -308,6 +309,9 @@ func (l *Library) loadBooks(id int64) ([]*Book, error) {
 		if err := str(s.query, s.set); err != nil {
 			return nil, err
 		}
+	}
+	if err := l.loadBookTypes(byID, id); err != nil {
+		return nil, err
 	}
 	return books, nil
 }

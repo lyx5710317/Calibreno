@@ -27,6 +27,18 @@ func presentError(err error) string {
 	if err == nil {
 		return ""
 	}
+	switch {
+	case errors.Is(err, calibre.ErrInvalidBookTypeName):
+		return locales.BookTypesInvalidName()
+	case errors.Is(err, calibre.ErrDuplicateBookType):
+		return locales.BookTypesDuplicate()
+	case errors.Is(err, calibre.ErrBookTypesChanged):
+		return locales.BookTypesChanged()
+	case errors.Is(err, calibre.ErrBookTypesUnavailable):
+		return locales.BookTypesUnavailable()
+	case errors.Is(err, calibre.ErrUnknownBookType):
+		return locales.BookTypesUnknown()
+	}
 	raw := err.Error()
 	if !simplifiedChinese() {
 		return raw

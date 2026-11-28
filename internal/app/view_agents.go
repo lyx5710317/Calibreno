@@ -253,7 +253,7 @@ func toolIcon(tool string) *ui.SVG {
 		return icons.Search
 	case "get_book":
 		return icons.BookOpen
-	case "list_facets":
+	case "list_facets", "list_book_types":
 		return icons.Tag
 	case "update_books", "find_metadata":
 		return icons.Pencil
@@ -314,6 +314,8 @@ func (a *App) callSummary(call mcp.Call) string {
 		return book(locales.McpRead, locales.McpReadMany)
 	case "list_facets":
 		return locales.McpListed(args.Kind)
+	case "list_book_types":
+		return locales.McpListed(locales.BookTypesTitle())
 	case "update_books":
 		return book(locales.McpEdited, locales.McpEditedMany)
 	case "set_cover":

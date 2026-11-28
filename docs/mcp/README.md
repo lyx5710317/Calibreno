@@ -134,6 +134,18 @@ update_books {"ids": [3, 4, 9], "patch": {"add_tags": ["Chinese SF", "Hard SF"]}
 then `update_books` with the values the agent trusts:
 `{"publisher": "Tor Books", "identifiers": {"isbn": "9780765382030"}}`.
 
+> Classify the unclassified books in my library.
+
+Call `list_book_types {}` for the library's built-in and custom types and
+their IDs. Use `search_books {"uncategorized": true}` to find unclassified
+books and `get_book` to read their metadata. Apply the appropriate IDs with
+`update_books {"ids": [3, 4], "patch": {"add_book_type_ids": ["fiction", "scienceFiction"]}}`.
+The same set of types is added to every book in the request. Existing
+book types and regular tags are preserved. An unknown type ID causes the
+affected book to fail, and the response lists the failures separately.
+To find books already marked with a type, use
+`search_books {"book_type_id": "scienceFiction"}`.
+
 > Use this picture as the cover of Piranesi: ~/Downloads/piranesi.jpg
 
 `set_cover {"id": 7, "path": "/Users/me/Downloads/piranesi.jpg"}`, or
@@ -203,10 +215,11 @@ loaded plugin appears in **Edit metadata › Fetch metadata**.
 
 | Tool | | Read only |
 |---|---|---|
-| `search_books` | Searches and filters the books: query, author, series, tag, publisher, language, format, recently added; sorted; 50 at a time. | ✓ |
-| `get_book` | A book's metadata, description, identifiers, and the paths of its files and cover. | ✓ |
+| `search_books` | Searches and filters books by query, author, series, tag, publisher, language, format, recent status, type ID or unclassified status. Returns sorted results with type IDs, 50 at a time by default. | ✓ |
+| `get_book` | A book's metadata, description, identifiers, book type IDs, and the paths of its files and cover. | ✓ |
 | `list_facets` | Authors, series, tags, publishers, languages or formats, with how many books have each. | ✓ |
-| `update_books` | Changes the fields given of one or more books; `add_tags` and `remove_tags` for tagging many. | |
+| `list_book_types` | Lists type IDs, names and whether each is custom, including types with no assigned books. | ✓ |
+| `update_books` | Changes the fields given of one or more books. `add_book_type_ids` adds book types. `add_tags` and `remove_tags` update regular tags. | |
 | `set_cover` | Replaces a book's cover with an image file or URL. | |
 | `add_books` | Adds e-book files, or every e-book in folders. | |
 | `remove_books` | Moves books to the Trash. | |

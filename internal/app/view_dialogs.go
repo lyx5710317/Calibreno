@@ -43,6 +43,9 @@ func (a *App) dialogs(c *ui.Context) {
 
 type editState struct {
 	id                  int64
+	lib                 *calibre.Library
+	original            *calibre.Book
+	saving              bool
 	order               []int64 // the books Previous and Next go through
 	title, titleSort    string
 	authors             []string
@@ -50,6 +53,7 @@ type editState struct {
 	series, seriesIndex string
 	rating              int // widgets.Stars, 0–5
 	tags                []string
+	types               bookTypeDraft
 	publisher           string
 	pubdate             time.Time
 	languages           []string
@@ -63,7 +67,7 @@ type editState struct {
 }
 
 func (a *App) openEditor(b *calibre.Book) {
-	if b == nil || a.lib == nil {
+	if b == nil || a.lib == nil || a.edit.saving {
 		return
 	}
 	d, err := a.lib.Details(b)
@@ -87,8 +91,9 @@ func (a *App) openEditor(b *calibre.Book) {
 	}
 	text := htmlToText(d.Comments)
 	a.edit = editState{
-		id: b.ID, order: ids, title: m.Title, titleSort: b.Sort, authors: m.Authors, authorSort: m.AuthorSort,
+		id: b.ID, lib: a.lib, original: b, order: ids, title: m.Title, titleSort: b.Sort, authors: m.Authors, authorSort: m.AuthorSort,
 		series: m.Series, seriesIndex: seriesIndex(m.SeriesIndex), rating: (m.Rating + 1) / 2, tags: m.Tags,
+		types:     bookTypeDraft{definitions: slices.Clone(a.bookTypes), selected: slices.Clone(b.BookTypeIDs)},
 		publisher: m.Publisher, pubdate: m.Pubdate, languages: m.Languages, identifiers: strings.Join(idents, ", "),
 		comments: text, commentsText: text, origComments: d.Comments,
 	}
@@ -100,8 +105,8 @@ func (a *App) openEditor(b *calibre.Book) {
 func (e *editState) metadata() calibre.Metadata {
 	idx, _ := strconv.ParseFloat(strings.TrimSpace(e.seriesIndex), 64)
 	m := calibre.Metadata{
-		Title: e.title, Authors: e.authors, AuthorSort: e.authorSort, Series: e.series, SeriesIndex: idx,
-		Tags: e.tags, Publisher: e.publisher, Rating: e.rating * 2, Pubdate: e.pubdate,
+		Title: e.title, Authors: slices.Clone(e.authors), AuthorSort: e.authorSort, Series: e.series, SeriesIndex: idx,
+		Tags: slices.Clone(e.tags), Publisher: e.publisher, Rating: e.rating * 2, Pubdate: e.pubdate,
 		Identifiers: map[string]string{}, Comments: e.origComments,
 	}
 	for _, l := range e.languages {
@@ -128,13 +133,75 @@ func (e *editState) metadata() calibre.Metadata {
 	return m
 }
 
+// saveEditor keeps the draft open if saving fails, including a concurrent type change.
+func (a *App) saveEditor(nextID int64) {
+	e := &a.edit
+	lib, old := e.lib, e.original
+	if !a.editOpen || e.saving || lib == nil || lib != a.lib || old == nil {
+		return
+	}
+	if e.types.addOpen && strings.TrimSpace(e.types.name) != "" && !e.types.add() {
+		return
+	}
+	m, cover, order := e.metadata(), e.cover, e.order
+	edit := calibre.BookTypeEdit{
+		Before: old.BookTypeIDs,
+		IDs:    slices.Clone(e.types.selected),
+		Create: slices.Clone(e.types.created),
+	}
+	slices.Sort(edit.IDs)
+	typesChanged := len(edit.Create) > 0 || !slices.Equal(edit.Before, edit.IDs)
+	e.saving, e.err = true, ""
+	a.run(func() {
+		var err, coverErr error
+		if typesChanged {
+			err = lib.UpdateMetadataAndBookTypes(old, m, edit)
+		} else {
+			err = lib.UpdateMetadata(old.ID, m)
+		}
+		if err == nil && len(cover) > 0 {
+			coverErr = lib.SetCover(old.ID, cover)
+		}
+		a.post(func() {
+			if a.lib != lib {
+				return
+			}
+			a.edit.saving = false
+			if err != nil {
+				if a.editOpen {
+					a.edit.err = presentError(err)
+				} else {
+					a.toastError(err)
+				}
+				return
+			}
+			advance := a.editOpen && nextID != 0
+			a.editOpen = false
+			a.covers.forget(old.ID)
+			a.reload(func() {
+				if coverErr != nil {
+					a.toastError(coverErr)
+				} else {
+					a.toast("%s", locales.AppToastSaved(m.Title))
+				}
+				if advance && !a.editOpen && a.edit.original == old {
+					if next := a.byID[nextID]; next != nil {
+						a.openEditor(next)
+						a.edit.order = order
+					}
+				}
+			})
+		})
+	})
+}
+
 func (a *App) editDialog(c *ui.Context) {
 	if !a.editOpen {
 		return
 	}
 	e := &a.edit
 	b := a.byID[e.id]
-	if b == nil {
+	if b == nil || e.lib != a.lib || e.original == nil || e.original.UUID != b.UUID {
 		a.editOpen = false
 		return
 	}
@@ -144,13 +211,8 @@ func (a *App) editDialog(c *ui.Context) {
 	}
 	pos := slices.Index(e.order, e.id)
 	step := func(delta int) {
-		a.saveMetadata(e.id, e.metadata(), e.cover)
 		if p := pos + delta; p >= 0 && p < len(e.order) {
-			if nb := a.byID[e.order[p]]; nb != nil {
-				order := e.order
-				a.openEditor(nb)
-				a.edit.order = order
-			}
+			a.saveEditor(e.order[p])
 		}
 	}
 	widgets.DialogFrame(c, &a.editOpen, 880, func() {
@@ -160,19 +222,19 @@ func (a *App) editDialog(c *ui.Context) {
 		}
 		ui.Spacer(c)
 		if widgets.ButtonSized(c, widgets.Secondary, icons.Search, locales.CommonFetchMetadata(), theme.ControlS).
-			Tooltip(locales.DialogsFetchTooltip()).Clicked() {
+			Tooltip(locales.DialogsFetchTooltip()).Disabled(e.saving).Clicked() {
 			a.openFetch()
 		}
 		if len(e.order) > 1 {
-			if widgets.IconButton(c, icons.ChevronLeft, locales.DialogsSaveEditPrevious(), false).Disabled(pos <= 0).Clicked() {
+			if widgets.IconButton(c, icons.ChevronLeft, locales.DialogsSaveEditPrevious(), false).Disabled(e.saving || pos <= 0).Clicked() {
 				step(-1)
 			}
-			if widgets.IconButton(c, icons.ChevronRight, locales.DialogsSaveEditNext(), false).Disabled(pos >= len(e.order)-1).Clicked() {
+			if widgets.IconButton(c, icons.ChevronRight, locales.DialogsSaveEditNext(), false).Disabled(e.saving || pos >= len(e.order)-1).Clicked() {
 				step(1)
 			}
 		}
 	}, func() {
-		ui.Row(c).Padding(theme.Space24).Gap(theme.Space32).AlignItems(ui.Start).Children(func() {
+		ui.Row(c).Padding(theme.Space24).Gap(theme.Space32).AlignItems(ui.Start).Disabled(e.saving).Children(func() {
 			// Cover column.
 			ui.Column(c).Width(184).Gap(theme.Space12).AlignItems(ui.Stretch).Children(func() {
 				ui.Row(c).Justify(ui.Center).Padding(theme.Space20, 0).Radius(theme.RadiusLG).Background(pal().Subtle).Children(func() {
@@ -243,6 +305,7 @@ func (a *App) editDialog(c *ui.Context) {
 						ui.TokenField(c, &e.tags, values(a.counts.Tags)).Placeholder(locales.DialogsAddTag()).Label(locales.CommonTags())
 					})
 				})
+				row(func() { e.types.field(c) })
 				row(func() {
 					widgets.Field(c, locales.CommonPublisher(), "", func() { ui.Combobox(c, &e.publisher, values(a.counts.Publishers)).Label(locales.CommonPublisher()) })
 					widgets.Field(c, locales.CommonPublished(), "", func() { ui.DateInput(c, &e.pubdate).Label(locales.CommonPublished()) })
@@ -262,21 +325,24 @@ func (a *App) editDialog(c *ui.Context) {
 		})
 	}, func() {
 		ui.Row(c).Grow(1).Gap(theme.Space6).AlignItems(ui.Center).Children(func() {
-			ui.Icon(c, icons.Database).FontSize(12).TextColor(pal().IconMuted)
-			ui.Text(c, locales.DialogsWritesNote()).FontSize(12).TextColor(pal().TextTertiary)
+			switch {
+			case e.err != "":
+				ui.Text(c, e.err).FontSize(12).TextColor(pal().Danger.FG).Shrink(1)
+			case e.saving:
+				ui.Spinner(c).Size(16, 16).Label(locales.CommonLoading())
+			default:
+				ui.Icon(c, icons.Database).FontSize(12).TextColor(pal().IconMuted)
+				ui.Text(c, locales.DialogsWritesNote()).FontSize(12).TextColor(pal().TextTertiary)
+			}
 		})
 		if widgets.Button(c, widgets.Secondary, nil, locales.CommonCancel()).Clicked() {
 			a.editOpen = false
 		}
-		if widgets.Button(c, widgets.Primary, nil, locales.CommonSave()).Clicked() {
-			a.saveMetadata(e.id, e.metadata(), e.cover)
-			a.editOpen = false
+		if widgets.Button(c, widgets.Primary, nil, locales.CommonSave()).Disabled(e.saving).Clicked() {
+			a.saveEditor(0)
 		}
 	})
-	c.OnWindowShortcut(ui.Cmd, ui.KeyS, func() {
-		a.saveMetadata(e.id, e.metadata(), e.cover)
-		a.editOpen = false
-	})
+	c.OnWindowShortcut(ui.Cmd, ui.KeyS, func() { a.saveEditor(0) })
 }
 
 func (a *App) chooseCover() {

@@ -71,6 +71,7 @@ type App struct {
 	books                  []*calibre.Book
 	byID                   map[int64]*calibre.Book
 	counts                 catalog.Counts
+	bookTypes              []calibre.BookType
 	version                int // bumps when books change, to recompute shown
 	booksTime              time.Time
 
@@ -116,7 +117,7 @@ type App struct {
 	agentIcons map[string]ui.ImageSource
 	// pickerOpen is which filter's picker is open, by kind; pickerQuery
 	// narrows its list.
-	pickerOpen  [catalog.ByLanguage + 1]bool
+	pickerOpen  [catalog.ByBookType + 1]bool
 	pickerQuery string
 
 	// plugins
@@ -179,6 +180,7 @@ type App struct {
 	// emailTestState is Settings › Email's last test email.
 	emailTestState   emailTest
 	readingTransfers readingTransfers
+	weRead           weReadState
 
 	// OPDS: the catalogs' sources, what checking each found (by catalog
 	// id), the catalog page, and the server sharing the library.
@@ -265,6 +267,7 @@ func New(settingsPath string) *App {
 		batchStore:       batch.NewStore(batchPath),
 		gb:               newGetBooks(),
 		readingTransfers: newReadingTransfers(),
+		weRead:           newWeReadState(settingsPath),
 	}
 	if settingsPath != "" {
 		home := filepath.Dir(settingsPath)
@@ -428,7 +431,7 @@ func (a *App) openLibrary(root string) {
 		a.toast("%s", locales.BooxSwitchBusy())
 		return
 	}
-	if a.readingTransfers.preparing || a.dev != nil && a.dev.sending != nil {
+	if a.weRead.busy || a.dev != nil && a.dev.sending != nil {
 		a.toast("%s", locales.DeviceTransferSwitchBusy())
 		return
 	}
@@ -452,6 +455,7 @@ func (a *App) openLibrary(root string) {
 		}
 		lib, err := a.open(root)
 		var books []*calibre.Book
+		var bookTypes []calibre.BookType
 		var ids map[string]int64
 		var uuid, batchKey string
 		if err == nil {
@@ -459,6 +463,7 @@ func (a *App) openLibrary(root string) {
 		}
 		if err == nil {
 			ids, _ = lib.Identifiers()
+			bookTypes, _ = lib.BookTypes()
 			uuid = lib.UUID()
 			batchKey = batch.LibraryKey(lib)
 		}
@@ -498,7 +503,11 @@ func (a *App) openLibrary(root string) {
 			a.curID, a.chosen = 0, ui.Selection[int64]{}
 			a.grid, a.table, a.tableLayout = ui.GridState{}, ui.ListState{}, ui.TableLayout{}
 			a.query.Filter, a.query.Search, a.query.Shelf = catalog.Filter{}, "", catalog.AllBooks
+			a.pickerOpen, a.pickerQuery = [catalog.ByBookType + 1]bool{}, ""
+			a.edit, a.editOpen, a.fetch.open = editState{}, false, false
+			a.weRead.duplicate, a.weRead.resend, a.weRead.manual = nil, weReadRequest{}, weReadRequest{}
 			a.act.results, a.act.review = nil, nil
+			a.bookTypes = bookTypes
 			a.setBooks(books)
 			a.settings.Opened(root, uuid)
 			a.saveSettings()
@@ -560,6 +569,7 @@ func (a *App) reload(after func()) {
 	a.run(func() {
 		books, err := lib.Books()
 		ids, _ := lib.Identifiers()
+		bookTypes, _ := lib.BookTypes()
 		a.post(func() {
 			if lib != a.lib {
 				return
@@ -570,6 +580,7 @@ func (a *App) reload(after func()) {
 			}
 			a.details, a.detailsReq = map[int64]*calibre.Details{}, map[int64]bool{}
 			a.idIndex = ids
+			a.bookTypes = bookTypes
 			a.setBooks(books)
 			if after != nil {
 				after()
@@ -692,28 +703,6 @@ func plural(n int, one, many string) string {
 		return one
 	}
 	return many
-}
-
-// saveMetadata writes the editor's changes.
-func (a *App) saveMetadata(id int64, m calibre.Metadata, cover []byte) {
-	lib := a.lib
-	if lib == nil {
-		return
-	}
-	a.run(func() {
-		err := lib.UpdateMetadata(id, m)
-		if err == nil && len(cover) > 0 {
-			err = lib.SetCover(id, cover)
-		}
-		a.post(func() {
-			if err != nil {
-				a.toastError(err)
-				return
-			}
-			a.covers.forget(id)
-			a.reload(func() { a.toast("%s", locales.AppToastSaved(m.Title)) })
-		})
-	})
 }
 
 // removeBooks moves the books to the Recycle Bin.

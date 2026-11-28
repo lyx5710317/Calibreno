@@ -5,11 +5,19 @@
 | 目的地 | 传输方式与配置 |
 | --- | --- |
 | Kindle | 插入能识别为 USB 磁盘的 Kindle 后，可在「传输 → Kindle」选择 USB 直传。也可以在 Kindle 标签添加 Send to Kindle 收件地址和 SMTP 发件账户，再从同一菜单选择收件人。发件地址需要加入 Amazon 账户的认可发件人列表。[Amazon 说明](https://digprjsurvey.amazon.co.uk/csad/help/node/G7NECT4B4ZWHQ8WV) |
-| 微信读书 | Calibreno 打开官方书架并定位本地 EPUB。在网页选择「传书到手机」，登录后手动选取 EPUB。缺少 EPUB 时，若当前版本支持转换且存在可用源格式，Calibreno 会打开以 EPUB 为目标的转换对话框。[微信读书书架](https://weread.qq.com/web/shelf) |
+| 微信读书 | 在「传送设置 → 微信读书」打开专用 Chrome 或 Edge 窗口扫码登录。随后从单本书的「传输 → 微信读书 → 发送到微信读书」提交 EPUB。也可以打开官网手动导入。[微信读书书架](https://weread.qq.com/web/shelf) |
 | BOOX | 电脑和 BOOX 接入同一网络。在设备上打开 BOOXDrop，把它显示的地址填到 BOOX 设置，测试连接并保存。设备未确认接收时，可先检查接收记录。直传不可用时，可以打开设备上传页手动传书。[BOOX 说明](https://help.boox.com/fa5fa/48481/36dc4) |
 | KOReader | 电脑和设备接入同一网络。在 Calibreno 的 KOReader 标签启用无线设备连接，可配置端口和密码。在阅读器的 Calibre 插件中选择「连接」，再回到 Calibreno 的传输菜单发送。首次连接可能需要在设备上选择接收目录。[KOReader 说明](https://github.com/koreader/koreader/wiki/Calibre) |
 
 KOReader 直传使用 Calibre 无线设备协议。工具栏的 OPDS 共享另提供书目浏览和按需下载，读者可以在设备上主动选择要下载的书。
+
+## 微信读书传书
+
+1. 在传送设置打开登录窗口，通过微信读书官网扫码。未显示二维码时，可以点击网页上的「登录」。扫码后回到 Calibreno 检查连接。专用窗口会保留登录会话，过期后可以再次扫码。
+2. 选择一本书发送。Calibreno 会把书库里对应的 EPUB 交给官网上传表单。如果缺少 EPUB 且当前版本支持转换，先转换，再从完成提示点击「发送到微信读书」。
+3. 最近传书记录会显示导入结果。遇到「待核对」，先打开微信读书查看书架或「我的文档」，找到书后再确认已导入。同一文件已导入或待核对时，重新发送需要再次确认。
+
+官网上传表单不可用时，从书籍菜单选择「手动导入」。Calibreno 会打开官网并定位 EPUB，由你在网页选取这个文件。
 
 ## Readers plugged in
 

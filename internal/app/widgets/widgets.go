@@ -156,6 +156,15 @@ func ReaderTag(c *ui.Context, reader string) ui.Element {
 // Tag is the Tag component. It reports a click on the chip, and onRemove
 // adds a remove Button.
 func Tag(c *ui.Context, label string, selected bool, onRemove func()) ui.Element {
+	return tag(c, label, selected, false, onRemove)
+}
+
+// CheckTag is a selectable tag with a visible check mark and checkbox semantics.
+func CheckTag(c *ui.Context, label string, checked bool) ui.Element {
+	return tag(c, label, checked, true, nil).Role(ui.RoleCheckBox).Checked(checked)
+}
+
+func tag(c *ui.Context, label string, selected, checkable bool, onRemove func()) ui.Element {
 	// A long tag stays inside its row and ends in an ellipsis.
 	e := ui.ButtonBase(c).Height(24).MaxWidthPercent(100).MinWidth(0).Radius(theme.RadiusFull).AlignItems(ui.Center).Gap(theme.Space4).Label(label)
 	e.Padding(0, theme.Space8)
@@ -170,6 +179,9 @@ func Tag(c *ui.Context, label string, selected bool, onRemove func()) ui.Element
 		bg = pal().Hover
 	}
 	return e.Background(bg).TextColor(fg).Children(func() {
+		if checkable && selected {
+			ui.Icon(c, icons.Check).FontSize(12)
+		}
 		ui.Text(c, label).FontSize(12).FontWeight(500).SingleLine().Shrink(1).MinWidth(0)
 		if onRemove != nil {
 			x := ui.ButtonBase(c).Size(16, 16).Radius(theme.RadiusFull).Center().Label(locales.WidgetsRemoveTag(label))

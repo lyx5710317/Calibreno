@@ -1,4 +1,4 @@
-// Package weread prepares local EPUBs for manual import through WeRead.
+// Package weread connects local EPUBs to the official WeRead upload page.
 package weread
 
 import (

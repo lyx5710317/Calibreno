@@ -3,7 +3,7 @@ package mcp
 import "slices"
 
 // readTools are the tools every agent gets.
-var readTools = []string{"search_books", "get_book", "list_facets"}
+var readTools = []string{"search_books", "get_book", "list_facets", "list_book_types"}
 
 // Group is a kind of tool, as Settings lists them.
 type Group int

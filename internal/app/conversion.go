@@ -25,9 +25,10 @@ type conversionSession struct {
 	form conversionDialogState
 	pdf  pdfReviewState
 
-	lib   *calibre.Library
-	book  int64
-	local string
+	lib    *calibre.Library
+	book   int64
+	local  string
+	onEPUB func()
 
 	workspace string
 	pdfSource string
@@ -387,11 +388,17 @@ func (a *App) completeConversion(s *conversionSession, format, output string, wa
 	}
 	if output != "" {
 		a.toasts = append(a.toasts, toastMsg{text: message, action: locales.CommonShowInFolder(), onAction: func() { revealPath(output) }})
-	} else {
-		a.toast("%s", message)
-		if a.lib == s.lib {
-			a.reload(nil)
-		}
+		return
+	}
+	if a.lib == s.lib && format == "EPUB" && s.onEPUB != nil {
+		a.reload(func() {
+			a.toasts = append(a.toasts, toastMsg{text: message, action: locales.WeReadSendAction(), onAction: s.onEPUB})
+		})
+		return
+	}
+	a.toast("%s", message)
+	if a.lib == s.lib {
+		a.reload(nil)
 	}
 }
 

@@ -6,6 +6,8 @@ shows, so write them for readers of the app. `mygo build` needs a
 
 ## Unreleased
 
+- 微信读书支持官网扫码登录后直接发送 EPUB，记录导入结果，并在结果待核对时提示检查书架。
+
 ## 0.8.2
 
 - 支持自研「日文假名标注」插件。可离线为日文 EPUB 添加三种范围的平假名注音，保留书中已有的读音和原始 EPUB。

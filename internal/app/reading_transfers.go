@@ -18,13 +18,11 @@ import (
 	"dalibre/internal/bookconvert"
 	"dalibre/internal/boox"
 	"dalibre/internal/calibre"
-	"dalibre/internal/weread"
 )
 
 type readingTransfers struct {
-	booxEdit  booxSettingsState
-	sending   bool
-	preparing bool
+	booxEdit booxSettingsState
+	sending  bool
 
 	probe    func(context.Context, string) (string, error)
 	send     func(context.Context, string, string, string, string) (boox.Outcome, error)
@@ -314,43 +312,4 @@ func sourceForWeRead(formats []string) string {
 		}
 	}
 	return ""
-}
-
-func (a *App) prepareWeRead(b *calibre.Book) {
-	lib, t := a.lib, &a.readingTransfers
-	if lib == nil || a.busy != "" || a.loading || t.preparing {
-		return
-	}
-	if !slices.Contains(b.Formats, "EPUB") {
-		if source := sourceForWeRead(b.Formats); source != "" && a.conversionEnabled() {
-			a.openBookConversion(b, source)
-		}
-		a.toast("%s", locales.WeReadNeedsEPUB())
-		return
-	}
-	t.preparing = true
-	open, reveal, copyPath := t.openURL, t.reveal, t.copyPath
-	a.run(func() {
-		file, _, err := libraryFormatPaths(lib, b, "EPUB")
-		if err == nil {
-			err = weread.Handoff(file, open, reveal)
-		}
-		a.post(func() {
-			t.preparing = false
-			if err != nil {
-				a.toastErrorSummary(locales.WeReadOpenFailed(), err)
-				return
-			}
-			a.toasts = append(a.toasts, toastMsg{
-				text: locales.WeReadOpened(), action: locales.WeReadCopyPath(),
-				onAction: func() {
-					if err := copyPath(file); err != nil {
-						a.toastErrorSummary(locales.WeReadCopyPath(), err)
-						return
-					}
-					a.toast("%s", locales.WeReadCopiedPath())
-				},
-			})
-		})
-	})
 }

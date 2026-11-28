@@ -211,6 +211,7 @@ func (a *App) bookDetail(c *ui.Context, b *calibre.Book) {
 			langs[i] = languageName(l)
 		}
 		row("Language", locales.CommonLanguage(), strings.Join(langs, ", "), false, nil)
+		row("Book types", locales.BookTypesTitle(), a.bookTypeDetails(b.BookTypeIDs), false, nil)
 		if d != nil {
 			keys := make([]string, 0, len(d.Identifiers))
 			for k := range d.Identifiers {

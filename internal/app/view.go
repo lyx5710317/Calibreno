@@ -527,6 +527,8 @@ func (a *App) viewTitle() string {
 	switch f.Kind {
 	case catalog.ByLanguage:
 		return languageName(f.Value)
+	case catalog.ByBookType:
+		return a.bookTypeLabel(f.Value)
 	case catalog.NoFilter:
 		if a.query.Shelf == catalog.RecentlyAdded {
 			return locales.MainNavRecentlyAdded()
@@ -606,6 +608,8 @@ func filterKindName(k catalog.FilterKind) string {
 		return locales.CommonPublisher()
 	case catalog.ByLanguage:
 		return locales.CommonLanguage()
+	case catalog.ByBookType:
+		return locales.BookTypesTitle()
 	}
 	return ""
 }
