@@ -73,6 +73,11 @@ func Inspect(archive string) (*Manifest, error) {
 // install. Granting its permissions is the caller's business, before or
 // after.
 func Install(archive, root string) (*Manifest, error) {
+	return InstallChecked(archive, root, nil)
+}
+
+// InstallChecked validates the extracted manifest before replacing an installed plugin.
+func InstallChecked(archive, root string, check func(*Manifest) error) (*Manifest, error) {
 	if isDir(archive) {
 		tmp, err := os.MkdirTemp("", "dalibre-plugin-")
 		if err != nil {
@@ -83,7 +88,7 @@ func Install(archive, root string) (*Manifest, error) {
 		if err != nil {
 			return nil, err
 		}
-		return Install(pkg, root)
+		return InstallChecked(pkg, root, check)
 	}
 	zr, err := zip.OpenReader(archive)
 	if err != nil {
@@ -131,6 +136,11 @@ func Install(archive, root string) (*Manifest, error) {
 	}
 	if Reserved(m.ID) {
 		return nil, fmt.Errorf("plugin.json: id %q is kept for plugins that ship with Dalibre", m.ID)
+	}
+	if check != nil {
+		if err := check(m); err != nil {
+			return nil, err
+		}
 	}
 	if _, err := os.Stat(filepath.Join(tmp, filepath.FromSlash(m.Main))); err != nil {
 		return nil, fmt.Errorf("the package has no %s", m.Main)

@@ -3,26 +3,25 @@ package app
 // Display strings for the built-in and marketplace plugins. Keys and values
 // used by the plugins themselves stay in their original form.
 var chinesePluginInfo = map[string]struct{ name, description string }{
-	"dalibre.gutenberg":                      {"古登堡计划", "提供七万多本公版电子书"},
 	"dalibre.googlebooks":                    {"Google 图书", "从 Google 图书获取书目资料"},
 	"dalibre.neodb":                          {"", "从 NeoDB 获取书目资料。该开放目录关联豆瓣、Goodreads 等平台"},
-	"org.randynamic.dalibre.apple-books":     {"Apple Books 封面", "从 Apple Books 商店获取高清封面"},
-	"org.randynamic.dalibre.chinese-convert": {"中文转换", "转换 EPUB 的简繁中文和排版方向"},
+	"org.randynamic.dalibre.apple-books":     {"Apple Books 封面", "仅获取封面，默认查询美国区 Apple Books，可在插件设置选择其他地区"},
+	"org.randynamic.dalibre.chinese-convert": {"中文转换", "转换 EPUB 的简繁、地区用词、标点和排版，并保留原 EPUB 备份"},
 	"org.randynamic.dalibre.clean-metadata":  {"清理元数据", "整理书名、作者和系列字段"},
 	"org.randynamic.dalibre.count-pages":     {"统计页数", "统计字数并估算页数"},
 	"org.randynamic.dalibre.epub-merge":      {"合并 EPUB", "将多本 EPUB 合并为新书，功能源于 Calibre 的 EpubMerge"},
 	"org.randynamic.dalibre.epub-split":      {"拆分 EPUB", "将 EPUB 的选定章节拆分为新书，功能源于 Calibre 的 EpubSplit"},
 	"org.randynamic.dalibre.extract-isbn":    {"提取 ISBN", "从图书内容提取 ISBN 并写入书目"},
-	"org.randynamic.dalibre.find-duplicates": {"查找重复书目", "按书名和作者或 ISBN 查找疑似重复书目"},
+	"org.randynamic.dalibre.find-duplicates": {"书目相似查重", "按书名、作者或 ISBN 筛查疑似重复书目"},
 	"org.randynamic.dalibre.kepub":           {"", "将 EPUB 转换为 Kobo 的 KePub 格式"},
 	"org.randynamic.dalibre.manage-series":   {"管理系列", "将书目加入系列并编号"},
 	"org.randynamic.dalibre.modify-epub":     {"修整 EPUB", "就地修整和清理 EPUB，功能源于 Calibre 的 Modify ePub"},
 	"org.randynamic.dalibre.quality-check":   {"书库质量检查", "查找元数据缺失或不规范的书目"},
-	"org.randynamic.dalibre.search-internet": {"在网上搜书", "在豆瓣、Amazon、Goodreads、维基百科等网站搜索图书，支持收藏和自定义站点"},
-	"org.randynamic.dalibre.wikidata":        {"维基数据", "从维基数据获取书目资料和封面"},
-	"io.github.bellussi1.hardcover":          {"", "从 Hardcover 获取元数据并同步阅读状态和评分，适用于 KOReader"},
-	"io.github.bellussi1.isbn-brasil":        {"巴西 ISBN", "通过 BrasilAPI 获取巴西 ISBN 元数据，可使用备用封面来源"},
-	"io.github.bellussi1.openlibrary":        {"", "从 Open Library 获取书目资料、封面、系列和简介"},
+	"org.randynamic.dalibre.search-internet": {"在网上搜书", "在浏览器打开豆瓣等站点的图书搜索，支持收藏和自定义站点"},
+	"org.randynamic.dalibre.wikidata":        {"维基数据", "从维基数据获取书目资料和封面，可设置检索语言"},
+	"io.github.bellussi1.hardcover":          {"", "获取 Hardcover 书目资料并同步阅读状态和评分。使用前需填写 Hardcover API 令牌"},
+	"io.github.bellussi1.isbn-brasil":        {"巴西 ISBN", "通过 BrasilAPI 查询巴西出版物的 ISBN 和书目资料"},
+	"io.github.bellussi1.openlibrary":        {"", "连接 Open Library 获取书目资料、封面、系列和简介"},
 }
 
 var chinesePluginStrings = map[string]string{
@@ -75,7 +74,6 @@ var chinesePluginStrings = map[string]string{
 	"Turn on the Books API for this key in Google Cloud.":     "请在 Google Cloud 中为此密钥启用 Books API。",
 	"Google’s shared quota is used up. Add your own API key.": "Google 图书的共享配额已用完，请在插件设置中添加自己的 API 密钥。",
 	"Google Books asks to slow down.":                         "Google 图书请求过于频繁，请稍后重试。",
-	"Project Gutenberg doesn’t have that page.":               "古登堡计划中找不到该页面。",
 	"Converted to KePub.":                                     "已转换为 KePub。",
 	"ePub updated.":                                           "已更新 EPUB。",
 	"Open favorites":                                          "打开收藏站点",

@@ -86,6 +86,9 @@ func optionTitle(f plugin.Filter, o plugin.Option) string {
 
 // getBooksNav is the sidebar's Get books entry, in a group of its own.
 func (a *App) getBooksNav(c *ui.Context) {
+	if a.page != pageGetBooks && len(a.sources()) == 0 {
+		return
+	}
 	ui.Column(c).Gap(theme.Space2).AlignItems(ui.Stretch).Children(func() {
 		a.navItem(c, "getbooks", icons.Download, locales.CommonGetBooks(), 0, a.page == pageGetBooks, nil, a.openGetBooks)
 	})
@@ -107,7 +110,7 @@ func (a *App) getBooksToolbar(c *ui.Context) {
 		ui.Text(c, locales.CommonGetBooks()).FontWeight(600).FontSize(22).LetterSpacing(-0.4).SingleLine().Grow(1)
 		if one != nil {
 			if widgets.IconButton(c, icons.Sliders, locales.GetBooksSourceSettings(pluginDisplayName(one.Manifest.ID, one.Manifest.Name)), false).Clicked() {
-				a.openPlugins(one.Manifest.ID)
+				a.openCatalogSheet(strings.TrimPrefix(one.Manifest.ID, catalogPrefix))
 			}
 		}
 		if widgets.IconButton(c, icons.PanelRight, locales.GetBooksDetailsTooltip(), !a.settings.HideDetail).Clicked() {
@@ -149,8 +152,6 @@ func (a *App) getBooksContent(c *ui.Context) {
 		a.getBooksFilters(c, srcs)
 	})
 	switch {
-	case len(a.sources()) == 0 && a.pluginsLoading:
-		ui.Column(c).Grow(1).Center().Children(func() { ui.Spinner(c).Size(24, 24).Label(locales.GetBooksLoadingPlugins()) })
 	case len(a.sources()) == 0:
 		a.noSources(c)
 	case g.source == allSources:
@@ -165,7 +166,7 @@ func (a *App) getBooksContent(c *ui.Context) {
 func (a *App) sourcePicker(c *ui.Context) {
 	g := &a.gb
 	label, icon := locales.CommonAllSources(), icons.Layers
-	if p := a.pluginByID(g.source); p != nil && g.source != allSources {
+	if p := a.gbSource(g.source); p != nil {
 		label, icon = pluginDisplayName(p.Manifest.ID, p.Manifest.Name), pluginIcon(p.Manifest)
 	}
 	b := ui.ButtonBase(c).Width(220).Height(theme.ControlM).Padding(0, theme.Space8, 0, theme.Space10).Gap(theme.Space8).AlignItems(ui.Center).
@@ -178,20 +179,14 @@ func (a *App) sourcePicker(c *ui.Context) {
 		if m.Item(locales.CommonAllSources()).Subtitle(locales.GetBooksSearchAllAtOnce()).Icon(icons.Menu(icons.Layers)).Checked(g.source == allSources).Chosen() {
 			a.gbSetSource(allSources)
 		}
-		// A separator only between groups that have items: with every
-		// source off, All sources sits right above Get more sources.
-		pending := 0
-		for _, mf := range a.pluginsPending {
-			if mf.IsBookSource() {
-				pending++
-			}
-		}
-		if len(a.sources())+pending > 0 {
+		sources := a.sources()
+		if len(sources) > 0 {
 			m.Separator()
 		}
-		for _, p := range a.sources() {
+		for _, p := range sources {
 			mf := p.Manifest
-			it := m.Item(mf.Name).ID(mf.ID).Subtitle(mf.Description).Icon(icons.Menu(pluginIcon(mf))).Checked(g.source == mf.ID)
+			display := pluginDisplayManifest(mf)
+			it := m.Item(display.Name).ID(mf.ID).Subtitle(display.Description).Icon(icons.Menu(pluginIcon(mf))).Checked(g.source == mf.ID)
 			if p.MissingSettings() != nil {
 				it.Trailing(locales.GetBooksSetUp())
 			}
@@ -199,14 +194,9 @@ func (a *App) sourcePicker(c *ui.Context) {
 				a.gbSetSource(mf.ID)
 			}
 		}
-		for _, mf := range a.pluginsPending {
-			if mf.IsBookSource() && m.Item(mf.Name).ID("pending:"+mf.ID).Subtitle(locales.GetBooksWaitingPermission()).Icon(icons.Menu(pluginIcon(mf))).Trailing(locales.GetBooksReview()).Chosen() {
-				a.askConsent(mf.ID)
-			}
-		}
 		m.Separator()
-		if m.Item(locales.GetBooksGetMoreSources()).Icon(icons.Menu(icons.Puzzle)).Chosen() {
-			a.openPlugins("")
+		if m.Item(locales.GetBooksAddOPDS()).Icon(icons.Menu(icons.Rss)).Chosen() {
+			a.openCatalogSheet("")
 		}
 	})
 	b.Children(func() {
@@ -396,10 +386,7 @@ func (a *App) resultsList(c *ui.Context, p *plugin.Plugin, collection string) {
 			case l.loading:
 				ui.Spinner(c).Size(20, 20).Label(locales.GetBooksLoadingMore())
 			case l.err != nil:
-				a.inlineProblem(c, p, l.err, func() {
-					l.err = nil
-					a.gbLoad(p, collection, true)
-				})
+				a.inlineProblem(c, p, l.err, func() { a.gbRetry(p, collection) })
 			case l.hasMore:
 				if widgets.Button(c, widgets.Ghost, nil, locales.GetBooksShowMore()).Clicked() {
 					a.gbLoad(p, collection, true)
@@ -529,13 +516,30 @@ func (a *App) browsePage(c *ui.Context, p *plugin.Plugin) {
 		ui.Column(c).Grow(1).Center().Children(func() { ui.Spinner(c).Size(24, 24).Label(locales.CommonLoading()) })
 		return
 	case b.err != nil:
-		a.sourceProblem(c, p, sourceState(p, b.err), b.err, func() {
-			delete(a.gb.browse, p.Manifest.ID)
-			a.gbBrowse(p)
-		})
+		a.sourceProblem(c, p, sourceState(p, b.err), b.err, func() { a.gbRetryBrowse(p) })
 		return
 	case len(b.collections) == 0:
 		a.getBooksPrompt(c, pluginIcon(p.Manifest), locales.GetBooksSearchSource(pluginDisplayName(p.Manifest.ID, p.Manifest.Name)), p.Manifest.Description)
+		return
+	}
+	// If every shelf failed, give the source one error and one retry action.
+	var failed error
+	for _, cl := range b.collections {
+		l := a.gbList(p, cl.ID)
+		if l == nil || l.loading || l.page > 0 || l.err == nil {
+			failed = nil
+			break
+		}
+		if failed == nil {
+			failed = l.err
+		}
+	}
+	if failed != nil {
+		a.sourceProblem(c, p, sourceState(p, failed), failed, func() {
+			for _, cl := range b.collections {
+				a.gbRetry(p, cl.ID)
+			}
+		})
 		return
 	}
 	ui.Scroll(c).Grow(1).MinHeight(0).Padding(theme.Space8, theme.Space32, theme.Space32, theme.Space32).Gap(theme.Space32).AlignItems(ui.Stretch).Children(func() {
@@ -623,11 +627,19 @@ func (a *App) allSourcesBody(c *ui.Context, srcs []*plugin.Plugin) {
 		ui.Scroll(c).Grow(1).MinHeight(0).Padding(theme.Space8, theme.Space32, theme.Space32, theme.Space32).Gap(theme.Space32).AlignItems(ui.Stretch).Children(func() {
 			for _, p := range browsing {
 				b := g.browse[p.Manifest.ID]
-				if b == nil || len(b.collections) == 0 {
-					continue
+				pc := c.Key(p.Manifest.ID)
+				switch {
+				case b == nil || b.loading:
+					ui.Row(pc).Gap(theme.Space8).AlignItems(ui.Center).Children(func() {
+						ui.Spinner(c).Size(16, 16).Label(locales.CommonLoading())
+						ui.Text(c, pluginDisplayName(p.Manifest.ID, p.Manifest.Name)).FontSize(13).TextColor(pal().TextSecondary)
+					})
+				case b.err != nil:
+					a.inlineProblem(pc, p, b.err, func() { a.gbRetryBrowse(p) })
+				case len(b.collections) > 0:
+					cl := b.collections[0]
+					a.shelf(pc, p, cl, locales.GetBooksShelfTitle(pluginDisplayText(p.Manifest.ID, cl.Title), pluginDisplayName(p.Manifest.ID, p.Manifest.Name)))
 				}
-				cl := b.collections[0]
-				a.shelf(c.Key(p.Manifest.ID), p, cl, locales.GetBooksShelfTitle(pluginDisplayText(p.Manifest.ID, cl.Title), pluginDisplayName(p.Manifest.ID, p.Manifest.Name)))
 			}
 		})
 		return
@@ -643,6 +655,7 @@ func (a *App) allSourcesBody(c *ui.Context, srcs []*plugin.Plugin) {
 // results.
 func (a *App) sourceGroup(c *ui.Context, p *plugin.Plugin) {
 	m := p.Manifest
+	name := pluginDisplayName(m.ID, m.Name)
 	l := a.gbList(p, "")
 	var err error
 	if l != nil {
@@ -651,9 +664,9 @@ func (a *App) sourceGroup(c *ui.Context, p *plugin.Plugin) {
 	kind := sourceState(p, err)
 	ui.Row(c).Padding(theme.Space8, theme.Space4).Gap(theme.Space8).AlignItems(ui.Center).Children(func() {
 		ui.Icon(c, pluginIcon(m)).FontSize(16).TextColor(pal().Icon)
-		ui.Text(c, m.Name).FontSize(13).FontWeight(600)
+		ui.Text(c, name).FontSize(13).FontWeight(600)
 		link := func(label string, chevron bool, onClick func()) {
-			b := ui.ButtonBase(c).Padding(theme.Space2, theme.Space4).Gap(theme.Space2).Radius(theme.RadiusXS).AlignItems(ui.Center).Label(locales.GetBooksLabelValue(label, m.Name))
+			b := ui.ButtonBase(c).Padding(theme.Space2, theme.Space4).Gap(theme.Space2).Radius(theme.RadiusXS).AlignItems(ui.Center).Label(locales.GetBooksLabelValue(label, name))
 			b.OnClick(onClick).Children(func() {
 				t := ui.Text(c, label).FontSize(12).FontWeight(500).TextColor(pal().TextAccent)
 				if b.Hovered() {
@@ -667,10 +680,13 @@ func (a *App) sourceGroup(c *ui.Context, p *plugin.Plugin) {
 		switch {
 		case kind == plugin.KindSettings || kind == plugin.KindAuth:
 			ui.Text(c, problemTitle(p, kind)).FontSize(12).TextColor(pal().Warning.FG).Grow(1).SingleLine()
-			link(locales.GetBooksSetUp(), false, func() { a.openPlugins(m.ID) })
+			link(locales.GetBooksSetUp(), false, func() { a.openCatalogSheet(strings.TrimPrefix(m.ID, catalogPrefix)) })
 		case err != nil:
 			ui.Text(c, problemTitle(p, kind)).FontSize(12).TextColor(pal().Danger.FG).Grow(1).SingleLine()
 			link(locales.CommonRetry(), false, func() { a.gbRetry(p, "") })
+			if kind == plugin.KindUnavailable || kind == plugin.KindTimeout {
+				link(locales.GetBooksAddOPDS(), false, func() { a.openCatalogSheet("") })
+			}
 		case l == nil || l.loading && l.page == 0:
 			ui.Spinner(c).Size(14, 14).Label(locales.CommonSearching())
 			ui.Text(c, locales.GetBooksSearching()).FontSize(12).TextColor(pal().TextTertiary).Grow(1)
@@ -735,6 +751,7 @@ func problemSentence(p *plugin.Plugin, kind plugin.ErrorKind) string {
 // to do about it.
 func (a *App) sourceProblem(c *ui.Context, p *plugin.Plugin, kind plugin.ErrorKind, err error, retry func()) {
 	m := pluginDisplayManifest(p.Manifest)
+	unavailable := kind == plugin.KindUnavailable || kind == plugin.KindTimeout
 	ui.Column(c).Grow(1).Center().Gap(theme.Space12).Padding(theme.Space48).Children(func() {
 		ic := icons.Alert
 		title, body := locales.GetBooksSourceNotAnswering(m.Name), locales.GetBooksCheckConnection()
@@ -760,13 +777,18 @@ func (a *App) sourceProblem(c *ui.Context, p *plugin.Plugin, kind plugin.ErrorKi
 		ui.Text(c, title).FontWeight(600).FontSize(16).TextAlign(ui.Center)
 		ui.Text(c, body).FontSize(13).TextColor(pal().TextSecondary).TextAlign(ui.Center).MaxWidth(420)
 		if kind == plugin.KindSettings || kind == plugin.KindAuth {
-			if widgets.Button(c, widgets.Primary, nil, locales.GetBooksOpenPluginSettings()).Margin(theme.Space8, 0, 0, 0).Clicked() {
-				a.openPlugins(m.ID)
+			if widgets.Button(c, widgets.Primary, nil, locales.SettingsEditCatalogTitle()).Margin(theme.Space8, 0, 0, 0).Clicked() {
+				a.openCatalogSheet(strings.TrimPrefix(m.ID, catalogPrefix))
 			}
-		} else if retry != nil {
-			if widgets.Button(c, widgets.Secondary, icons.Refresh, locales.CommonTryAgain()).Margin(theme.Space8, 0, 0, 0).Clicked() {
-				retry()
-			}
+		} else if retry != nil || unavailable {
+			ui.Row(c).Margin(theme.Space8, 0, 0, 0).Gap(theme.Space8).Justify(ui.Center).Wrap().Children(func() {
+				if retry != nil && widgets.Button(c, widgets.Secondary, icons.Refresh, locales.CommonTryAgain()).Clicked() {
+					retry()
+				}
+				if unavailable && widgets.Button(c, widgets.Secondary, icons.Rss, locales.GetBooksAddOPDS()).Clicked() {
+					a.openCatalogSheet("")
+				}
+			})
 		}
 	})
 }
@@ -780,6 +802,11 @@ func (a *App) inlineProblem(c *ui.Context, p *plugin.Plugin, err error, retry fu
 		ui.Text(c, problemSentence(p, kind)).FontSize(12).TextColor(pal().Warning.FG).Grow(1)
 		if widgets.ButtonSized(c, widgets.Secondary, icons.Refresh, locales.CommonRetry(), theme.ControlS).Clicked() {
 			retry()
+		}
+		if kind == plugin.KindUnavailable || kind == plugin.KindTimeout {
+			if widgets.ButtonSized(c, widgets.Secondary, icons.Rss, locales.GetBooksAddOPDS(), theme.ControlS).Clicked() {
+				a.openCatalogSheet("")
+			}
 		}
 	})
 }
@@ -828,12 +855,12 @@ func (a *App) getBooksPrompt(c *ui.Context, icon *ui.SVG, title, body string) {
 func (a *App) noSources(c *ui.Context) {
 	ui.Column(c).Grow(1).Center().Gap(theme.Space12).Padding(theme.Space48).Children(func() {
 		ui.Box(c).Size(48, 48).Radius(theme.RadiusFull).Background(pal().Subtle).Center().Children(func() {
-			ui.Icon(c, icons.Puzzle).FontSize(20).TextColor(pal().IconMuted)
+			ui.Icon(c, icons.Rss).FontSize(20).TextColor(pal().IconMuted)
 		})
 		ui.Text(c, locales.GetBooksNoSourcesTitle()).FontWeight(600).FontSize(16)
 		ui.Text(c, locales.GetBooksNoSourcesBody()).FontSize(13).TextColor(pal().TextSecondary).TextAlign(ui.Center)
-		if widgets.Button(c, widgets.Primary, icons.Puzzle, locales.GetBooksManagePlugins()).Margin(theme.Space8, 0, 0, 0).Clicked() {
-			a.openPlugins("")
+		if widgets.Button(c, widgets.Primary, icons.Rss, locales.GetBooksAddOPDS()).Margin(theme.Space8, 0, 0, 0).Clicked() {
+			a.openCatalogSheet("")
 		}
 	})
 }

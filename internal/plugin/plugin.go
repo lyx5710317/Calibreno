@@ -94,6 +94,8 @@ type Plugin struct {
 
 // Options configure a loaded plugin.
 type Options struct {
+	// CheckManifest can reject a folder's manifest before its script runs.
+	CheckManifest func(*Manifest) error
 	// Settings are the user's values for the manifest's settings; missing
 	// ones take their defaults.
 	Settings map[string]string
@@ -145,6 +147,11 @@ func LoadBuiltin(fsys fs.FS, opts Options) (*Plugin, error) {
 }
 
 func load(m *Manifest, fsys fs.FS, dir string, opts Options) (*Plugin, error) {
+	if opts.CheckManifest != nil {
+		if err := opts.CheckManifest(m); err != nil {
+			return nil, err
+		}
+	}
 	p := &Plugin{Manifest: m, Dir: dir, fsys: fsys, ctx: context.Background(), logf: opts.Logf, settings: map[string]string{}}
 	if p.logf == nil {
 		p.logf = log.Printf
@@ -429,10 +436,9 @@ func (p *Plugin) loadModule(name string) (string, error) {
 	return string(data), err
 }
 
-// Discover loads every plugin in the folders inside root that load
-// accepts (all when nil). A folder that fails to load gives an error and
-// is skipped.
-func Discover(root string, load func(m *Manifest) (Options, bool)) ([]*Plugin, []error) {
+// Discover loads plugins in the folders inside root when accepted by the
+// callback (all when nil). A folder that fails to load gives an error and is skipped.
+func Discover(root string, accept func(m *Manifest) (Options, bool)) ([]*Plugin, []error) {
 	entries, err := os.ReadDir(root)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -466,13 +472,13 @@ func Discover(root string, load func(m *Manifest) (Options, bool)) ([]*Plugin, [
 		}
 		seen[m.ID] = e.Name()
 		o, ok := Options{}, true
-		if load != nil {
-			o, ok = load(m)
+		if accept != nil {
+			o, ok = accept(m)
 		}
 		if !ok {
 			continue
 		}
-		p, err := Load(dir, o)
+		p, err := load(m, os.DirFS(dir), dir, o)
 		if err != nil {
 			errs = append(errs, err)
 			continue

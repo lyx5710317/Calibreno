@@ -24,7 +24,7 @@ for (const name of names) {
     external: ["node:*"],
     outfile: `plugins/${name}/main.js`,
     legalComments: "none",
-    banner: { js: `// Built from marketplace/src/${name} in https://github.com/djyde/dalibre. Edit the source, not this file.` },
+    banner: { js: `// Built from marketplace/src/${name}. Edit the source, not this file.` },
     logLevel: "warning",
   });
   const { size } = await stat(`plugins/${name}/main.js`);

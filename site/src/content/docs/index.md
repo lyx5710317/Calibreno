@@ -38,8 +38,8 @@ UI of its own. Plugins › Marketplace, in the toolbar, has calibre's most
 used plugins ported to Dalibre.
 
 [**Writing plugins**](/docs/plugins/) has everything on one page: an
-overview, a quick start that builds a working book source, and the full
-reference for `plugin.json`, book sources, metadata sources, file type
+overview, a quick start that builds a working metadata plugin, and the full
+reference for `plugin.json`, metadata sources, file type
 plugins, actions, the runtime, permissions, the CLI, publishing and every
 type. The `dalibre-plugin` CLI has it too: `npx dalibre-plugin docs`. To start one,
 use [dalibre-plugin-template](https://github.com/djyde/dalibre-plugin-template) on GitHub.

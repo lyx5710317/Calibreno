@@ -1,15 +1,15 @@
 # Writing Dalibre plugins
 
-Calibreno uses the Dalibre plugin SDK. The examples here apply to Calibreno with the same manifest fields, CLI commands, and JavaScript API.
+Calibreno uses the Dalibre plugin SDK for metadata, file types and actions.
+The SDK can still read legacy book source manifests for compatibility.
+Calibreno's desktop app and Marketplace exclude plugins that declare
+`bookSource`, including the legacy `"source"` array entry. To browse or
+import books from your OPDS catalog, add it in Settings › OPDS.
 
 A Dalibre plugin is a folder with a `plugin.json` and a JavaScript (or
 TypeScript) module.
-Plugin API 1 has four capabilities; a plugin may have any of them:
+Calibreno supports these Plugin API 1 capabilities:
 
-- A **book source** searches and browses a catalogue and says where each
-  book's file is. Dalibre shows every book source in its **Get books**
-  page, with the same controls for all, downloads the file and adds the
-  book to the user's library, with the metadata the plugin gave.
 - A **metadata source** looks books up: given a book's title, authors
   and identifiers, it returns candidates with their details. Dalibre
   shows them in Edit metadata › **Fetch metadata**, next to the book's
@@ -27,10 +27,8 @@ Plugin API 1 has four capabilities; a plugin may have any of them:
 
 Your plugin gives data and never draws UI.
 
-The [Project Gutenberg plugin](../../plugins/gutenberg) (a book source)
-and the [NeoDB plugin](../../plugins/neodb) and [Google Books
-plugin](../../plugins/googlebooks) (metadata sources) ship inside
-Dalibre; read them as worked examples.
+The [NeoDB plugin](../../plugins/neodb) and [Google Books
+plugin](../../plugins/googlebooks) ship with Calibreno as metadata sources.
 
 No build step and nothing to install besides the `dalibre-plugin` tool:
 plugins are JavaScript or TypeScript modules (ES2023), run sandboxed by
@@ -52,21 +50,22 @@ limits of what the user granted.
 
 ## Quick start
 
-Start on GitHub from
-[dalibre-plugin-template](https://github.com/djyde/dalibre-plugin-template): **Use this template**, clone it, and
-give it your own `id` and `name` in `plugin.json`. Or make the same
-folder with the tool:
+Use the SDK tool to start a metadata plugin. After `init`, use the
+manifest below and the module in [`identify`](#identify). The module
+includes one local test record so you can run it without a server.
+The metadata manifest requires a host entry. This example declares
+`example.invalid` and makes no network requests.
 
 ```sh
 npm i -g dalibre-plugin                          # or npx dalibre-plugin …; or download it from a Dalibre release
 
-dalibre-plugin init my-source --id com.example.books --name "Example Books"
-cd my-source
-# edit plugin.json and main.js
+dalibre-plugin init example-metadata --id com.example.metadata --name "Example Metadata"
+cd example-metadata
+# Replace plugin.json and main.js with this guide's metadata examples.
 dalibre-plugin check .
-dalibre-plugin dev .                             # add it to Dalibre, reloaded as you save
-dalibre-plugin search . "dune" --set apiKey=…
-dalibre-plugin pack .                            # com.example.books-0.1.0.dalibre-plugin
+dalibre-plugin identify . "Dune" --author "Frank Herbert"
+dalibre-plugin dev .                            # add it to the app, reloaded as you save
+dalibre-plugin pack .                           # com.example.metadata-0.1.0.dalibre-plugin
 ```
 
 This guide comes with the tool, for the API of its version:
@@ -87,35 +86,19 @@ runs it as it is. See [TypeScript and npm packages](#typescript-and-npm-packages
 ```json
 {
   "$schema": "./plugin.schema.json",
-  "id": "com.example.books",
-  "name": "Example Books",
-  "version": "1.2.0",
+  "id": "com.example.metadata",
+  "name": "Example Metadata",
+  "version": "0.1.0",
   "api": 1,
-  "description": "Books from example.com",
+  "description": "Looks up a local test record for Dune",
   "author": "Ann Author",
-  "homepage": "https://github.com/ann/dalibre-example-books",
   "license": "MIT",
   "main": "main.js",
-  "icon": "globe",
+  "icon": "database",
   "capabilities": {
-    "bookSource": {
-      "collections": true,
-      "filters": [
-        { "key": "language", "title": "Language", "type": "language",
-          "options": [{ "value": "", "title": "Any language" }, { "value": "en" }, { "value": "fr" }] },
-        { "key": "sort", "title": "Sort", "type": "select", "default": "popular",
-          "options": [{ "value": "popular", "title": "Most popular" }, { "value": "new", "title": "Newest" }] }
-      ]
-    }
+    "metadata": { "fields": ["title", "authors", "identifiers"] }
   },
-  "permissions": {
-    "hosts": ["api.example.com", "*.cdn.example.com"],
-    "localNetwork": false
-  },
-  "settings": [
-    { "key": "apiKey", "title": "API key", "type": "secret", "required": true,
-      "description": "From your account page on example.com." }
-  ]
+  "permissions": { "library": "read", "hosts": ["example.invalid"] }
 }
 ```
 
@@ -126,12 +109,12 @@ runs it as it is. See [TypeScript and npm packages](#typescript-and-npm-packages
 | `version` | **Required.** [Semantic version](https://semver.org) of your plugin. |
 | `api` | **Required.** The plugin API you wrote for: `1`. |
 | `dalibre` | The oldest Dalibre your plugin works in, as `">=0.4.0"`, when it uses what plugin API 1 gained since it began (actions, `covers`, `remember`, toggle, select and number settings): an older Dalibre refuses it, and its Marketplace shows it as needing an update. `dalibre-plugin check` warns when you need it. |
-| `description` | One line, shown under your name in the Get books source picker and when the user installs: what the catalogue holds ("Over 70,000 free public-domain ebooks"). |
-| `author`, `homepage`, `license` | Shown when the user installs. `license` is an SPDX id. The page's Open site button opens `homepage`. |
+| `description` | One line that describes the tool when the user installs it. |
+| `author`, `homepage`, `license` | Shown when the user installs. `license` is an SPDX id. |
 | `icon` | One of Dalibre's icons: `globe` (default), `library`, `book-open`, `database`, `network`, `building`, `bookmark`, `layers`. Never an image, so a plugin can't dress up as another app. |
 | `main` | The main module, relative to `plugin.json`: a `.js`, `.mjs`, `.ts` or `.mts` file. Default `main.js`. |
-| `capabilities` | **Required.** `{"bookSource": {…}}`: `collections` (`true` when you export `collections` and `list`) and up to 4 `filters` ([below](#filters)). `{"metadata": {…}}`: a metadata source ([`identify`](#identify)). `{"fileType": {…}}`: a file type plugin ([`process`](#process)), with an optional `title` (what the book menu calls it, default your name), `onImport` (`false` to run only from the book menu), and `onPostImport`, `onPostAdd`, `onPostDelete` for [hooks](#hooks). `["source"]`, the form API 1 began with, still means a book source with no filters or collections; `["metadata"]` works too. |
-| `permissions.hosts` | **Required for a source.** Every host your plugin reaches, through `fetch`, file downloads, covers **and redirects**. `*.example.com` matches any subdomain, not `example.com` itself. |
+| `capabilities` | **Required.** `{"metadata": {…}}` declares a metadata source ([`identify`](#identify)). `{"fileType": {…}}` declares a file type plugin ([`process`](#process)). `{"actions": […]}` declares [actions](#run) for the book menu or Tools. |
+| `permissions.hosts` | Every host your plugin reaches through `fetch`, including covers and redirects. `*.example.com` matches only subdomains. |
 | `permissions.library` | `"read"`: your plugin sees the details of the books it is asked about. **Required for a metadata source** and for [hooks](#hooks). `"write"`: your hooks may also change those details; the install dialog warns about it. |
 | `permissions.covers` | `"any"`: the `cover` URLs you return may be on any https host, not only your `hosts`, for covers on mirrors and CDNs you can't list. Dalibre fetches them itself, without your headers or cookies, and takes only images. Users see it when they install. Dalibre 0.6.4 added it: say `"dalibre": ">=0.6.4"`. |
 | `permissions.open` | `"any"`: the pages your action returns with `open` may be on any http or https host, not only your `hosts` — for a plugin that opens searches on sites the user names. Only the browser opens them: the plugin itself reaches nothing new. Users see it when they install. |
@@ -151,17 +134,12 @@ Dalibre calls:
 
 ```js
 // @ts-check
-import { toResult } from "./lib/map.js";       // your own files, relative paths
-
-/** @param {Dalibre.Query} query @returns {Promise<Dalibre.Page>} */
-export async function search({ text, page, cursor }) { … }
-
-/** @param {Dalibre.Result} item @param {Dalibre.FormatName} format */
-export async function resolve(item, format) { … }   // optional
+/** @param {Dalibre.Book} book @returns {Dalibre.Candidate[]} */
+export function identify(book) { … }
 ```
 
-`export default { search, resolve }` and CommonJS
-(`module.exports = { search }`, `exports.search = …`) work too.
+`export default { identify }` and CommonJS (`module.exports = { identify }`,
+`exports.identify = …`) work too.
 
 - **Imports** are relative paths to `.js`, `.mjs`, `.ts` or `.mts` files
   in your plugin's folder; as in TypeScript, `"./lib.js"` finds `lib.ts`,
@@ -176,6 +154,10 @@ export async function resolve(item, format) { … }   // optional
   is loaded afresh. What must survive goes in [`/data`](#your-folders).
 
 ### search
+
+The `search`, filters, `collections`, `list`, `get` and `resolve` sections
+describe the legacy book source protocol. Calibreno does not load these
+plugins in the desktop app. The SDK retains the protocol for compatibility.
 
 `search(query) → Page` is called when the user searches with your
 source, and again with `page + 1` when they ask for more. With **All
@@ -331,14 +313,11 @@ when the user typed something else, `{ title: "what they typed" }` or
 the library is sent.
 
 ```js
-export async function identify({ title, authors, identifiers }) {
-  const q = identifiers.isbn || [title, authors[0]].filter(Boolean).join(" ");
-  const res = await fetch(`https://api.example.com/books?q=${encodeURIComponent(q)}`);
-  const { books } = await res.json();
-  return books.map((b) => ({
-    id: b.key, title: b.title, authors: b.authors, publisher: b.publisher, pubdate: b.date,
-    identifiers: { isbn: b.isbn, example: b.key }, cover: b.image, description: b.summary,
-  }));
+/** @param {Dalibre.Book} book @returns {Dalibre.Candidate[]} */
+export function identify({ title, identifiers }) {
+  const isbn = "9780441172719";
+  if (title?.trim().toLowerCase() !== "dune" && identifiers?.isbn !== isbn) return [];
+  return [{ id: isbn, title: "Dune", authors: ["Frank Herbert"], identifiers: { isbn } }];
 }
 ```
 
@@ -830,16 +809,9 @@ interpreter, checks, permissions and limits.
 
 ```sh
 dalibre-plugin check .                        # manifest, script loads, exports, what it asks for
-dalibre-plugin search . "dune"                # results, warnings, and how to get the next page
-dalibre-plugin search . "dune" --page 2 --filter language=fr
-dalibre-plugin search . "dune" --json         # exactly what Dalibre gets
-dalibre-plugin collections .                  # what the browse page shows
-dalibre-plugin list . popular --page 2
-dalibre-plugin get . "dune" --item 2          # what the detail panel shows
 dalibre-plugin identify . "Dune" --author "Frank Herbert"   # what Fetch metadata shows
 dalibre-plugin identify . --isbn 9780441172719 --json
 dalibre-plugin process . "My Book.epub" -o out  # what a file type plugin makes of a file
-dalibre-plugin download . "dune" --item 3 --format PDF -o /tmp
 ```
 
 `--set key=value` gives a setting; otherwise the values saved in Dalibre
@@ -891,10 +863,9 @@ install with a click, from
 the plugins in [marketplace/](../../marketplace) and the community's.
 To list yours, open a pull request adding your repository to
 [marketplace/community.json](../../marketplace/community.json):
-`{ "repo": "ann/dalibre-example-books", "category":
-"sources", "calibre": "Example Books" }`. `category` is one of
-`library`, `metadata`, `epub`, `language`, `sources`; `calibre`,
-optional, names the calibre plugin yours does the work of. Your
+`{ "repo": "ann/dalibre-example-metadata", "category": "metadata" }`.
+`category` is one of `library`, `metadata`, `epub` or `language`. The
+optional `calibre` field names the calibre plugin yours does the work of. Your
 repository needs a release: the Marketplace lists the latest, checked
 with `dalibre-plugin check`, and picks up new ones within a day.
 Installing still shows users what your plugin asks for.
@@ -927,16 +898,13 @@ the body: `res.json()` and `res.text()` now return promises
 
 ## Guidelines
 
-- **Only sources you may use.** Publish plugins for catalogues whose
-  terms allow it: public-domain libraries, stores and services the user
-  has an account with, the user's own servers. Dalibre doesn't host,
-  review or endorse plugins.
+- **Check metadata API terms.** Use services that allow your plugin's
+  requests and comply with their rate limits.
 - **Be polite.** One request per search where the API allows it; cache
   what doesn't change (in module variables, or the data folder); honour
   `429` by throwing `rateLimited` rather than retrying in a loop.
-- **Fill in metadata.** Users see results before they download: authors,
-  language, size and cover make the choice easy. Add your own id to
-  `identifiers`.
+- **Fill in metadata.** Include authors and identifiers so users can
+  match a candidate to the correct edition.
 - **Ask only for what you need.** Exact hosts beat wildcards; avoid
   `localNetwork` unless the plugin is for a server at home.
 - **Never log secrets or send them to a host other than the one they're

@@ -25,11 +25,11 @@ func toolPlugin(t *testing.T, version string, body []byte) string {
 	src := filepath.Join(t.TempDir(), "src")
 	os.MkdirAll(src, 0o755)
 	os.WriteFile(filepath.Join(src, "plugin.json"), []byte(`{"id":"com.example.tooly","name":"Tooly","version":"`+version+`","api":1,
-		"capabilities":["source"],"permissions":{"hosts":["a.example"]},
+		"capabilities":["metadata"],"permissions":{"library":"read","hosts":["a.example"]},
 		"tools":{"fake":{"version":"1.0","packages":{"brew":"example/tap/fake-tool-dalibre-test"},
 		"platforms":{"`+plugin.Platform()+`":{"url":"https://dl.example/fake","sha256":"`+hex.EncodeToString(sum[:])+`","size":`+strconv.Itoa(len(body))+`}}}}}`), 0o644)
 	os.WriteFile(filepath.Join(src, "main.js"), []byte(`
-		export async function search() { return { items: [] }; }
+		export async function identify() { return []; }
 		export async function check() {
 			const r = await dalibre.exec("fake", []);
 			if (!r.stdout.includes("signed in")) throw dalibre.error("auth", "Sign in with fake login");

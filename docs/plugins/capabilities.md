@@ -1,13 +1,13 @@
 # Plugin capabilities
 
-Status: rollout steps 1–4, 6 and 7 are built (the Get books page, the
-book source capability with filters, collections, `get`, and the built-in
-Project Gutenberg plugin; a data folder and file settings; the metadata
-capability, `permissions.library` and the built-in NeoDB plugin; the
-file type capability; actions); the rest is a proposal. Extends plugin API 1
-without breaking it; see [design.md](design.md) for the engine, sandbox
-and trust model, which this keeps as they are. Plugin authors read
-[README.md](README.md).
+This document records the original Plugin API 1 rollout. Calibreno
+supports metadata, file types and actions. The book source sections and
+Project Gutenberg rollout entry describe legacy behavior. Calibreno
+excludes `bookSource` plugins and uses the native Get books page for
+user-configured OPDS catalogs.
+
+See [design.md](design.md) for the engine, sandbox and trust model and
+[README.md](README.md) for the current author guide.
 
 UI: Figma, Screens › **07 · Get books** (supersedes the per-source
 pages in 05) and the Plugins dialog there.

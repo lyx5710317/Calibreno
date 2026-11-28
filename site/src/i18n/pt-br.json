@@ -6,7 +6,7 @@
     "features": [
       "Abre bibliotecas calibre já existentes",
       "Edita metadados e os busca em fontes online",
-      "Obtém livros de catálogos e servidores OPDS",
+      "Navegue pelos catálogos OPDS que você adicionar",
       "Envia livros para leitores de e-book via OPDS",
       "Plugins em JavaScript isolados em sandbox",
       "Um Marketplace com os plugins mais usados do calibre, adaptados",
@@ -68,15 +68,15 @@
       "done": "Pronto: 3 livros estão marcados como “Hard SF”, e Dune está pronto para o seu Kindle."
     },
     "extend": {
-      "ask": "Quero baixar livros do Standard Ebooks.",
+      "ask": "Quero preencher os dados que faltam nos livros com a Open Library.",
       "steps": [
         "Leu o guia de plugins do Dalibre",
-        "Escreveu um plugin para o Standard Ebooks",
-        "Pediu sua permissão para acessar standardebooks.org",
-        "Testou uma busca por “Dune” e corrigiu um erro",
-        "Testou de novo: 3 livros encontrados"
+        "Escreveu um plugin de metadados para a Open Library",
+        "Pediu sua permissão para acessar openlibrary.org",
+        "Testou uma busca por ISBN",
+        "Encontrou uma capa e dados de publicação"
       ],
-      "done": "Funcionou. O Standard Ebooks agora aparece em “Get books”."
+      "done": "A Open Library está disponível em “Obter metadados”."
     }
   },
   "light": {
@@ -120,7 +120,7 @@
         "Adicione todos os e-books da minha pasta Downloads.",
         "Preencha as capas e editoras que faltam.",
         "Faça uma cópia Kindle de Dune.",
-        "Crie um jeito de baixar livros do Standard Ebooks para mim."
+        "Crie um plugin que busque os dados dos livros na Open Library."
       ]
     }
   },
@@ -165,17 +165,15 @@
     "lead": "O Dalibre cresce com plugins. Instale os mais usados do calibre, adaptados, pelo Marketplace, ou peça à sua IA o que estiver faltando: ela cria o plugin, testa e corrige o que falhar. Você só decide a que ele pode acessar.",
     "dialog": {
       "label": "O Dalibre pergunta",
-      "title": "Adicionar “Standard Ebooks”?",
+      "title": "Adicionar “Open Library Metadata”?",
       "lead": "Este plugin pede para acessar um único site:",
-      "note": "Ele não consegue acessar mais nada e não pode ler seus arquivos.",
+      "note": "O plugin também pede permissão para ler os metadados da sua biblioteca.",
       "deny": "Não permitir",
       "allow": "Permitir"
     },
     "builtIn": "Integrado",
-    "kindSource": "Fonte de livros",
     "kindMetadata": "Metadados",
     "builtins": [
-      "Pesquise e navegue em mais de 70.000 e-books gratuitos de domínio público, por idioma. Inclui as listas de mais populares e adicionados recentemente.",
       "Título, autores, séries, tags, editora, data, ISBN, capa e descrição de um catálogo aberto ligado ao Douban, Goodreads e outros. Não precisa de conta.",
       "Título, autores, tags, editora, data, ISBN, capa e descrição do Google Books. Adicione sua própria chave de API para ter uma cota só sua."
     ],
@@ -216,7 +214,7 @@
     "items": [
       {
         "q": "O Dalibre é uma alternativa ao calibre?",
-        "a": "Sim, para gerenciar sua biblioteca de e-books. O Dalibre faz o dia a dia do calibre (navegar, pesquisar, editar metadados, obter livros e enviá-los para o seu leitor) em um app nativo {ratio}× menor. A conversão de formatos está em desenvolvimento; o editor de e-books do calibre está fora do escopo."
+        "a": "Sim, para gerenciar sua biblioteca de e-books. O Dalibre faz o dia a dia do calibre (navegar, pesquisar, editar metadados, adicionar livros locais e enviá-los para o seu leitor) em um app nativo {ratio}× menor. A conversão de formatos está em desenvolvimento; o editor de e-books do calibre está fora do escopo."
       },
       {
         "q": "Preciso migrar minha biblioteca do calibre?",

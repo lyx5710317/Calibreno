@@ -6,7 +6,7 @@
     "features": [
       "Opens existing calibre libraries",
       "Edit metadata and fetch it from online sources",
-      "Get books from catalogues and OPDS servers",
+      "Browse OPDS catalogs you add",
       "Send books to e-readers over OPDS",
       "Sandboxed JavaScript plugins",
       "A Marketplace of calibre's most used plugins, ported",
@@ -68,15 +68,15 @@
       "done": "Done: 3 books are tagged “Hard SF”, and Dune is ready for your Kindle."
     },
     "extend": {
-      "ask": "I want to get books from Standard Ebooks.",
+      "ask": "I want to fill in missing book details from Open Library.",
       "steps": [
         "Read Dalibre’s plugin guide",
-        "Wrote a plugin for Standard Ebooks",
-        "Asked you to allow standardebooks.org",
-        "Tried a search for “Dune”, and fixed one error",
-        "Tried again: 3 books found"
+        "Wrote a metadata plugin for Open Library",
+        "Asked you to allow openlibrary.org",
+        "Tested a lookup by ISBN",
+        "Found a cover and publication details"
       ],
-      "done": "It works. Standard Ebooks is in Get books now."
+      "done": "Open Library is ready to use in Fetch metadata."
     }
   },
   "light": {
@@ -120,7 +120,7 @@
         "Add every e-book in my Downloads folder.",
         "Fill in the missing covers and publishers.",
         "Make a Kindle copy of Dune.",
-        "Build me a way to get books from Standard Ebooks."
+        "Build a plugin that looks up book details on Open Library."
       ]
     }
   },
@@ -165,17 +165,15 @@
     "lead": "Dalibre grows with plugins. Install calibre's most used ones, ported, from the Marketplace, or ask your AI for the one you need: it builds the plugin, tries it, and fixes what fails. You only decide what it may reach.",
     "dialog": {
       "label": "Dalibre asks you",
-      "title": "Add “Standard Ebooks”?",
+      "title": "Add “Open Library Metadata”?",
       "lead": "This plugin asks to reach one website:",
-      "note": "It can’t reach anything else, and can’t read your files.",
+      "note": "It also asks to read your library’s metadata.",
       "deny": "Don’t allow",
       "allow": "Allow"
     },
     "builtIn": "Built in",
-    "kindSource": "Book source",
     "kindMetadata": "Metadata",
     "builtins": [
-      "Search and browse over 70,000 free public-domain ebooks, by language. Most popular and Recently added lists.",
       "Title, authors, series, tags, publisher, date, ISBN, cover and description from an open catalogue linked to Douban, Goodreads and more. No account needed.",
       "Title, authors, tags, publisher, date, ISBN, cover and description from Google Books. Add your own API key for a quota of your own."
     ],
@@ -216,7 +214,7 @@
     "items": [
       {
         "q": "Is Dalibre a calibre alternative?",
-        "a": "Yes, for managing your e-book library. Dalibre does the everyday part of calibre (browsing, searching, editing metadata, getting books and sending them to your e-reader) in a native app that is {ratio}× smaller. Format conversion is in the works; calibre's e-book editor is out of scope."
+        "a": "Yes, for managing your e-book library. Dalibre does the everyday part of calibre (browsing, searching, editing metadata, adding local books and sending them to your e-reader) in a native app that is {ratio}× smaller. Format conversion is in the works; calibre's e-book editor is out of scope."
       },
       {
         "q": "Do I have to migrate my calibre library?",

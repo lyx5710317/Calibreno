@@ -6,7 +6,7 @@
     "features": [
       "Opent bestaande calibre-bibliotheken",
       "Bewerk metadata en haal die op uit online bronnen",
-      "Haal boeken op uit catalogi en OPDS-servers",
+      "Blader door OPDS-catalogi die je zelf toevoegt",
       "Stuur boeken naar e-readers via OPDS",
       "JavaScript-plugins in een sandbox",
       "Een Marketplace met de meestgebruikte calibre-plugins, overgezet",
@@ -68,15 +68,15 @@
       "done": "Klaar: 3 boeken hebben de tag „Hard SF”, en Dune staat klaar voor je Kindle."
     },
     "extend": {
-      "ask": "Ik wil boeken ophalen van Standard Ebooks.",
+      "ask": "Ik wil ontbrekende boekgegevens aanvullen met Open Library.",
       "steps": [
         "Dalibre’s plugin-gids gelezen",
-        "Een plugin geschreven voor Standard Ebooks",
-        "Je gevraagd standardebooks.org toe te staan",
-        "Gezocht naar „Dune” en één fout opgelost",
-        "Opnieuw geprobeerd: 3 boeken gevonden"
+        "Een metadata-plugin voor Open Library geschreven",
+        "Je gevraagd openlibrary.org toe te staan",
+        "Zoeken op ISBN getest",
+        "Een omslag en publicatiegegevens gevonden"
       ],
-      "done": "Het werkt. Standard Ebooks staat nu bij Get books."
+      "done": "Open Library is beschikbaar bij ‘Metadata ophalen’."
     }
   },
   "light": {
@@ -120,7 +120,7 @@
         "Voeg elk e-book in mijn map Downloads toe.",
         "Vul de ontbrekende covers en uitgevers in.",
         "Maak een Kindle-kopie van Dune.",
-        "Bouw een manier om boeken van Standard Ebooks op te halen."
+        "Bouw een plugin die boekgegevens opzoekt in Open Library."
       ]
     }
   },
@@ -165,17 +165,15 @@
     "lead": "Dalibre groeit met plugins. Installeer de meestgebruikte van calibre, overgezet, uit de Marketplace, of vraag je AI om de plugin die je mist: het bouwt de plugin, probeert hem uit en repareert wat faalt. Jij bepaalt alleen wat hij mag bereiken.",
     "dialog": {
       "label": "Dalibre vraagt je",
-      "title": "„Standard Ebooks” toevoegen?",
+      "title": "‘Open Library Metadata’ toevoegen?",
       "lead": "Deze plugin wil één website bereiken:",
-      "note": "Hij kan niets anders bereiken, en kan je bestanden niet lezen.",
+      "note": "De plugin vraagt ook toestemming om de metadata van je bibliotheek te lezen.",
       "deny": "Niet toestaan",
       "allow": "Toestaan"
     },
     "builtIn": "Ingebouwd",
-    "kindSource": "Boekbron",
     "kindMetadata": "Metadata",
     "builtins": [
-      "Zoek en blader door meer dan 70.000 gratis e-books uit het publieke domein, per taal. Met de lijsten Meest populair en Recent toegevoegd.",
       "Titel, auteurs, reeksen, tags, uitgever, datum, ISBN, cover en beschrijving uit een open catalogus die gekoppeld is aan Douban, Goodreads en meer. Geen account nodig.",
       "Titel, auteurs, tags, uitgever, datum, ISBN, cover en beschrijving uit Google Books. Voeg je eigen API-sleutel toe voor een eigen quotum."
     ],
@@ -216,7 +214,7 @@
     "items": [
       {
         "q": "Is Dalibre een calibre-alternatief?",
-        "a": "Ja, voor het beheren van je e-bibliotheek. Dalibre doet het dagelijkse werk van calibre (bladeren, zoeken, metadata bewerken, boeken ophalen en naar je e-reader sturen) in een native app die {ratio}× kleiner is. Het omzetten van formaten komt eraan; de e-bookeditor van calibre valt buiten de scope."
+        "a": "Ja, voor het beheren van je e-bibliotheek. Dalibre doet het dagelijkse werk van calibre (bladeren, zoeken, metadata bewerken, lokale boeken toevoegen en naar je e-reader sturen) in een native app die {ratio}× kleiner is. Het omzetten van formaten komt eraan; de e-bookeditor van calibre valt buiten de scope."
       },
       {
         "q": "Moet ik mijn calibre-bibliotheek migreren?",

@@ -41,13 +41,6 @@ func (a *App) openPlugins(id string) {
 	}
 }
 
-// openMarketplace opens the Plugins window at the Marketplace.
-func (a *App) openMarketplace() {
-	a.pluginsOpen, a.plTab = true, pluginsTabMarketplace
-	a.checkUpdates(false)
-	a.loadMarketplace(false)
-}
-
 // pluginsButton is the toolbar's Plugins button (Figma "18 · Plugin
 // marketplace"): it opens the Plugins window.
 func (a *App) pluginsButton(c *ui.Context) {
@@ -96,6 +89,9 @@ const (
 
 // pluginStatus says what state a plugin is in, as its row shows it.
 func (a *App) pluginStatus(k knownPlugin) (text string, tone ui.Color, loaded bool) {
+	if k.manifest.IsBookSource() {
+		return locales.PluginsStatusDownloadUnsupported(), pal().Warning.FG, false
+	}
 	id := k.manifest.ID
 	if p := a.pluginByID(id); p != nil {
 		if p.MissingSettings() != nil {
@@ -208,6 +204,8 @@ func (a *App) pluginRow(c *ui.Context, k knownPlugin) {
 			ui.Text(c, status).FontSize(12).TextColor(tone).SingleLine()
 		})
 		switch {
+		case m.IsBookSource():
+			ui.Icon(c, icons.Alert).FontSize(16).TextColor(pal().Warning.FG)
 		case pending:
 			if widgets.ButtonSized(c, widgets.Secondary, nil, locales.PluginsReview(), theme.ControlS).Clicked() {
 				a.askConsent(m.ID)
@@ -333,6 +331,14 @@ func (a *App) pluginPane(c *ui.Context, k knownPlugin) {
 	if m.Description != "" {
 		ui.Text(c, m.Description).FontSize(13).TextColor(pal().TextSecondary)
 	}
+	if m.IsBookSource() {
+		ui.Text(c, locales.PluginsStatusDownloadUnsupported()).FontSize(13).TextColor(pal().Warning.FG)
+		ui.Row(c).Children(func() {
+			ui.Spacer(c)
+			a.pluginRemoveButton(c, k)
+		})
+		return
+	}
 	if u := a.updates[m.ID]; u != nil {
 		a.updateBanner(c, m, u)
 	}
@@ -342,9 +348,6 @@ func (a *App) pluginPane(c *ui.Context, k knownPlugin) {
 	ui.Column(c).Gap(theme.Space8).AlignItems(ui.Stretch).Children(func() {
 		widgets.Overline(c, locales.PluginsAddsToTitle())
 		ui.Row(c).Gap(theme.Space6).Children(func() {
-			if m.IsBookSource() {
-				widgets.Tag(c, locales.CommonGetBooks(), false, nil)
-			}
 			if m.IsMetadataSource() {
 				widgets.Tag(c, locales.CommonFetchMetadata(), false, nil)
 			}
@@ -358,9 +361,6 @@ func (a *App) pluginPane(c *ui.Context, k knownPlugin) {
 				widgets.Tag(c, locales.PluginsCapBookMenu(), false, nil)
 			}
 		})
-		if m.IsBookSource() {
-			ui.Text(c, locales.PluginsGetBooksNote(m.Name)).FontSize(12).TextColor(pal().TextTertiary)
-		}
 		if m.IsMetadataSource() {
 			ui.Text(c, locales.PluginsFetchMetadataNote(m.Name)).FontSize(12).TextColor(pal().TextTertiary)
 		}
@@ -437,16 +437,21 @@ func (a *App) pluginPane(c *ui.Context, k knownPlugin) {
 			}
 		}
 		ui.Spacer(c)
-		if !k.builtin {
-			label := locales.PluginsUninstallButton()
-			if k.linked != "" {
-				label = locales.PluginsRemoveButton()
-			}
-			if widgets.Button(c, widgets.Secondary, nil, label).Clicked() {
-				a.pl.uninstall = true
-			}
-		}
+		a.pluginRemoveButton(c, k)
 	})
+}
+
+func (a *App) pluginRemoveButton(c *ui.Context, k knownPlugin) {
+	if k.builtin {
+		return
+	}
+	label := locales.PluginsUninstallButton()
+	if k.linked != "" {
+		label = locales.PluginsRemoveButton()
+	}
+	if widgets.Button(c, widgets.Secondary, nil, label).Clicked() {
+		a.pl.uninstall = true
+	}
 }
 
 // libraryPermission shows what the plugin may see and change of the

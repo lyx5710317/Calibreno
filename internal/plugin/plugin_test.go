@@ -634,7 +634,7 @@ func TestFileName(t *testing.T) {
 	}
 }
 
-// The Gutenberg plugin shipped in plugins/, against a recorded answer.
+// Exercise the legacy book-source protocol with a synthetic plugin.
 func TestBookSourceCalls(t *testing.T) {
 	manifest := `{"id":"dalibre.books","name":"Books","version":"1.0.0","api":1,"icon":"library",
 		"capabilities":{"bookSource":{"collections":true,"filters":[

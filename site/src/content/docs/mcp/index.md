@@ -6,8 +6,8 @@ description: Let your own AI agents, such as Claude Code, Claude Desktop and Cur
 Dalibre serves the open library to AI agents on your computer over the
 [Model Context Protocol](https://modelcontextprotocol.io). Your agent can
 search your books, read their details and files, edit metadata, add
-books and formats, and get books from Get books' sources, while Dalibre
-is open.
+books and formats, and import from OPDS catalogs you configure, while
+the app is open.
 
 MCP is in Dalibre 0.2.0 and later.
 
@@ -15,7 +15,7 @@ MCP is in Dalibre 0.2.0 and later.
 |---|---|
 | Search and read the library | `search_books`, `get_book`, `list_facets` |
 | Change the library | `update_books`, `set_cover`, `add_books`, `remove_books`, `add_format`, `remove_format` |
-| Use Get books' sources and the metadata plugins | `find_books`, `download_book`, `find_metadata` |
+| Search and import from configured OPDS catalogs, or look up metadata | `find_books`, `download_book`, `find_metadata` |
 | Write plugins and try them | `list_plugins`, `create_plugin`, `add_plugin`, `reload_plugins`, `test_plugin`, `enable_plugin`, `remove_plugin` |
 | Run plugins’ actions | `list_actions`, `run_action` |
 
@@ -164,10 +164,13 @@ outside the library folder.
 `add_books {"paths": ["/Users/me/Downloads/books"]}`. Books already in
 the library are reported, not added again.
 
-> Find Pride and Prejudice on Project Gutenberg and add the EPUB.
+> Find Pride and Prejudice in my OPDS catalog and add the EPUB.
 
-`find_books {"query": "Pride and Prejudice"}`, then
-`download_book {"source": "dalibre.gutenberg", "id": "1342", "format": "EPUB"}`.
+First add a searchable catalog in **Settings › OPDS** and make it
+available in **Get books**. Call `find_books {"query": "Pride and Prejudice"}`,
+then pass the result's `source` and `id` to `download_book` with
+`"format": "EPUB"` if the result offers that format. MCP must be allowed
+to change the library for these tools to be available.
 
 ### Remove
 
@@ -179,19 +182,17 @@ Bin on Windows), so you can get them back.
 
 ### Write a plugin
 
-> Write a Dalibre plugin that gets books from Standard Ebooks, and try
-> it.
+> Write a metadata plugin for a local test book, and try it.
 
 The agent reads the [plugin docs](/docs/plugins/), then
-`create_plugin {"path": "/Users/me/standard-ebooks", "id": "io.github.me.standardebooks"}`,
-writes `plugin.json` and `main.js` there, and
-`add_plugin {"path": "/Users/me/standard-ebooks"}`. Dalibre asks you to
-allow the hosts the plugin reaches; the agent can't allow them for you.
-Then it tries it,
-`test_plugin {"id": "io.github.me.standardebooks", "call": "search", "text": "dune"}`,
-reads the results, the script's logs and errors, fixes the code and
-calls `reload_plugins`. The plugin loads from its folder, so it is in
-Get books as soon as it works.
+`create_plugin {"path": "/Users/me/example-metadata", "id": "io.github.me.examplemetadata"}`.
+It applies the example metadata manifest in the plugin guide to
+`plugin.json`, exports `identify` in `main.js`, and calls
+`add_plugin {"path": "/Users/me/example-metadata"}`. The app prompts you
+to approve the requested permissions. The agent can then call
+`test_plugin {"id": "io.github.me.examplemetadata", "call": "identify", "book": {"title": "Dune"}}`,
+read the result and logs, and use `reload_plugins` after an edit. The
+loaded plugin appears in **Edit metadata › Fetch metadata**.
 
 ## Tools
 
@@ -206,14 +207,14 @@ Get books as soon as it works.
 | `remove_books` | Moves books to the Trash. | |
 | `add_format` | Adds a file to a book as a format, or replaces the one it has. | |
 | `remove_format` | Deletes one format of a book. | |
-| `find_books` | Searches Get books' sources. | |
-| `download_book` | Adds a `find_books` result to the library. | |
+| `find_books` | Searches the OPDS catalogs you configured and made available in Get books. | |
+| `download_book` | Adds a result from one of those catalogs to the library. | |
 | `find_metadata` | Looks a book up with the metadata plugins. | |
 | `list_plugins` | The plugins: loaded, off, waiting for you to allow them, or failed and why. | |
 | `create_plugin` | Starts a plugin in an empty folder from the template. | |
 | `add_plugin` | Adds a plugin from its folder; you are asked to allow what it reaches. | |
 | `reload_plugins` | Loads the plugins again after an edit. | |
-| `test_plugin` | Calls a plugin's `search`, `collections`, `list`, `get`, `resolve`, `identify` or `process` and returns the result, logs and error. | |
+| `test_plugin` | Calls a plugin's `identify` or `process` and returns the result, logs and error. | |
 | `enable_plugin` | Turns a plugin on or off. | |
 | `remove_plugin` | Removes a plugin added from a folder; the folder stays. | |
 | `list_actions` | Lists what the plugins can do with books and the library: their actions. | |

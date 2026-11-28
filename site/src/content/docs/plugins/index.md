@@ -1,26 +1,27 @@
 ---
 title: Plugins
-description: Everything about writing Dalibre plugins on one page, from a first book source to the full API reference. Also available as plain Markdown at /docs/plugins.md.
+description: Write a metadata plugin, file type plugin or action for Calibreno with the Dalibre SDK. Also available as plain Markdown at /docs/plugins.md.
 ---
 
-A Dalibre plugin is a folder with a `plugin.json` and a JavaScript (or
-TypeScript) module.
-Plugin API 1 offers four **capabilities**, and one plugin may have any
-of them:
+A plugin is a folder with a `plugin.json` and a JavaScript or TypeScript
+module. Calibreno uses the Dalibre SDK and supports these plugin capabilities:
 
 | Capability | What it does | Where users see it |
 |---|---|---|
-| **Book source** | Searches and browses a catalogue, and says where each book's file is. Dalibre downloads the file and adds the book to the library, with the metadata the plugin gave. | The **Get books** page |
 | **Metadata source** | Looks a book up by its title, authors and identifiers, and returns candidates with their details. | Edit metadata › **Fetch metadata** |
 | **File type** | Works on books' files: each file Dalibre adds, and the books the user runs it on. Cleans up, converts or unlocks with the user's own key, as calibre's file type plugins do. | Nowhere as files are added; the **book menu** to run it on books |
-| **Actions** | Runs on the books the user chose, or on the whole library: find duplicates, check the library, merge books. Returns what it found and what it wants changed; Dalibre shows the books and applies the changes. | The **book menu**, and the sidebar's **Tools** |
+| **Actions** | Runs on the books the user chose or on the whole library, for example to find duplicates, check the library or merge books. | The **book menu** and the sidebar's **Tools** |
+
+The SDK retains legacy book source types. The desktop app and Marketplace
+exclude plugins with the `bookSource` capability. To browse or import from
+an OPDS catalog, add it in **Settings › OPDS**.
 
 **On this page:**
 
 - [Overview](#overview)
 - [Quick start](#quick-start)
 - [plugin.json](#pluginjson)
-- [Book sources](#book-sources)
+- [Legacy book source protocol](#book-sources)
 - [Metadata sources](#metadata-sources)
 - [File type plugins](#file-type-plugins)
 - [Plugin actions](#plugin-actions)
@@ -39,15 +40,12 @@ controls. Your plugin never sees a window, a DOM or a dialog.
 
 That's a deliberate trade:
 
-- **Users learn it once.** Every book source has the same search box,
-  filters, shelves, detail panel and download progress.
 - **Plugins can't impersonate.** A plugin can't fake a sign-in page or a
   system dialog, and its icon is picked from Dalibre's own set, never an
   image.
 - **Dalibre knows what a plugin does before running it.** Capabilities,
-  filters, settings and permissions are *declared* in `plugin.json`, so
-  the app can lay out the source picker and ask for consent without
-  loading any code.
+  settings and permissions are declared in `plugin.json`, so the app
+  can place entries in menus and ask for consent before loading code.
 - **The UI can change without breaking you.** Your contract is data, not
   layout.
 
@@ -59,7 +57,7 @@ They use the standard APIs you know: `fetch`, `URL`, `setTimeout`,
 `TextEncoder`, `node:fs`. There is no build step.
 
 ```text
-my-source/
+example-metadata/
 ├── plugin.json        what the plugin is, adds and asks for
 ├── main.js            the functions Dalibre calls (or main.ts)
 ├── lib/…              more modules, imported by relative path (optional)
@@ -71,62 +69,19 @@ my-source/
 2. When the plugin is first needed, Dalibre runs `main.js` once as a
    module. Module-level variables live until Dalibre quits or reloads the
    plugin.
-3. Dalibre calls your exports (`search`, `identify`, …) with plain
+3. Dalibre calls your exports (`identify`, `process`, `run`) with plain
    objects, and checks what you return. Bad results are dropped with a
    warning; the rest are shown.
 4. Your script reaches the network with `fetch`, limited to the hosts
    you declared, and reads and writes files only in its own folders.
-   Books are downloaded by Dalibre, not by your script.
 
 Calls into one plugin run one at a time; different plugins run in
 parallel. A plugin that throws or runs out of time only fails that one
 call.
 
-### What a book source looks like
-
-```json
-{
-  "id": "com.example.books",
-  "name": "Example Books",
-  "version": "0.1.0",
-  "api": 1,
-  "capabilities": { "bookSource": {} },
-  "permissions": { "hosts": ["books.example.com"] }
-}
-```
-
-```js
-// @ts-check
-export async function search({ text, page }) {
-  const res = await fetch(
-    `https://books.example.com/api?q=${encodeURIComponent(text)}&p=${page}`
-  );
-  const { books, next } = await res.json();
-  return {
-    items: books.map((b) => ({
-      id: b.id,
-      title: b.title,
-      authors: b.authors,
-      cover: b.cover,
-      formats: [{ format: "EPUB", url: b.epub }],
-    })),
-    hasMore: Boolean(next),
-  };
-}
-```
-
-That is a complete plugin. Everything else (filters, browsable
-collections, a detail view, signed download links) is optional and added
-one export at a time.
-
 ### Built-in plugins
 
-Three plugins ship inside Dalibre, and are good worked examples:
-
-- **Project Gutenberg** (`dalibre.gutenberg`), a book source on
-  gutenberg.org's own OPDS catalog: search with language and sort
-  filters, *Most popular* and *Recently added* shelves, and `get` for
-  each book's details and file sizes.
+Calibreno includes two metadata plugins:
 - **NeoDB** (`dalibre.neodb`), a metadata source on neodb.social's open
   catalog: by NeoDB id or ISBN when the book has one, else by title and
   first author, with ranking. Candidates carry NeoDB, Douban, Goodreads,
@@ -137,295 +92,67 @@ Three plugins ship inside Dalibre, and are good worked examples:
 
 ## Quick start
 
-> **The fastest start: [dalibre-plugin-template](https://github.com/djyde/dalibre-plugin-template).** On GitHub,
-> click **Use this template**, clone your new repository, and set your own
-> `id` and `name` in `plugin.json`. It has a starter `main.js`, the types
-> and schema for your editor, and a workflow that checks the plugin on
-> each push and publishes a release when you push a tag. The same files
-> come from `npx dalibre-plugin init my-plugin`.
-
-In this guide you'll write a book source for Project Gutenberg's
-70,000 public-domain books, read from its OPDS catalog. By the end it
-will search, filter by language, show covers, offer shelves to browse
-and download EPUBs into your library.
-
-You need Dalibre and a text editor. You don’t need Node or npm, and there is no build step.
-
-### 1. Make a folder
-
-Make a folder called `gutenberg`, and download three files into it for
-your editor:
-
-- [`dalibre.d.ts`](/sdk/dalibre.d.ts): the plugin API's types.
-- [`jsconfig.json`](/sdk/jsconfig.json): tells your editor to check
-  `main.js` against them.
-- [`plugin.schema.json`](/sdk/plugin.schema.json): the manifest's JSON
-  Schema.
+The SDK's `init` command provides the manifest schema, editor types and a
+GitHub workflow for building releases. This example uses one local metadata
+record, so you can test it without a network service.
+The metadata manifest requires a host entry. This example declares
+`example.invalid` and makes no network requests.
 
 ```sh
-mkdir gutenberg && cd gutenberg
-for f in dalibre.d.ts jsconfig.json plugin.schema.json; do
-  curl -fsSO "https://dalibre.randynamic.org/sdk/$f"
-done
+npm i -g dalibre-plugin
+dalibre-plugin init example-metadata --id com.example.metadata --name "Example Metadata"
+cd example-metadata
 ```
 
-They're optional, but worth it: with `// @ts-check` at the top of
-`main.js`, VS Code and other editors check your code and complete the
-API as you type, and `plugin.json` is validated as you write it.
-
-> Started from the [template](https://github.com/djyde/dalibre-plugin-template) or `npx dalibre-plugin init`? These
-> files are there already.
-
-### 2. Pick an id
-
-Every plugin has a permanent `id`: it's how Dalibre tells your plugin
-apart from every other, across updates. Use a domain you control,
-reversed (`com.example.books`), or your GitHub name. This guide uses
-`io.github.you.gutenberg`.
-
-### 3. Describe the plugin
-
-Replace `plugin.json` with:
-
-```json
-{
-  "$schema": "./plugin.schema.json",
-  "id": "io.github.you.gutenberg",
-  "name": "Gutenberg (OPDS)",
-  "version": "0.1.0",
-  "api": 1,
-  "description": "70,000 public-domain books from Project Gutenberg",
-  "author": "You",
-  "license": "MIT",
-  "icon": "library",
-  "capabilities": {
-    "bookSource": {
-      "filters": [
-        {
-          "key": "language", "title": "Language", "type": "language",
-          "options": [
-            { "value": "", "title": "Any language" },
-            { "value": "en" }, { "value": "fr" }, { "value": "de" }, { "value": "zh" }
-          ]
-        }
-      ]
-    }
-  },
-  "permissions": {
-    "hosts": ["www.gutenberg.org", "gutenberg.org"]
-  }
-}
-```
-
-Two things matter here:
-
-- **`capabilities.bookSource`** tells Dalibre to list the plugin on the
-  Get books page, and declares one filter. Dalibre draws the drop-down
-  and names the languages; you only get the chosen code.
-- **`permissions.hosts`** lists every host the plugin reaches: the
-  catalog, the files and the covers, redirects included.
-
-### 4. Write search
-
-Project Gutenberg publishes its catalog as
-[OPDS](https://opds.org), an Atom XML feed that most e-book catalogs
-speak. Each book in a search is an `<entry>` like this:
-
-```xml
-<entry>
-  <id>https://www.gutenberg.org/ebooks/1342.opds</id>
-  <title>Pride and Prejudice</title>
-  <content type="text">Jane Austen</content>
-  …
-</entry>
-```
-
-The sandbox has no XML parser, but the feed is generated and
-well-formed, so a few regular expressions are enough. Replace `main.js`
-with:
+Use the [manifest below](#a-full-example) as `plugin.json` and save this
+function as `main.js`.
 
 ```js
 // @ts-check
-const SITE = "https://www.gutenberg.org";
-const PER_PAGE = 25; // what the catalog returns per page
-
-/**
- * @param {Dalibre.Query} query
- * @returns {Promise<Dalibre.Page>}
- */
-export async function search({ text, page, filters }) {
-  return feed(text, filters.language, "downloads", page);
-}
-
-/**
- * A page of the catalog: books matching text, in sort order.
- * @param {string} text @param {string} language @param {string} sort @param {number} page
- * @returns {Promise<Dalibre.Page>}
- */
-async function feed(text, language, sort, page) {
-  // The catalog's own syntax narrows by language: "dickens l.fr".
-  const query = [text, language ? `l.${language}` : ""].filter(Boolean).join(" ");
-  let url = `${SITE}/ebooks/search.opds/?sort_order=${sort}&start_index=${(page - 1) * PER_PAGE + 1}`;
-  if (query) url += `&query=${encodeURIComponent(query)}`;
-
-  const res = await fetch(url);
-  if (res.status === 429) throw dalibre.error("rateLimited");
-  if (!res.ok) throw dalibre.error("unavailable", `Project Gutenberg answered ${res.status}.`);
-  const xml = await res.text();
-
-  /** @type {Dalibre.Result[]} */
-  const items = [];
-  for (const [, entry] of xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)) {
-    // Books link to /ebooks/<number>.opds; other entries are lists of authors or subjects.
-    const id = /\/ebooks\/(\d+)\.opds/.exec(tag(entry, "id"))?.[1];
-    if (!id) continue;
-    const author = tag(entry, "content");
-    items.push({
-      id,
-      // With a language asked for, titles end in it: "Oliver Twist (French)".
-      title: tag(entry, "title").replace(/\s+\([A-Z][a-z]+\)$/, ""),
-      authors: author ? [author] : [],
-      identifiers: { gutenberg: id },
-      url: `${SITE}/ebooks/${id}`,
-      cover: `${SITE}/cache/epub/${id}/pg${id}.cover.medium.jpg`,
-      formats: [
-        { format: "EPUB", url: `${SITE}/ebooks/${id}.epub3.images` },
-        { format: "MOBI", url: `${SITE}/ebooks/${id}.kindle.images` },
-      ],
-    });
-  }
-  return { items, hasMore: xml.includes('rel="next"') };
-}
-
-/** The text inside the first <name>…</name>, or "". @param {string} xml @param {string} name */
-function tag(xml, name) {
-  const m = new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`).exec(xml);
-  return m ? decode(m[1]).trim() : "";
-}
-
-/** @param {string} s */
-function decode(s) {
-  return s
-    .replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)))
-    .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
-    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+/** @param {Dalibre.Book} book @returns {Dalibre.Candidate[]} */
+export function identify({ title, identifiers }) {
+  const isbn = "9780441172719";
+  if (title?.trim().toLowerCase() !== "dune" && identifiers?.isbn !== isbn) return [];
+  return [{ id: isbn, title: "Dune", authors: ["Frank Herbert"], identifiers: { isbn } }];
 }
 ```
 
-What's going on:
-
-- `search` is called with what the user typed, the page (from 1) and the
-  value of every filter you declared. When the user asks for more, it's
-  called again with `page + 1`, as long as you returned `hasMore: true`.
-- Each result needs an `id`, a `title` and at least one format. The rest
-  is optional, but users choose from what they see: authors and a cover
-  make the choice easy. Gutenberg keeps files and covers at predictable
-  addresses, so one request per search is enough.
-- `identifiers.gutenberg` lets Dalibre mark a result **In library** when
-  the user already has that book.
-- `dalibre.error("rateLimited")` tells Dalibre to show "Try again in a
-  while" instead of a generic failure.
-
-### 5. Load it into Dalibre
-
-In Dalibre, open **Plugins › Add plugin › From a folder…**
-and pick the plugin's folder. Grant the hosts it asks for.
-
-Dalibre loads the plugin from that folder, not a copy, and reloads it a
-moment after you save a change. Open **Get books**, pick
-*Gutenberg (OPDS)* in the source picker, and search: try
-*pride and prejudice*, then *dickens* with the language set to French,
-then download a book into your library.
-
-If the plugin doesn't load, Plugins shows why: a field
-`plugin.json` doesn't allow, a missing export, a script error.
-
-From a terminal, `npx dalibre-plugin dev .` does the same: it adds the
-folder to the running Dalibre and prints each reload, with its errors.
-It needs Dalibre's MCP server on (Settings › MCP).
-
-Your own AI agent can do this loop for you over [MCP](/docs/mcp/#write-a-plugin): it starts
-the plugin, adds its folder, calls its functions and reads their
-results, logs and errors. You still allow the hosts it reaches.
-
-> Dalibre already ships a Project Gutenberg source built on this same
-> catalog. Put yours next to it and compare: the built-in one also
-> exports `get`, which reads each book's own entry for its description,
-> subjects and file sizes.
-
-### 6. Add browsable shelves (optional)
-
-With the search box empty, a source can show shelves of covers. Add
-`"collections": true` to `capabilities.bookSource` in `plugin.json`, and
-two exports to `main.js`:
-
-```js
-const SHELVES = [
-  { id: "popular", title: "Most popular", sort: "downloads" },
-  { id: "new", title: "Recently added", sort: "release_date" },
-];
-
-export function collections() {
-  return SHELVES.map(({ id, title }) => ({ id, title }));
-}
-
-/** @param {Dalibre.Query} query @returns {Promise<Dalibre.Page>} */
-export async function list({ collection, page, filters }) {
-  const shelf = SHELVES.find((s) => s.id === collection);
-  if (!shelf) throw dalibre.error("notFound");
-  return feed("", filters.language, shelf.sort, page);
-}
+```sh
+dalibre-plugin check .
+dalibre-plugin identify . "Dune" --author "Frank Herbert"
 ```
 
-Save, and the Get books page shows your two shelves, each with *See all*.
-
-### 7. Share it
-
-Push the folder to a GitHub repository, with `plugin.json` at its root.
-Anyone can then install it from **Plugins › Install from
-GitHub**. Tag releases so they get your updates: see
-[Publishing](#publishing).
+To try it in the app, turn on MCP in **Settings › MCP** and run
+`dalibre-plugin dev .`, or open **Plugins › Add plugin › From a folder**
+and select your folder. Approve library read access and choose
+**Fetch metadata** in a book's metadata editor. Search for `Dune` to
+see the local candidate. The app reloads the plugin when you save an edit.
+For packaging and updates, see [Publishing](#publishing).
 
 ## plugin.json
 
-`plugin.json` sits at the root of your plugin's folder. Dalibre reads it
-before running any code: it's how the app lays out the source picker,
-draws your filters and settings form, and asks the user for consent.
+`plugin.json` sits at the root of your plugin's folder. The app reads it
+before loading the plugin, then builds its settings form and uses the
+declared permissions to ask the user for consent.
 
 ### A full example
 
 ```json
 {
   "$schema": "./plugin.schema.json",
-  "id": "com.example.books",
-  "name": "Example Books",
-  "version": "1.2.0",
+  "id": "com.example.metadata",
+  "name": "Example Metadata",
+  "version": "0.1.0",
   "api": 1,
-  "description": "Books from example.com",
+  "description": "Looks up a local test record for Dune",
   "author": "Ann Author",
-  "homepage": "https://github.com/ann/dalibre-example-books",
   "license": "MIT",
   "main": "main.js",
-  "icon": "globe",
+  "icon": "database",
   "capabilities": {
-    "bookSource": {
-      "collections": true,
-      "filters": [
-        { "key": "language", "title": "Language", "type": "language",
-          "options": [{ "value": "", "title": "Any language" }, { "value": "en" }, { "value": "fr" }] },
-        { "key": "sort", "title": "Sort", "type": "select", "default": "popular",
-          "options": [{ "value": "popular", "title": "Most popular" }, { "value": "new", "title": "Newest" }] }
-      ]
-    }
+    "metadata": { "fields": ["title", "authors", "identifiers"] }
   },
-  "permissions": {
-    "hosts": ["api.example.com", "*.cdn.example.com"],
-    "localNetwork": false
-  },
-  "settings": [
-    { "key": "apiKey", "title": "API key", "type": "secret", "required": true,
-      "description": "From your account page on example.com." }
-  ]
+  "permissions": { "library": "read", "hosts": ["example.invalid"] }
 }
 ```
 
@@ -443,8 +170,8 @@ validates and completes the file as you type.
 | `version` | **Required.** A [semantic version](https://semver.org): `1.2.0`, `2.0.0-beta.1`. Bump it in every release, or users won't be offered the update. |
 | `api` | **Required.** The plugin API you wrote for: `1`. |
 | `dalibre` | The oldest Dalibre your plugin works in, as `">=0.4.0"`, when it uses what plugin API 1 gained since it began (actions, `covers`, `remember`, toggle, select and number settings): an older Dalibre refuses it, and its Marketplace shows it as needing an update. `dalibre-plugin check` warns when you need it. |
-| `description` | One line, shown under your name in the source picker and when the user installs. Say what the catalogue holds: "Over 70,000 free public-domain ebooks". |
-| `author`, `homepage`, `license` | Shown when the user installs. `license` is an SPDX id (`MIT`, `Apache-2.0`). The Get books page's *Open site* button opens `homepage`. |
+| `description` | One line that describes the tool when the user installs it. |
+| `author`, `homepage`, `license` | Shown when the user installs. `license` is an SPDX id such as `MIT` or `Apache-2.0`. |
 | `icon` | One of Dalibre's icons: `globe` (default), `library`, `book-open`, `database`, `network`, `building`, `bookmark`, `layers`. Never an image, so a plugin can't dress up as another app. |
 | `main` | The main module, relative to `plugin.json`: a `.js`, `.mjs`, `.ts` or `.mts` file. Default `main.js`. |
 
@@ -458,22 +185,11 @@ more keys.
 
 ```json
 "capabilities": {
-  "bookSource": { "collections": true, "filters": [ … ] },
   "metadata": { "fields": ["title", "authors", "cover", "description"] },
   "fileType": { "title": "Clean up EPUB" },
   "actions": [{ "id": "find", "title": "Find duplicates…", "scope": "library" }]
 }
 ```
-
-#### bookSource
-
-Lists the plugin on the **Get books** page. Export `search`; see
-[Book sources](#book-sources).
-
-| Field | |
-|---|---|
-| `collections` | `true` when you export `collections` and `list`: shelves to browse while the search box is empty. |
-| `filters` | Up to 4 drop-downs under the search box. See [filters](#filters). |
 
 #### metadata
 
@@ -504,11 +220,13 @@ Adds actions to the book menu and the sidebar's **Tools**: a list of
 
 #### The array form
 
-API 1 began with `"capabilities": ["source"]`. It still works and means
-a book source with no filters or collections; `["metadata"]` works too.
-Prefer the object form in new plugins.
+The SDK reads `"capabilities": ["metadata"]`. Use the object form in new
+plugins. The legacy array entry `"source"` maps to `bookSource` and is
+also excluded from the desktop app and Marketplace.
 
 ### Filters
+
+These filters belong to the [legacy book source protocol](#book-sources).
 
 Each filter is a drop-down Dalibre draws under the search box. Its value
 arrives in `query.filters[key]` on every `search` and `list` call.
@@ -583,6 +301,9 @@ It applies as soon as it is chosen; up to 16 MB. With `dalibre-plugin`,
 `--set keyFile=path/to/user-key.der` copies the file in the same way.
 
 ## Book sources
+
+This section describes the legacy SDK protocol. Calibreno uses the
+native OPDS integration for books from user-configured catalogs.
 
 A book source lets users search and browse a catalogue from Dalibre's
 **Get books** page, open a book in the detail panel, and download it
@@ -847,9 +568,6 @@ It's the equivalent of calibre's metadata sources.
 - `fields` (optional) lists what you can fill, from `title`, `authors`,
   `series`, `tags`, `publisher`, `pubdate`, `language`, `identifiers`,
   `cover` and `description`.
-
-A plugin can be both a book source and a metadata source; declare both
-keys under `capabilities`.
 
 ### identify
 
@@ -1325,9 +1043,8 @@ async function cachedToken() {
 
 - `process`, `require`, and Node's other modules (`path`, `crypto`,
   `child_process`, `net`…).
-- The DOM: no `document`, `window`, `DOMParser`. Parse HTML or XML with
-  regular expressions or a small bundled parser; the built-in Project
-  Gutenberg plugin reads OPDS (Atom XML) with a few regular expressions.
+- The DOM APIs `document`, `window` and `DOMParser` are unavailable.
+  Use a bundled parser for HTML or XML.
 - `crypto` (WebCrypto), `Blob`, `FormData`, `CompressionStream`,
   `WebAssembly`, `Temporal`. Bundle a pure-JavaScript library when you
   need hashing, ciphers or zip.
@@ -1445,8 +1162,7 @@ install.
 `"library": "read"` lets a metadata source see the title, authors,
 identifiers and language of the books the user looks up with it, and a
 file type plugin's [hooks](#hooks) the details of the books they run for,
-and nothing else. The install dialog says so. A book source doesn't need
-it.
+and nothing else. The install dialog shows that access.
 
 `"library": "write"` lets hooks change those details, without asking each
 time. The install dialog shows it as a warning. Even then a plugin never
@@ -1457,8 +1173,8 @@ only *Save* writes.
 ### Consent
 
 Users grant your permissions when they install. The install dialog
-shows your name, author, description, what the plugin adds (Get books,
-Metadata, Book files), and every host and permission it asks for. A file
+shows your name, author, description, the features it adds, and every
+host and permission it asks for. A file
 type plugin is shown as reaching the user's books' files.
 
 Updates are held to the same consent:
@@ -1512,7 +1228,7 @@ npm i -g dalibre-plugin        # or put npx in front of each command
 | `init <dir> --id ID --name NAME` | Makes what [dalibre-plugin-template](https://github.com/djyde/dalibre-plugin-template) holds: `plugin.json`, `main.js`, the types and schema, `.gitignore`, and a GitHub workflow that checks it on each push and releases it on a `v*` tag |
 | `check .` | Validates `plugin.json`, loads the script, lists its exports and what it asks for |
 | `dev .` | Adds the folder to the running Dalibre, which reloads it as you save, and prints each reload with its errors. Needs Dalibre's MCP server on |
-| `search . "dune"`, `get`, `download`, `collections`, `list` | Calls a book source as the Get books page does; `--json` prints exactly what Dalibre gets |
+| `search`, `get`, `download`, `collections`, `list` | SDK commands for the legacy book source protocol |
 | `identify . "Dune" --author "Frank Herbert"` | What Fetch metadata shows |
 | `process . book.epub` | Runs a file type plugin on a file |
 | `run . find --library DIR` | Runs an action; `--answer key=value` answers its forms |
@@ -1578,18 +1294,17 @@ that isn't a pre-release, or a new commit on the branch followed.
 ### The Marketplace
 
 **Plugins › Marketplace** (the toolbar's Plugins button) lists plugins users install with a
-click: the plugins in Dalibre's [marketplace/](https://github.com/djyde/dalibre/tree/main/marketplace)
-folder, and the community's. To list yours, open a pull request adding
+click. The catalog includes ports, community releases and tools maintained
+by Calibreno. To list yours, open a pull request adding
 your repository to
-[marketplace/community.json](https://github.com/djyde/dalibre/blob/main/marketplace/community.json):
+[Calibreno's community catalog](https://github.com/lyx5710317/Calibreno/blob/main/marketplace/community.json):
 
 ```json
-{ "repo": "ann/dalibre-example-books", "category": "sources", "calibre": "Example Books" }
+{ "repo": "ann/dalibre-example-metadata", "category": "metadata" }
 ```
 
-- `category` is one of `library`, `metadata`, `epub`, `language`,
-  `sources`; `calibre`, optional, names the calibre plugin yours does the
-  work of, so calibre's users find it.
+- `category` is one of `library`, `metadata`, `epub` or `language`. The
+  optional `calibre` field names the calibre plugin your project ports.
 - Your repository needs a release, as above. The Marketplace lists its
   latest, checked with `dalibre-plugin check`, and picks up new releases
   within a day.
@@ -1651,10 +1366,8 @@ JSDoc (`@param {Dalibre.Query} query`). In TypeScript, they're global.
 
 ### Exports
 
-What Dalibre calls. A book source implements `Source`; a metadata source
-`MetadataSource`; a file type plugin `FileType`; one with actions
-`Actions`; a plugin with several
-capabilities, each of them.
+Calibreno calls `MetadataSource`, `FileType` and `Actions` exports for
+the corresponding capabilities. `Source` is included for SDK compatibility.
 
 ```ts
 interface Source {

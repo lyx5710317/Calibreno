@@ -160,8 +160,8 @@ func TestMCPPlugins(t *testing.T) {
 	folder := func(id, hosts string) string {
 		dir := filepath.Join(t.TempDir(), "src")
 		os.MkdirAll(dir, 0o755)
-		os.WriteFile(filepath.Join(dir, "plugin.json"), []byte(`{"id":"`+id+`","name":"Dev","version":"0.1.0","api":1,"capabilities":["source"],"permissions":{"hosts":[`+hosts+`]}}`), 0o644)
-		os.WriteFile(filepath.Join(dir, "main.js"), []byte(`exports.search = () => ({items: []})`), 0o644)
+		os.WriteFile(filepath.Join(dir, "plugin.json"), []byte(`{"id":"`+id+`","name":"Dev","version":"0.1.0","api":1,"capabilities":["metadata"],"permissions":{"library":"read","hosts":[`+hosts+`]}}`), 0o644)
+		os.WriteFile(filepath.Join(dir, "main.js"), []byte(`exports.identify = () => []`), 0o644)
 		return dir
 	}
 	dir := folder("com.example.dev", `"a.example"`)
@@ -216,7 +216,7 @@ func TestMCPPlugins(t *testing.T) {
 	}
 
 	info, err := add(dir, true)
-	if err != nil || info.State != mcp.PluginLoaded || info.Folder != dir || !slices.Equal(info.Exports, []string{"search"}) {
+	if err != nil || info.State != mcp.PluginLoaded || info.Folder != dir || !slices.Equal(info.Exports, []string{"identify"}) {
 		t.Fatalf("added %+v: %v", info, err)
 	}
 	if h.Plugin(ctx, "com.example.dev") == nil {
@@ -228,15 +228,15 @@ func TestMCPPlugins(t *testing.T) {
 	}
 
 	// A broken edit shows as failed, with why.
-	os.WriteFile(filepath.Join(dir, "main.js"), []byte(`exports.search = (`), 0o644)
+	os.WriteFile(filepath.Join(dir, "main.js"), []byte(`exports.identify = (`), 0o644)
 	h.ReloadPlugins(ctx)
 	list := h.Plugins(ctx)
 	if len(list.Plugins) != 1 || list.Plugins[0].State != mcp.PluginFailed || len(list.Errors) != 1 {
 		t.Fatalf("broken: %+v", list)
 	}
-	os.WriteFile(filepath.Join(dir, "main.js"), []byte(`exports.search = () => ({items: []})`), 0o644)
+	os.WriteFile(filepath.Join(dir, "main.js"), []byte(`exports.identify = () => []`), 0o644)
 	// An edit asking for another host waits for the user.
-	os.WriteFile(filepath.Join(dir, "plugin.json"), []byte(`{"id":"com.example.dev","name":"Dev","version":"0.2.0","api":1,"capabilities":["source"],"permissions":{"hosts":["a.example","b.example"]}}`), 0o644)
+	os.WriteFile(filepath.Join(dir, "plugin.json"), []byte(`{"id":"com.example.dev","name":"Dev","version":"0.2.0","api":1,"capabilities":["metadata"],"permissions":{"library":"read","hosts":["a.example","b.example"]}}`), 0o644)
 	h.ReloadPlugins(ctx)
 	if list = h.Plugins(ctx); list.Plugins[0].State != mcp.PluginNeedsApproval || h.Plugin(ctx, "com.example.dev") != nil {
 		t.Fatalf("asking for more: %+v", list)

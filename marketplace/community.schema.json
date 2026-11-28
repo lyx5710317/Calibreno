@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Community plugins in the Dalibre Marketplace",
+  "title": "Community plugins in the Calibreno Marketplace",
   "type": "object",
   "additionalProperties": false,
   "required": ["plugins"],
@@ -18,7 +18,7 @@
             "type": "string",
             "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$"
           },
-          "category": { "enum": ["library", "metadata", "epub", "language", "sources"] },
+          "category": { "enum": ["library", "metadata", "epub", "language"] },
           "calibre": {
             "description": "The calibre plugin it does the work of, as named on plugins.calibre-ebook.com.",
             "type": "string"

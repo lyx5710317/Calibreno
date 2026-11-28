@@ -1,6 +1,7 @@
 package app
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/egoist/mygo/ui"
@@ -51,7 +52,9 @@ func (a *App) marketplacePane(c *ui.Context) {
 		a.loadMarketplace(false)
 	}
 	list := a.marketListings()
-	if (mk.sel == "" || mk.index.Find(mk.sel) == nil) && len(list) > 0 {
+	if len(list) == 0 {
+		mk.sel = ""
+	} else if !slices.ContainsFunc(list, func(l *plugin.Listing) bool { return l.ID == mk.sel }) {
 		mk.sel = list[0].ID
 	}
 	// The grid's scroll bar runs in a gutter of its own, off the cards.
@@ -197,7 +200,8 @@ func (a *App) listingPane(c *ui.Context, l *plugin.Listing) {
 				meta := locales.PluginsVersion(l.Version)
 				if state == listingUpdate {
 					meta = locales.MarketVersionInstalled(a.installedVersion(l.ID, nil), l.Version)
-				} else if l.Author != "" {
+				}
+				if l.Author != "" {
 					meta += " · " + l.Author
 				}
 				ui.Text(c, meta).FontSize(12).TextColor(pal().TextTertiary).SingleLine()
@@ -264,8 +268,13 @@ func (a *App) listingPane(c *ui.Context, l *plugin.Listing) {
 			}
 		}
 		ui.Spacer(c)
-		if l.Community {
+		switch {
+		case l.Origin == plugin.MarketOriginCommunity || l.Community:
 			widgets.Tag(c, locales.MarketCommunity(), false, nil).Tooltip(locales.MarketCommunityNote(l.Repo))
+		case l.Origin == plugin.MarketOriginUpstream:
+			ui.Text(c, locales.MarketUpstream()).FontSize(12).TextColor(pal().TextTertiary)
+		case l.Origin == plugin.MarketOriginCalibreno:
+			ui.Text(c, locales.MarketCalibreno()).FontSize(12).TextColor(pal().TextTertiary)
 		}
 		if l.License != "" {
 			ui.Text(c, l.License).FontSize(12).TextColor(pal().TextTertiary)
@@ -323,9 +332,6 @@ func listingPlaces(m *plugin.Manifest) []place {
 			where = locales.MainNavTools()
 		}
 		out = append(out, place{actionIcon(act), act.Title, where})
-	}
-	if m.IsBookSource() {
-		out = append(out, place{icons.Download, locales.CommonGetBooks(), ""})
 	}
 	if m.IsMetadataSource() {
 		out = append(out, place{icons.Search, locales.CommonFetchMetadata(), ""})

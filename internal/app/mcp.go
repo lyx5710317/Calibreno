@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/calibre"
 	"dalibre/internal/mcp"
 	"dalibre/internal/plugin"
@@ -256,6 +257,9 @@ func (h mcpHost) MetadataSources(ctx context.Context) []*plugin.Plugin {
 
 // Download adds r to the library as Get books' downloadBook does.
 func (h mcpHost) Download(ctx context.Context, p *plugin.Plugin, r plugin.Result, format string) (int64, error) {
+	if p == nil || p.Native() == nil {
+		return 0, errors.New(locales.PluginsStatusDownloadUnsupported())
+	}
 	lib := h.Library()
 	if lib == nil {
 		return 0, errors.New("no library is open in " + Name)
@@ -307,6 +311,8 @@ func (a *App) pluginList() mcp.PluginList {
 		st := a.settings.Plugins[m.ID]
 		i := slices.IndexFunc(a.plugins, func(p *plugin.Plugin) bool { return p.Manifest.ID == m.ID })
 		switch {
+		case m.IsBookSource():
+			info.State = mcp.PluginUnsupported
 		case st != nil && st.Disabled:
 			info.State = mcp.PluginDisabled
 		case slices.ContainsFunc(a.pluginsPending, func(p *plugin.Manifest) bool { return p.ID == m.ID }):
@@ -383,7 +389,7 @@ func (h mcpHost) ReloadPlugins(ctx context.Context) {
 // what it asks for before.
 func (h mcpHost) AddPlugin(ctx context.Context, folder string) (mcp.PluginInfo, error) {
 	a := h.a
-	m, err := plugin.Inspect(folder)
+	m, err := inspectSupportedPlugin(folder)
 	if err != nil {
 		return mcp.PluginInfo{}, err
 	}
@@ -467,8 +473,14 @@ func (h mcpHost) SetPluginEnabled(ctx context.Context, id string, on bool) error
 	var err error
 	var wait <-chan struct{}
 	h.onMain(ctx, func() {
-		if _, err = h.a.knownPlugin(id); err != nil {
+		var k knownPlugin
+		if k, err = h.a.knownPlugin(id); err != nil {
 			return
+		}
+		if on {
+			if err = checkPluginSupported(k.manifest); err != nil {
+				return
+			}
 		}
 		wait = h.a.afterPluginLoad()
 		h.a.setPluginEnabled(id, on)

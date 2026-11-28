@@ -125,8 +125,6 @@ func pluginCategoryTitle(cat plugin.Category) string {
 		return locales.MarketEpub()
 	case "language":
 		return locales.CommonLanguage()
-	case "sources":
-		return locales.MarketSources()
 	default:
 		return cat.Title
 	}
@@ -149,7 +147,6 @@ var pluginMessagePatterns = []struct {
 	{regexp.MustCompile("^Apple's search answered (\\d{3})\\.$"), "Apple Books 返回了 HTTP ${1}。"},
 	{regexp.MustCompile("^([\\d.]+) / ([\\d.]+) \\(([\\d,]+) ratings?\\)$"), "${1} / ${2}（${3} 人评分）"},
 	{regexp.MustCompile("^(NeoDB|Google Books) answered (\\d{3})(?: [^.]*)?\\.$"), "${1} 返回了 HTTP ${2}。"},
-	{regexp.MustCompile("^Project Gutenberg answered (\\d{3})(?: [^.]*)?\\.$"), "古登堡计划返回了 HTTP ${1}。"},
 	{regexp.MustCompile("^There is no list called (.+)\\.$"), "找不到名为“${1}”的书单。"},
 	{regexp.MustCompile("^(.+) is no longer in the catalog\\.$"), "目录已不再提供《${1}》。"},
 	{regexp.MustCompile("^([\\d,.]+) pages? · ([\\d,.]+) words?$"), "${1} 页 · ${2} 字"},

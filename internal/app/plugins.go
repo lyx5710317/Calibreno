@@ -28,7 +28,25 @@ type knownPlugin struct {
 	linked   string // the folder it loads from, when linked
 }
 
-// download is a book coming from a source plugin into the library.
+func checkPluginSupported(m *plugin.Manifest) error {
+	if m != nil && m.IsBookSource() {
+		return errors.New(locales.PluginsStatusDownloadUnsupported())
+	}
+	return nil
+}
+
+func inspectSupportedPlugin(path string) (*plugin.Manifest, error) {
+	m, err := plugin.Inspect(path)
+	if err != nil {
+		return nil, err
+	}
+	if err := checkPluginSupported(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// download is a book coming from a configured OPDS catalog into the library.
 type download struct {
 	plugin      *plugin.Plugin
 	result      plugin.Result
@@ -149,7 +167,7 @@ func (a *App) loadPlugins() {
 				}
 				known = append(known, knownPlugin{manifest: m, builtin: true})
 				st := states[m.ID]
-				if st.Disabled {
+				if st.Disabled || m.IsBookSource() {
 					continue
 				}
 				p, err := plugin.LoadBuiltin(fsys, options(m, st))
@@ -167,7 +185,7 @@ func (a *App) loadPlugins() {
 					return plugin.Options{}, false // linked: loaded from its folder below
 				}
 				known = append(known, knownPlugin{manifest: m})
-				if st.Disabled {
+				if st.Disabled || m.IsBookSource() {
 					return plugin.Options{}, false
 				}
 				if !granted(&st, m) {
@@ -206,7 +224,7 @@ func (a *App) loadPlugins() {
 				continue
 			}
 			known = append(known, knownPlugin{manifest: m, linked: st.Path})
-			if st.Disabled {
+			if st.Disabled || m.IsBookSource() {
 				continue
 			}
 			if !granted(&st, m) {
@@ -219,6 +237,7 @@ func (a *App) loadPlugins() {
 			}
 			o := options(m, st)
 			o.Tools = paths
+			o.CheckManifest = checkPluginSupported
 			p, err := plugin.Load(st.Path, o)
 			if err != nil {
 				errs = append(errs, err)
@@ -246,6 +265,11 @@ func (a *App) loadPlugins() {
 			})
 			a.pluginsLoading = false
 			a.pluginErrs, a.pluginsPending, a.pluginsKnown = errs, pending, known
+			for _, k := range known {
+				if k.manifest.IsBookSource() {
+					delete(a.updates, k.manifest.ID)
+				}
+			}
 			a.tl.missing, a.tl.places = needTools, places
 			a.setPlugins(plugins)
 			if a.tl.prune {
@@ -291,15 +315,9 @@ func (a *App) setPlugins(plugins []*plugin.Plugin) {
 	}
 }
 
-// sources are the loaded plugins that search for books, and the OPDS
-// catalogs that can search, unless the user keeps them out.
+// sources are the user's searchable OPDS catalogs, unless they keep them out.
 func (a *App) sources() []*plugin.Plugin {
 	var out []*plugin.Plugin
-	for _, p := range a.plugins {
-		if p.Manifest.IsBookSource() {
-			out = append(out, p)
-		}
-	}
 	if !a.settings.OPDS.NotInGetBooks {
 		for _, p := range a.catalogs {
 			if st := a.catalogStatus[strings.TrimPrefix(p.Manifest.ID, catalogPrefix)]; st != nil && st.searchable {
@@ -314,7 +332,7 @@ func (a *App) sources() []*plugin.Plugin {
 // the user granted it, the user is asked first (a.consent).
 func (a *App) installPlugin(archive string) {
 	a.run(func() {
-		m, err := plugin.Inspect(archive)
+		m, err := inspectSupportedPlugin(archive)
 		a.post(func() {
 			if err != nil {
 				a.toastError(errors.New(locales.PluginsInstallFailed(presentError(err))))
@@ -373,7 +391,7 @@ func (a *App) finishInstallFrom(archive string, src *settings.PluginSource) {
 	}
 	dir := a.pluginDir
 	a.run(func() {
-		m, err := plugin.Install(archive, dir)
+		m, err := plugin.InstallChecked(archive, dir, checkPluginSupported)
 		if src != nil {
 			os.Remove(archive)
 		}
@@ -433,7 +451,7 @@ func (a *App) linkPlugin(folder string) {
 		abs, err := filepath.Abs(folder)
 		var m *plugin.Manifest
 		if err == nil {
-			m, err = plugin.Inspect(abs)
+			m, err = inspectSupportedPlugin(abs)
 		}
 		a.post(func() {
 			if err != nil {
@@ -484,11 +502,10 @@ func (a *App) uninstallPlugin(id string) {
 	})
 }
 
-// downloadBook downloads r as format with its plugin and adds it to the
-// library, with the metadata the plugin gave.
+// downloadBook imports r as format from a configured OPDS catalog.
 func (a *App) downloadBook(p *plugin.Plugin, r plugin.Result, format string) {
 	lib := a.lib
-	if lib == nil {
+	if lib == nil || p == nil || p.Native() == nil {
 		return
 	}
 	ctx, cancel := context.WithCancel(context.Background())

@@ -100,8 +100,8 @@ type metadataOut struct {
 }
 
 func (s *Server) addSourceTools() {
-	sdk.AddTool(s.srv, sourceTool("find_books", "Searches the book sources of Get books, such as Project Gutenberg, for books to add.", true), s.findBooks)
-	sdk.AddTool(s.srv, sourceTool("download_book", "Downloads a book find_books found and adds it to the library, as Get books does.", false), s.downloadBook)
+	sdk.AddTool(s.srv, sourceTool("find_books", "Searches your configured OPDS catalogs for books to add.", true), s.findBooks)
+	sdk.AddTool(s.srv, sourceTool("download_book", "Adds a book found with find_books from your configured OPDS catalog to the library.", false), s.downloadBook)
 	sdk.AddTool(s.srv, sourceTool("find_metadata", "Looks a book up in the metadata sources. Nothing changes: apply a candidate with update_books.", true), s.findMetadata)
 }
 

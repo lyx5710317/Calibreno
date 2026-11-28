@@ -6,7 +6,6 @@ import Eye from "@lucide/astro/icons/eye";
 import Globe from "@lucide/astro/icons/globe";
 import Laptop from "@lucide/astro/icons/laptop";
 import LayoutGrid from "@lucide/astro/icons/layout-grid";
-import Library from "@lucide/astro/icons/library";
 import Pencil from "@lucide/astro/icons/pencil";
 import Search from "@lucide/astro/icons/search";
 import Send from "@lucide/astro/icons/send";
@@ -36,11 +35,7 @@ const calibreGB = `${(calibreMB / 1024).toFixed(2)} GB`;
 
 const handIcons = [LayoutGrid, Search, Pencil, Send];
 const featureIcons = [Laptop, Eye, BookLock];
-const builtins = [
-  { name: "Project Gutenberg", source: true },
-  { name: "NeoDB", source: false },
-  { name: "Google Books", source: false },
-];
+const builtins = ["NeoDB", "Google Books"];
 // Lucide paths of the MCP popover's activity: plus, book-open, pencil, search.
 const activity = [
   ["M5 12h14M12 5v14", "10:42"],
@@ -417,7 +412,7 @@ const eyebrow = (n: number, text: string) => `${String(n).padStart(2, "0")} · $
               <p class="mt-1.5 text-sm leading-relaxed text-sand-11">{t.extend.dialog.lead}</p>
               <p class="mt-4 flex items-center gap-2.5 rounded-[10px] border border-sand-4 bg-paper-2 px-3.5 py-3 text-sm">
                 <Globe size={16} stroke-width={1.75} class="shrink-0 text-violet" aria-hidden="true" />
-                standardebooks.org
+                openlibrary.org
               </p>
               <p class="mt-3 text-[13px] leading-relaxed text-sand-11">{t.extend.dialog.note}</p>
               <div class="mt-5 flex justify-end gap-2 text-[13px] font-medium" aria-hidden="true">
@@ -431,13 +426,13 @@ const eyebrow = (n: number, text: string) => `${String(n).padStart(2, "0")} · $
           <div class="mt-16">
             <h3 class="font-mono text-xs tracking-widest text-sand-9 uppercase">{t.extend.builtIn}</h3>
             <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {builtins.map((p, i) => (
+              {builtins.map((name, i) => (
                 <li class="rounded-2xl border border-sand-4 bg-paper-2 p-6">
-                  <div class:list={["flex items-center gap-2", p.source ? "text-accent" : "text-violet"]}>
-                    {p.source ? <Library size={16} stroke-width={1.75} aria-hidden="true" /> : <Tags size={16} stroke-width={1.75} aria-hidden="true" />}
-                    <span class="font-mono text-[11px]">{p.source ? t.extend.kindSource : t.extend.kindMetadata}</span>
+                  <div class="flex items-center gap-2 text-violet">
+                    <Tags size={16} stroke-width={1.75} aria-hidden="true" />
+                    <span class="font-mono text-[11px]">{t.extend.kindMetadata}</span>
                   </div>
-                  <p class="mt-3 font-medium">{p.name}</p>
+                  <p class="mt-3 font-medium">{name}</p>
                   <p class="mt-2 text-sm leading-relaxed text-sand-11">{t.extend.builtins[i]}</p>
                 </li>
               ))}

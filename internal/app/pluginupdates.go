@@ -167,7 +167,7 @@ func (a *App) ghChoose(tag, branch string) {
 		}
 		var m *plugin.Manifest
 		if err == nil {
-			m, err = plugin.Inspect(archive)
+			m, err = inspectSupportedPlugin(archive)
 		}
 		readme := ""
 		if err == nil {
@@ -242,7 +242,7 @@ func (a *App) checkUpdates(force bool) {
 	// whatever its source says: Dalibre's releases there aren't updates of
 	// it.
 	for id, st := range a.settings.Plugins {
-		if s := st.Source; s != nil && !s.Marketplace && s.Repo == plugin.MarketplaceRepo {
+		if s := st.Source; s != nil && !s.Marketplace && plugin.IsMarketplaceRepo(s.Repo) {
 			s.Marketplace, s.Branch = true, ""
 			if m := a.knownManifest(id); m != nil {
 				s.Ref = m.Version
@@ -260,7 +260,7 @@ func (a *App) checkUpdates(force bool) {
 	}
 	var items []item
 	for id, st := range a.settings.Plugins {
-		if st.Source != nil {
+		if st.Source != nil && checkPluginSupported(a.knownManifest(id)) == nil {
 			items = append(items, item{id, *st.Source})
 		}
 	}
@@ -302,6 +302,9 @@ func (a *App) checkUpdates(force bool) {
 				delete(a.updates, it.id)
 			}
 			for id, u := range found {
+				if checkPluginSupported(a.knownManifest(id)) != nil {
+					continue
+				}
 				a.updates[id] = u
 				if st := a.settings.Plugins[id]; st != nil && st.Source != nil && st.Source.Auto {
 					a.updatePlugin(id, true)
@@ -327,7 +330,7 @@ func latestUpdate(gh *plugin.GitHub, id string, src settings.PluginSource, marke
 		if err != nil {
 			return nil, err
 		}
-		return marketUpdate(index, id, src.Ref), nil
+		return marketUpdate(index, id, src.Ref, src.Repo), nil
 	}
 	repo, err := plugin.ParseRepo(src.Repo)
 	if err != nil {
@@ -358,7 +361,7 @@ func latestUpdate(gh *plugin.GitHub, id string, src settings.PluginSource, marke
 func (a *App) updatePlugin(id string, auto bool) {
 	u := a.updates[id]
 	st := a.settings.Plugins[id]
-	if u == nil || u.busy || st == nil || st.Source == nil {
+	if u == nil || u.busy || st == nil || st.Source == nil || checkPluginSupported(a.knownManifest(id)) != nil {
 		return
 	}
 	u.busy = true
@@ -369,10 +372,11 @@ func (a *App) updatePlugin(id string, auto bool) {
 		archive, err := gh.Download(context.Background(), u.archive, os.TempDir())
 		var m *plugin.Manifest
 		if err == nil {
-			m, err = plugin.Inspect(archive)
-		}
-		if err == nil && m.ID != id {
-			err = errors.New(locales.PluginsUpdateWrongPlugin(m.ID))
+			version := ""
+			if src.Marketplace {
+				version = u.ref
+			}
+			m, err = inspectPluginPackage(archive, id, version)
 		}
 		a.post(func() {
 			u.busy = false

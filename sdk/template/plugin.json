@@ -4,22 +4,16 @@
   "name": "{{NAME}}",
   "version": "0.1.0",
   "api": 1,
-  "description": "Books from example.com",
+  "description": "Book metadata from example.com",
   "author": "",
   "license": "MIT",
   "icon": "globe",
   "capabilities": {
-    "bookSource": {
-      "filters": [
-        {
-          "key": "language", "title": "Language", "type": "language",
-          "options": [{ "value": "", "title": "Any language" }, { "value": "en" }, { "value": "fr" }]
-        }
-      ]
-    }
+    "metadata": {}
   },
   "permissions": {
-    "hosts": ["api.example.com"]
+    "hosts": ["api.example.com"],
+    "library": "read"
   },
   "settings": [
     { "key": "apiKey", "title": "API key", "type": "secret", "description": "From your account page on example.com." }

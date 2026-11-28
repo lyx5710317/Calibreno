@@ -1,26 +1,32 @@
 {
-  "name": "Dalibre Marketplace",
+  "name": "Calibreno Marketplace",
   "categories": [
     { "id": "library", "title": "Library" },
     { "id": "metadata", "title": "Metadata" },
     { "id": "epub", "title": "EPUB tools" },
-    { "id": "language", "title": "Language" },
-    { "id": "sources", "title": "Book sources" }
+    { "id": "language", "title": "Language" }
+  ],
+  "featured": [
+    "org.randynamic.dalibre.search-internet",
+    "org.randynamic.dalibre.chinese-convert",
+    "org.randynamic.dalibre.extract-isbn",
+    "org.randynamic.dalibre.epub-merge",
+    "org.randynamic.dalibre.epub-split"
   ],
   "plugins": {
-    "find-duplicates": { "category": "library", "calibre": "Find Duplicates" },
-    "quality-check": { "category": "library", "calibre": "Quality Check" },
-    "clean-metadata": { "category": "library", "calibre": "Clean Metadata" },
-    "manage-series": { "category": "library", "calibre": "Manage Series" },
-    "search-internet": { "category": "library", "calibre": "Search The Internet" },
-    "count-pages": { "category": "library", "calibre": "Count Pages" },
-    "extract-isbn": { "category": "metadata", "calibre": "Extract ISBN" },
-    "chinese-convert": { "category": "language", "calibre": "Chinese Text Conversion" },
-    "apple-books": { "category": "metadata", "calibre": "Apple Books covers" },
-    "wikidata": { "category": "metadata", "calibre": "Wikidata" },
-    "epub-merge": { "category": "epub", "calibre": "EpubMerge" },
-    "epub-split": { "category": "epub", "calibre": "EpubSplit" },
-    "modify-epub": { "category": "epub", "calibre": "Modify ePub" },
-    "kepub": { "category": "epub", "calibre": "KoboTouchExtended" }
+    "find-duplicates": { "category": "library", "origin": "upstream", "calibre": "Find Duplicates" },
+    "quality-check": { "category": "library", "origin": "upstream", "calibre": "Quality Check" },
+    "clean-metadata": { "category": "library", "origin": "upstream", "calibre": "Clean Metadata" },
+    "manage-series": { "category": "library", "origin": "upstream", "calibre": "Manage Series" },
+    "search-internet": { "category": "library", "origin": "upstream", "calibre": "Search The Internet" },
+    "count-pages": { "category": "library", "origin": "upstream", "calibre": "Count Pages" },
+    "extract-isbn": { "category": "metadata", "origin": "upstream", "calibre": "Extract ISBN" },
+    "chinese-convert": { "category": "language", "origin": "upstream", "calibre": "Chinese Text Conversion" },
+    "apple-books": { "category": "metadata", "origin": "upstream", "calibre": "Apple Books covers" },
+    "wikidata": { "category": "metadata", "origin": "upstream", "calibre": "Wikidata" },
+    "epub-merge": { "category": "epub", "origin": "upstream", "calibre": "EpubMerge" },
+    "epub-split": { "category": "epub", "origin": "upstream", "calibre": "EpubSplit" },
+    "modify-epub": { "category": "epub", "origin": "upstream", "calibre": "Modify ePub" },
+    "kepub": { "category": "epub", "origin": "upstream", "calibre": "KoboTouchExtended" }
   }
 }

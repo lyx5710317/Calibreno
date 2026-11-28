@@ -2,8 +2,9 @@
 # the community's with the dalibre-plugin of the same commit. On main, and
 # daily for the community's new releases, packs each plugin version not
 # packed yet and writes marketplace.json, onto the marketplace branch,
-# which Dalibre reads (plugin.MarketplaceURL). A pack is never replaced:
-# bump a plugin's version to publish a change.
+# which Calibreno reads (plugin.MarketplaceURL). A pack is never replaced:
+# bump a plugin's version to publish a change. catalog.json selects the
+# local plugins to check, pack and publish.
 name: Marketplace
 
 on:
@@ -23,12 +24,17 @@ concurrency: marketplace-${{ github.ref }}
 
 jobs:
   marketplace:
+    if: github.event_name == 'pull_request' || github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: ubuntu-latest
     defaults:
       run:
+        shell: bash
         working-directory: marketplace
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
@@ -43,30 +49,43 @@ jobs:
       - run: npm ci
       - name: Bundle and check the plugins
         run: |
-          node build.mjs
-          for d in plugins/*/; do dalibre-plugin check "$d" | tee /tmp/check.txt; ! grep -q '^warning: uses what' /tmp/check.txt; done
+          node index.mjs --folders > "$RUNNER_TEMP/marketplace-folders"
+          mapfile -t folders < "$RUNNER_TEMP/marketplace-folders"
+          if [ "${#folders[@]}" -eq 0 ]; then
+            exit 0
+          fi
+          node build.mjs "${folders[@]#plugins/}"
+          for d in "${folders[@]}"; do
+            dalibre-plugin check "$d" | tee /tmp/check.txt
+            if grep -q '^warning: uses what' /tmp/check.txt; then
+              exit 1
+            fi
+          done
       # Users of the latest release are offered each plugin its dalibre
       # field allows, so that release's dalibre-plugin must take it: one
       # using what Dalibre added since raises its dalibre to the next one.
-      - name: Check the plugins in the released Dalibre
+      - name: Check the plugins against the latest reachable stable version
         run: |
-          tag=$(git ls-remote --tags --refs --sort=-v:refname origin 'v*' | head -1 | sed 's,.*refs/tags/,,')
+          tag=$(git tag --merged HEAD --list 'v*' --sort=-version:refname | awk '/^v[0-9]+\.[0-9]+\.[0-9]+$/ && !seen { print; seen = 1 }')
+          if [ -z "$tag" ]; then
+            echo "No stable version tag is reachable. The current checkout was checked above."
+            exit 0
+          fi
           released=${tag#v}
-          git fetch --depth 1 origin tag "$tag"
           git worktree add --detach /tmp/released "$tag"
           (cd /tmp/released && go build -ldflags "-X main.version=$released" -o /tmp/dalibre-plugin-released ./cmd/dalibre-plugin)
-          for d in plugins/*/; do
+          while IFS= read -r d; do
             min=$(jq -r '.dalibre // "" | gsub("[>= ]"; "")' "$d/plugin.json")
             if [ -n "$min" ] && [ "$(printf '%s\n%s\n' "$min" "$released" | sort -V | tail -1)" != "$released" ]; then
               echo "$d: needs Dalibre $min, newer than $released"
               continue
             fi
             /tmp/dalibre-plugin-released check "$d" > /dev/null || {
-              echo "::error file=marketplace/${d}plugin.json::Dalibre $released can't load ${d%/}, yet its dalibre offers it there: raise \"dalibre\" to the next version"
+              echo "::error file=marketplace/$d/plugin.json::Dalibre $released can't load $d at its declared minimum version"
               exit 1
             }
-          done
-      - name: Check the community's plugins
+          done < "$RUNNER_TEMP/marketplace-folders"
+      - name: Check the catalog and community packages
         if: github.event_name == 'pull_request'
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -76,22 +95,32 @@ jobs:
         if: github.event_name != 'pull_request'
         working-directory: .
         run: |
-          if git ls-remote --exit-code --heads origin marketplace > /dev/null; then
-            git fetch --depth 1 origin marketplace
-            git worktree add /tmp/published origin/marketplace
-            git -C /tmp/published switch -c marketplace
+          if git ls-remote --exit-code --heads origin refs/heads/marketplace > /dev/null; then
+            git fetch --depth 1 origin +refs/heads/marketplace:refs/remotes/origin/marketplace
+            git worktree add --detach /tmp/published origin/marketplace
           else
+            status=$?
+            if [ "$status" -ne 2 ]; then
+              exit "$status"
+            fi
             git worktree add --orphan -b marketplace /tmp/published
           fi
       - name: Pack new versions
         if: github.event_name != 'pull_request'
         run: |
           mkdir -p /tmp/published/packages
-          for d in plugins/*/; do
-            id=$(jq -r .id "$d/plugin.json") version=$(jq -r .version "$d/plugin.json")
-            [ -e "/tmp/published/packages/$id-$version.dalibre-plugin" ] && continue
-            dalibre-plugin pack "$d" -o /tmp/published/packages
-          done
+          while IFS= read -r d; do
+            id=$(jq -r .id "$d/plugin.json")
+            version=$(jq -r .version "$d/plugin.json")
+            package="/tmp/published/packages/$id-$version.dalibre-plugin"
+            if [ ! -e "$package" ]; then
+              dalibre-plugin pack "$d" -o /tmp/published/packages
+            fi
+            if [ ! -s "$package" ]; then
+              echo "::error file=marketplace/$d/plugin.json::The package for $id $version is missing or empty."
+              exit 1
+            fi
+          done < "$RUNNER_TEMP/marketplace-folders"
       - name: Write marketplace.json
         if: github.event_name != 'pull_request'
         env:
@@ -101,9 +130,11 @@ jobs:
       - name: Publish
         if: github.event_name != 'pull_request'
         working-directory: /tmp/published
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           git add -A
           git diff --cached --quiet && exit 0
           git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "Marketplace from ${GITHUB_SHA::7}"
-          git push origin marketplace
+          git -c credential.helper= -c 'credential.helper=!gh auth git-credential' push origin HEAD:refs/heads/marketplace

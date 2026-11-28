@@ -11,26 +11,35 @@ import (
 	"strings"
 )
 
-// The Marketplace lists plugins anyone can install: the ones in Dalibre's
-// repository (marketplace/), and the community's, which its
-// marketplace/community.json points to. CI packs the former and writes
-// marketplace.json, the index Dalibre reads, to the repository's
-// marketplace branch: each plugin's manifest details and the package to
-// download for its listed version.
+// The Marketplace lists the plugins Calibreno maintains and the community
+// plugins listed in marketplace/community.json. CI writes the index and
+// packages to the marketplace branch of the repository running it.
 
-// MarketplaceRepo is Dalibre's repository, where the Marketplace's own
-// plugins are developed. Its releases are Dalibre's, not a plugin's.
-const MarketplaceRepo = "djyde/dalibre"
+// MarketplaceRepo is the Calibreno repository that publishes the catalog.
+const MarketplaceRepo = "lyx5710317/Calibreno"
 
-// MarketplaceURL is where Dalibre reads the Marketplace's index.
-const MarketplaceURL = "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/marketplace.json"
+// MarketplaceURL is where Calibreno reads the Marketplace's index.
+const MarketplaceURL = "https://raw.githubusercontent.com/" + MarketplaceRepo + "/refs/heads/marketplace/marketplace.json"
+
+// IsMarketplaceRepo recognizes the repositories of first-party marketplace
+// packages, including the upstream repository saved by earlier versions.
+func IsMarketplaceRepo(repo string) bool {
+	return strings.EqualFold(repo, MarketplaceRepo) || strings.EqualFold(repo, "djyde/dalibre")
+}
 
 // Marketplace is the Marketplace's index, marketplace.json.
 type Marketplace struct {
 	Name       string     `json:"name"`
 	Categories []Category `json:"categories"`
+	Featured   []string   `json:"featured,omitempty"` // plugin IDs in recommended order
 	Plugins    []Listing  `json:"plugins"`
 }
+
+const (
+	MarketOriginUpstream  = "upstream"
+	MarketOriginCalibreno = "calibreno"
+	MarketOriginCommunity = "community"
+)
 
 // Category is a group of plugins the Marketplace filters by.
 type Category struct {
@@ -49,6 +58,7 @@ type Listing struct {
 	Icon        string `json:"icon,omitempty"`
 	Homepage    string `json:"homepage,omitempty"`
 	Category    string `json:"category,omitempty"`
+	Origin      string `json:"origin,omitempty"`
 	// Capabilities are its manifest's: what it adds to Dalibre.
 	Capabilities Capabilities `json:"capabilities"`
 	// Calibre names the calibre plugin it does the work of, for calibre's
@@ -57,9 +67,8 @@ type Listing struct {
 	Dalibre   string `json:"dalibre,omitempty"`
 	Calibre   string `json:"calibre,omitempty"`
 	Downloads int    `json:"downloads,omitempty"`
-	// Repo is the GitHub repository it is developed in, owner/name;
-	// Community is true for a plugin from outside the Marketplace's own
-	// repository.
+	// Repo is the distribution repository, owner/name. Origin identifies
+	// the publisher type; Community also supports older indexes.
 	Repo      string `json:"repo"`
 	Community bool   `json:"community,omitempty"`
 	// Package is where its listed version downloads: a .dalibre-plugin,
@@ -98,12 +107,20 @@ func ParseMarketplace(data []byte) (*Marketplace, error) {
 	ok := m.Plugins[:0]
 	for _, l := range m.Plugins {
 		if l.ID == "" || l.Name == "" || Reserved(l.ID) || !semverPattern.MatchString(l.Version) ||
-			!packageURL(l.Package) {
+			!packageURL(l.Package) || l.Capabilities.BookSource != nil {
 			continue
 		}
 		ok = append(ok, l)
 	}
 	m.Plugins = ok
+	// Cached and older indexes may still advertise a book sources tab.
+	categories := m.Categories[:0]
+	for _, c := range m.Categories {
+		if c.ID != "sources" {
+			categories = append(categories, c)
+		}
+	}
+	m.Categories = categories
 	return &m, nil
 }
 

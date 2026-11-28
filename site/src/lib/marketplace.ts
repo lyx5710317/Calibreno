@@ -2,7 +2,7 @@
 // marketplace.json Dalibre reads, so the plugins page lists what the app
 // offers as soon as it changes.
 
-export const url = "https://raw.githubusercontent.com/djyde/dalibre/refs/heads/marketplace/marketplace.json";
+export const url = "https://raw.githubusercontent.com/lyx5710317/Calibreno/refs/heads/marketplace/marketplace.json";
 
 export interface Category {
   id: string;
@@ -28,10 +28,10 @@ export interface Plugin {
   category: string;
   /** The calibre plugin it does the work of. */
   calibre?: string;
-  /** calibre's downloads of that plugin, which orders the list. */
+  /** calibre's downloads of that plugin, used after featured order. */
   downloads?: number;
   repo?: string;
-  capabilities: {
+  capabilities?: string[] | {
     bookSource?: unknown;
     metadata?: { fields?: string[] };
     fileType?: { title?: string };
@@ -40,11 +40,18 @@ export interface Plugin {
   permissions: { hosts?: string[]; localNetwork?: boolean; library?: "read" | "write" };
 }
 
-export async function loadMarketplace(): Promise<{ categories: Category[]; plugins: Plugin[] }> {
+export async function loadMarketplace(): Promise<{ categories: Category[]; featured: string[]; plugins: Plugin[] }> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`fetching the Marketplace: ${res.status} ${res.statusText}`);
-  const data = (await res.json()) as { categories: Category[]; plugins: Plugin[] };
-  return { categories: data.categories ?? [], plugins: data.plugins ?? [] };
+  const data = (await res.json()) as { categories?: Category[]; featured?: string[]; plugins?: Plugin[] };
+  return {
+    categories: (data.categories ?? []).filter((category) => category.id !== "sources"),
+    featured: data.featured ?? [],
+    plugins: (data.plugins ?? []).filter(({ category, capabilities }) =>
+      category !== "sources" && (Array.isArray(capabilities)
+        ? !capabilities.includes("source") && !capabilities.includes("bookSource")
+        : capabilities?.bookSource == null)),
+  };
 }
 
 /** What the plugin may reach, in one short line: "Reads your library · Offline". */

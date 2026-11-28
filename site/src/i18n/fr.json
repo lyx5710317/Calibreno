@@ -6,7 +6,7 @@
     "features": [
       "Ouvre les bibliothèques calibre existantes",
       "Modifiez les métadonnées et récupérez-les depuis des sources en ligne",
-      "Récupérez des livres depuis des catalogues et des serveurs OPDS",
+      "Parcourir les catalogues OPDS que vous ajoutez",
       "Envoyez des livres à vos liseuses via OPDS",
       "Plugins JavaScript isolés",
       "Un Marketplace des plugins calibre les plus utilisés, portés",
@@ -68,15 +68,15 @@
       "done": "C’est fait : 3 livres sont tagués « Hard SF », et Dune est prêt pour votre Kindle."
     },
     "extend": {
-      "ask": "Je voudrais récupérer des livres depuis Standard Ebooks.",
+      "ask": "Je voudrais compléter les fiches de mes livres avec Open Library.",
       "steps": [
         "Lecture du guide des plugins de Dalibre",
-        "Écriture d’un plugin pour Standard Ebooks",
-        "Demande d’autorisation pour standardebooks.org",
-        "Essai d’une recherche « Dune », et correction d’une erreur",
-        "Nouvel essai : 3 livres trouvés"
+        "Écriture d’un plugin de métadonnées pour Open Library",
+        "Demande d’autorisation pour openlibrary.org",
+        "Test d’une recherche par ISBN",
+        "Couverture et informations de publication trouvées"
       ],
-      "done": "Ça marche. Standard Ebooks est maintenant dans « Get books »."
+      "done": "Open Library est disponible dans « Récupérer les métadonnées »."
     }
   },
   "light": {
@@ -120,7 +120,7 @@
         "Ajoutez tous les e-books de votre dossier Téléchargements.",
         "Complétez les couvertures et les éditeurs manquants.",
         "Faites-moi une copie Kindle de Dune.",
-        "Créez-moi un moyen de récupérer des livres depuis Standard Ebooks."
+        "Créez un plugin qui recherche les informations des livres dans Open Library."
       ]
     }
   },
@@ -165,17 +165,15 @@
     "lead": "Dalibre grandit grâce aux plugins. Installez les plus utilisés de calibre, portés, depuis le Marketplace, ou demandez à votre IA celui qui vous manque : elle crée le plugin, le teste et corrige ce qui échoue. Vous décidez seulement de ce qu’il peut atteindre.",
     "dialog": {
       "label": "Dalibre vous demande",
-      "title": "Ajouter « Standard Ebooks » ?",
+      "title": "Ajouter « Open Library Metadata » ?",
       "lead": "Ce plugin demande à accéder à un seul site :",
-      "note": "Il ne peut rien atteindre d’autre, et ne peut pas lire vos fichiers.",
+      "note": "Le plugin demande également à lire les métadonnées de votre bibliothèque.",
       "deny": "Ne pas autoriser",
       "allow": "Autoriser"
     },
     "builtIn": "Intégré",
-    "kindSource": "Source de livres",
     "kindMetadata": "Métadonnées",
     "builtins": [
-      "Recherchez et parcourez plus de 70 000 e-books gratuits du domaine public, par langue. Listes « Les plus populaires » et « Ajoutés récemment ».",
       "Titre, auteurs, séries, tags, éditeur, date, ISBN, couverture et description depuis un catalogue ouvert lié à Douban, Goodreads et d’autres. Aucun compte nécessaire.",
       "Titre, auteurs, tags, éditeur, date, ISBN, couverture et description depuis Google Books. Ajoutez votre propre clé API pour disposer de votre propre quota."
     ],
@@ -216,7 +214,7 @@
     "items": [
       {
         "q": "Dalibre est-il une alternative à calibre ?",
-        "a": "Oui, pour gérer votre bibliothèque d’e-books. Dalibre assure le quotidien de calibre (parcourir, chercher, modifier les métadonnées, récupérer des livres et les envoyer à votre liseuse) dans une application native {ratio}× plus légère. La conversion de formats est en préparation ; l’éditeur d’e-books de calibre ne fait pas partie du projet."
+        "a": "Oui, pour gérer votre bibliothèque d’e-books. Dalibre assure le quotidien de calibre (parcourir, chercher, modifier les métadonnées, ajouter des fichiers locaux et les envoyer à votre liseuse) dans une application native {ratio}× plus légère. La conversion de formats est en préparation ; l’éditeur d’e-books de calibre ne fait pas partie du projet."
       },
       {
         "q": "Dois-je migrer ma bibliothèque calibre ?",

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"os"
@@ -91,10 +92,10 @@ func (a *App) loadMarketplace(force bool) {
 // the plugins installed from the Marketplace.
 func (a *App) marketUpdates() {
 	for id, st := range a.settings.Plugins {
-		if st.Source == nil || !st.Source.Marketplace {
+		if st.Source == nil || !st.Source.Marketplace || checkPluginSupported(a.knownManifest(id)) != nil {
 			continue
 		}
-		u := marketUpdate(a.mk.index, id, a.installedVersion(id, st.Source))
+		u := marketUpdate(a.mk.index, id, a.installedVersion(id, st.Source), st.Source.Repo)
 		if u == nil {
 			if old := a.updates[id]; old != nil && !old.busy {
 				delete(a.updates, id)
@@ -125,9 +126,15 @@ func (a *App) installedVersion(id string, src *settings.PluginSource) string {
 
 // marketUpdate is the update index lists of plugin id at version have,
 // nil when there is none.
-func marketUpdate(index *plugin.Marketplace, id, have string) *pluginUpdate {
+func marketUpdate(index *plugin.Marketplace, id, have, repo string) *pluginUpdate {
 	l := index.Find(id)
 	if l == nil || !plugin.NewerVersion(l.Version, have) || l.Manifest().NeedsDalibre() != "" {
+		return nil
+	}
+	sameRepo := strings.EqualFold(repo, l.Repo)
+	movedUpstream := l.Origin == plugin.MarketOriginUpstream &&
+		plugin.IsMarketplaceRepo(repo) && plugin.IsMarketplaceRepo(l.Repo)
+	if !sameRepo && !movedUpstream {
 		return nil
 	}
 	return &pluginUpdate{ref: l.Version, label: l.Version, archive: l.Package}
@@ -151,10 +158,43 @@ func (a *App) marketListings() []*plugin.Listing {
 		}
 		out = append(out, l)
 	}
-	// Most downloaded on calibre first; the community's after the
-	// Marketplace's own, as they are listed.
-	slices.SortStableFunc(out, func(x, y *plugin.Listing) int { return y.Downloads - x.Downloads })
+	regional := simplifiedChinese()
+	slices.SortStableFunc(out, func(x, y *plugin.Listing) int {
+		left, right := slices.Index(mk.index.Featured, x.ID), slices.Index(mk.index.Featured, y.ID)
+		if left < 0 {
+			left = len(mk.index.Featured)
+		}
+		if right < 0 {
+			right = len(mk.index.Featured)
+		}
+		if left != right {
+			return cmp.Compare(left, right)
+		}
+		if regional {
+			if priority := cmp.Compare(chineseMarketplacePriority(x.ID), chineseMarketplacePriority(y.ID)); priority != 0 {
+				return priority
+			}
+		}
+		return cmp.Compare(y.Downloads, x.Downloads)
+	})
 	return out
+}
+
+// chineseMarketplacePriority puts Chinese-language tools first and plugins
+// for a particular service, region or reader after general tools.
+func chineseMarketplacePriority(id string) int {
+	switch id {
+	case "org.randynamic.dalibre.search-internet":
+		return 0
+	case "org.randynamic.dalibre.chinese-convert":
+		return 1
+	case "org.randynamic.dalibre.extract-isbn":
+		return 2
+	case "org.randynamic.dalibre.apple-books", "org.randynamic.dalibre.kepub", "io.github.bellussi1.hardcover",
+		"io.github.bellussi1.isbn-brasil", "io.github.bellussi1.openlibrary":
+		return 4
+	}
+	return 3
 }
 
 // listingState is what a listing's row offers.
@@ -193,10 +233,7 @@ func (a *App) installListing(l *plugin.Listing) {
 		archive, err := gh.Download(context.Background(), want.Package, os.TempDir())
 		var m *plugin.Manifest
 		if err == nil {
-			m, err = plugin.Inspect(archive)
-		}
-		if err == nil && m.ID != want.ID {
-			err = errors.New(locales.PluginsUpdateWrongPlugin(m.ID))
+			m, err = inspectPluginPackage(archive, want.ID, want.Version)
 		}
 		a.post(func() {
 			a.mk.installing = ""
@@ -215,4 +252,18 @@ func (a *App) installListing(l *plugin.Listing) {
 			a.finishInstallFrom(archive, src)
 		})
 	})
+}
+
+func inspectPluginPackage(path, id, expectedVersion string) (*plugin.Manifest, error) {
+	m, err := inspectSupportedPlugin(path)
+	if err != nil {
+		return nil, err
+	}
+	if m.ID != id {
+		return nil, errors.New(locales.PluginsUpdateWrongPlugin(m.ID))
+	}
+	if expectedVersion != "" && m.Version != expectedVersion {
+		return nil, errors.New(locales.MarketVersionMismatch(expectedVersion, m.Version))
+	}
+	return m, nil
 }

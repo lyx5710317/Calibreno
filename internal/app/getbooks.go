@@ -14,10 +14,8 @@ import (
 	"dalibre/internal/plugin"
 )
 
-// The Get books page (Figma "07 · Get books"): one page where the user
-// picks a book source, searches or browses it, and adds books to the
-// library. Every book source plugin gets the same page; plugins only give
-// data.
+// The Get books page searches the OPDS catalogs the user added and
+// imports their books into the library.
 
 // allSources is the source picker's "All sources".
 const allSources = "*"
@@ -40,7 +38,7 @@ const (
 )
 
 type getBooksState struct {
-	source string // a plugin id, or allSources
+	source string // an OPDS source id, or allSources
 	text   string // the search box
 	// query is what was last searched; "" shows the browse page.
 	query string
@@ -137,9 +135,9 @@ func (a *App) pluginByID(id string) *plugin.Plugin {
 func (a *App) openGetBooks() {
 	a.page = pageGetBooks
 	g := &a.gb
-	if g.source == "" || g.source != allSources && a.pluginByID(g.source) == nil {
+	if g.source != allSources && a.gbSource(g.source) == nil {
 		g.source = a.settings.GetBooksSource
-		if g.source != allSources && a.pluginByID(g.source) == nil {
+		if g.source != allSources && a.gbSource(g.source) == nil {
 			g.source = ""
 			if s := a.sources(); len(s) > 0 {
 				g.source = s[0].Manifest.ID
@@ -193,8 +191,18 @@ func (a *App) gbSources() []*plugin.Plugin {
 	if a.gb.source == allSources {
 		return a.sources()
 	}
-	if p := a.pluginByID(a.gb.source); p != nil && p.Manifest.IsBookSource() {
+	if p := a.gbSource(a.gb.source); p != nil {
 		return []*plugin.Plugin{p}
+	}
+	return nil
+}
+
+// gbSource looks up a catalog currently available to Get books.
+func (a *App) gbSource(id string) *plugin.Plugin {
+	for _, p := range a.sources() {
+		if p.Manifest.ID == id {
+			return p
+		}
 	}
 	return nil
 }
@@ -310,12 +318,25 @@ func (a *App) gbLoad(p *plugin.Plugin, collection string, more bool) {
 	})
 }
 
-// gbRetry asks again for a list that failed.
+// gbRetry retries the failed page, keeping results already shown.
 func (a *App) gbRetry(p *plugin.Plugin, collection string) {
-	if l := a.gbList(p, collection); l != nil && !l.loading {
+	if l := a.gbList(p, collection); l != nil {
+		if l.loading {
+			return
+		}
+		if l.page > 0 {
+			a.gbLoad(p, collection, true)
+			return
+		}
 		delete(a.gb.lists, a.gbKey(p, collection))
 	}
 	a.gbLoad(p, collection, false)
+}
+
+// gbRetryBrowse asks again for a source's collection list.
+func (a *App) gbRetryBrowse(p *plugin.Plugin) {
+	delete(a.gb.browse, p.Manifest.ID)
+	a.gbBrowse(p)
 }
 
 // gbBrowse loads p's collections and the first page of each.

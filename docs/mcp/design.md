@@ -24,7 +24,7 @@ setting.
 
 | Option | Why not |
 |---|---|
-| A separate process opening `metadata.db` | The window doesn't watch the database, so it would show stale books; plugins (Get books, metadata) and their consent and keychain secrets live in the app. |
+| A separate process opening `metadata.db` | The window doesn't watch the database. The app manages OPDS catalogs, metadata plugins, consent and keychain secrets. |
 
 For clients that only start stdio servers, the app binary takes an `mcp`
 argument (checked in `main` before `mygo.App.Run`) and bridges stdio to
@@ -91,8 +91,8 @@ book's file can't be moved onto another).
 
 | Tool | |
 |---|---|
-| `find_books(query, source?)` | Searches Get books' sources. |
-| `download_book(source, id, format?)` | Adds a result of `find_books` (the server keeps the last 1000) to the library, as Get books does. |
+| `find_books(query, source?)` | Searches the user-configured OPDS catalogs available in Get books. |
+| `download_book(source, id, format?)` | Imports one of the last 1000 `find_books` results from a currently available OPDS catalog. |
 | `find_metadata(id, source?)` | Candidates from metadata plugins (`plugin.Identify`); the agent picks one and applies it with `update_books`. |
 
 ### Plugins (unless read only)

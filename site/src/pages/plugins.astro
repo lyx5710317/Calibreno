@@ -28,9 +28,8 @@ const icons = { globe: Globe, library: Library, "book-open": BookOpen, database:
 
 const en = strings("en").extend;
 const builtins = [
-  { name: "Project Gutenberg", kind: en.kindSource, text: en.builtins[0] },
-  { name: "NeoDB", kind: en.kindMetadata, text: en.builtins[1] },
-  { name: "Google Books", kind: en.kindMetadata, text: en.builtins[2] },
+  { name: "NeoDB", text: en.builtins[0] },
+  { name: "Google Books", text: en.builtins[1] },
 ];
 
 // How plugins are kept safe; each point is what docs/plugins says.
@@ -69,7 +68,7 @@ const safety = [
 
 const chip = "rounded-full border border-sand-6 px-3.5 py-1.5 text-sm text-sand-11 transition hover:border-sand-9 hover:text-ink";
 const title = "Plugins · Dalibre";
-const description = "Plugins for Dalibre, from its Marketplace: book sources, metadata, EPUB tools and actions on your library.";
+const description = "Find plugins for metadata, EPUB editing and library management in the Calibreno Marketplace.";
 ---
 
 <!doctype html>
@@ -107,7 +106,7 @@ const description = "Plugins for Dalibre, from its Marketplace: book sources, me
           Make Dalibre <em class="text-violet">yours.</em>
         </h1>
         <p class="rise mt-6 max-w-2xl leading-relaxed text-sand-11">
-          Plugins add what Dalibre doesn't do on its own: places to get books, metadata lookups, EPUB tools and actions on your library.
+          Use plugins to look up metadata, edit EPUBs and organize your library.
           Install them from <strong class="font-medium text-ink">Plugins › Marketplace</strong> in Dalibre's toolbar. Each one shows what it may reach before you allow it.
         </p>
         <nav id="categories" class="rise mt-8 flex flex-wrap gap-2" aria-label="Categories">
@@ -155,7 +154,7 @@ const description = "Plugins for Dalibre, from its Marketplace: book sources, me
               <li class="rounded-xl border border-sand-4 bg-paper-2 p-4">
                 <div class="flex items-center justify-between gap-3">
                   <p class="font-medium">{b.name}</p>
-                  <span class="shrink-0 font-mono text-[11px] text-sand-9">{b.kind}</span>
+                  <span class="shrink-0 font-mono text-[11px] text-sand-9">{en.kindMetadata}</span>
                 </div>
                 <p class="mt-2 line-clamp-2 text-sm leading-snug text-sand-11">{b.text}</p>
               </li>
@@ -169,7 +168,7 @@ const description = "Plugins for Dalibre, from its Marketplace: book sources, me
           <p class="font-serif text-3xl leading-tight tracking-tight">Missing one? Write it.</p>
           <p class="mt-1 max-w-xl text-sm text-sand-11">
             A plugin is a <code class="font-mono text-[13px]">plugin.json</code> and a JavaScript file; your AI agent can
-            write it for you. List yours with a pull request to the <a href="https://github.com/djyde/dalibre/blob/main/marketplace/README.md#list-your-plugin" target="_blank" rel="noopener" class="text-violet hover:underline">Marketplace</a>.
+            write it for you. List yours with a pull request to the <a href="https://github.com/lyx5710317/Calibreno/blob/main/marketplace/README.md#list-your-plugin" target="_blank" rel="noopener" class="text-violet hover:underline">Marketplace</a>.
           </p>
         </div>
         <div class="flex shrink-0 flex-wrap gap-3">
@@ -226,13 +225,16 @@ const description = "Plugins for Dalibre, from its Marketplace: book sources, me
         const root = document.getElementById("marketplace")!;
         const nav = document.getElementById("categories")!;
         try {
-          const { categories, plugins } = await loadMarketplace();
+          const { categories, featured, plugins } = await loadMarketplace();
+          const featuredOrder = new Map(featured.map((id, index) => [id, index]));
           const groups = categories
             .map((c) => ({
               ...c,
               plugins: plugins
                 .filter((p) => p.category === c.id)
-                .sort((a, b) => (b.downloads ?? 0) - (a.downloads ?? 0) || a.name.localeCompare(b.name)),
+                .sort((a, b) =>
+                  (featuredOrder.get(a.id) ?? featured.length) - (featuredOrder.get(b.id) ?? featured.length) ||
+                  (b.downloads ?? 0) - (a.downloads ?? 0) || a.name.localeCompare(b.name)),
             }))
             .filter((c) => c.plugins.length);
           root.replaceChildren(...groups.map((c) => {
@@ -250,7 +252,7 @@ const description = "Plugins for Dalibre, from its Marketplace: book sources, me
           root.replaceChildren(el("section", "border-t border-sand-4 py-12",
             el("p", "text-sand-11", "The Marketplace didn’t load. ",
               Object.assign(el("a", "text-violet hover:underline", "See its plugins on GitHub ↗"),
-                { href: "https://github.com/djyde/dalibre/tree/main/marketplace", target: "_blank", rel: "noopener" }))));
+                { href: "https://github.com/lyx5710317/Calibreno/tree/main/marketplace", target: "_blank", rel: "noopener" }))));
         }
       }
       render();

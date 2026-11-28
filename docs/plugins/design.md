@@ -3,10 +3,10 @@
 For Dalibre's developers. Plugin authors read [README.md](README.md),
 which is the contract.
 
-Status: plugin API 1, book sources. Engine, consent, packaging, author
-CLI, library import, the Get books page, the Plugins dialog and the
-built-in Project Gutenberg plugin are done and tested. What comes next is
-in [capabilities.md](capabilities.md).
+Calibreno supports metadata, file types and actions from plugin API 1.
+The engine and author CLI retain the legacy book source protocol for
+compatibility. The desktop app imports from manually configured OPDS
+catalogs and excludes external `bookSource` plugins.
 
 ## Goals
 
@@ -150,7 +150,7 @@ State per plugin id, in `settings.json`:
 
 ```json
 "plugins": {
-  "gutenberg": { "disabled": false, "granted": { "hosts": ["gutendex.com", "…"] }, "values": { "languages": "en" } }
+  "com.example.metadata": { "disabled": false, "granted": { "library": "read" } }
 }
 ```
 
@@ -227,24 +227,21 @@ Every failure is a `*plugin.Error` with a `Kind` the UI acts on:
 | `internal/calibre/importer.go` | `ImportWith` |
 | `cmd/dalibre-plugin` | the author CLI |
 | `sdk/` | `dalibre.d.ts`, `plugin.schema.json`, the `init` template (embedded) |
-| `plugins/` | built-in plugins, embedded in the app: `gutenberg`, `neodb`, `googlebooks` |
+| `plugins/` | built-in metadata plugins embedded in the app: `neodb`, `googlebooks` |
 
 ## UI
 
 Designed in Figma first (Screens › 05–07), built in `internal/app`:
 
-1. **Get books** (sidebar): one page with a source picker (each book
-   source, and All sources), search, the source's filters, browse
-   shelves from its collections, results with covers and formats, the
-   detail panel filled by `get`, download per format. "In library" by
-   identifier.
+1. **Get books** (sidebar): searches configured, searchable OPDS
+   catalogs and shows results with their importable formats. Each
+   configured catalog has its own sidebar entry for browsing.
 2. **Downloads** in the jobs popover: progress,
    cancel, retry, show in library; error kinds turned into what to do.
-3. **Plugins** dialog (from the picker's "Get more sources…" and the
-   source's settings button): every plugin found (built in, on, off,
-   waiting for permission), its switch, settings form with masked
-   secrets, what it adds and can reach, uninstall, "Install from file…",
-   "Open plugins folder", "Reload plugins".
+3. **Plugins** dialog in the toolbar: built-in and installed plugins,
+   their status, settings and permissions. Users can install compatible
+   plugins from a package or folder, reload plugins, and remove ones
+   they installed.
 4. **Permission dialog**: name, author, description, and the
    permissions in plain words, the local network called out; for an
    update, only what is new.

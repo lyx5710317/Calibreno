@@ -278,9 +278,9 @@ func (g *fakeGitHub) release(t *testing.T, version string, hosts string) {
 	zw := zip.NewWriter(&buf)
 	w, _ := zw.Create("plugin.json")
 	w.Write([]byte(`{"id":"com.example.gh","name":"GitHub Books","version":"` + version + `","api":1,"author":"o",
-		"capabilities":["source"],"permissions":{"hosts":[` + hosts + `]}}`))
+		"capabilities":["metadata"],"permissions":{"library":"read","hosts":[` + hosts + `]}}`))
 	w, _ = zw.Create("main.js")
-	w.Write([]byte(`export const search = () => ({items: []})`))
+	w.Write([]byte(`export const identify = () => []`))
 	zw.Close()
 	g.assets[version] = buf.Bytes()
 	g.releases = append([]map[string]any{{"tag_name": "v" + version, "published_at": time.Now().Add(-72 * time.Hour), "body": "Faster search",

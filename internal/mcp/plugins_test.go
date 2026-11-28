@@ -40,16 +40,12 @@ func TestPluginTools(t *testing.T) {
 
 	script := func(title string) {
 		os.WriteFile(filepath.Join(dir, "main.js"), []byte(`
-			export function search(q) {
-				console.log("searching", q.text, q.filters.language);
-				if (q.text === "boom") throw dalibre.error("unavailable", "down");
-				if (q.text === "bug") null.x;
-				return { items: [
-					{ id: "1", title: "`+title+`", formats: [{ format: "EPUB", url: "https://api.example.com/1.epub" }], extra: { k: 1 } },
-					{ id: "2", title: "", formats: [] },
-				] };
+			export function identify(book) {
+				console.log("looking up", book.title, book.language);
+				if (book.title === "boom") throw dalibre.error("unavailable", "down");
+				if (book.title === "bug") null.x;
+				return [{ id: "1", title: "`+title+`" }, { id: "2", title: "" }];
 			}
-			export const get = (item) => ({ ...item, description: "About " + item.title + " " + item.extra.k });
 		`), 0o644)
 	}
 	script("First")
@@ -61,58 +57,45 @@ func TestPluginTools(t *testing.T) {
 		t.Fatalf("added %+v", ao)
 	}
 
-	type page struct {
-		Items []map[string]any `json:"items"`
+	identify := func(title string) map[string]any {
+		return map[string]any{"id": "com.example.mine", "call": "identify", "book": map[string]any{"title": title, "language": "fr"}}
 	}
 	var to struct {
-		OK     bool       `json:"ok"`
-		Result page       `json:"result"`
-		Error  *TestError `json:"error"`
-		Logs   []string   `json:"logs"`
+		OK     bool             `json:"ok"`
+		Result []map[string]any `json:"result"`
+		Error  *TestError       `json:"error"`
+		Logs   []string         `json:"logs"`
 	}
-	if msg := call(t, cs, "test_plugin", map[string]any{"id": "com.example.mine", "call": "search", "text": "dune", "filters": map[string]string{"language": "fr"}}, &to); msg != "" {
+	if msg := call(t, cs, "test_plugin", identify("dune"), &to); msg != "" {
 		t.Fatal(msg)
 	}
-	if !to.OK || len(to.Result.Items) != 1 || to.Result.Items[0]["title"] != "First" {
-		t.Fatalf("search: %+v", to)
+	if !to.OK || len(to.Result) != 1 || to.Result[0]["title"] != "First" {
+		t.Fatalf("identify: %+v", to)
 	}
 	// What the script logged, and what Dalibre dropped of its answer.
 	logs := strings.Join(to.Logs, "\n")
-	if !strings.Contains(logs, "searching dune fr") || !strings.Contains(logs, "warning") {
+	if !strings.Contains(logs, "looking up dune fr") || !strings.Contains(logs, "warning") {
 		t.Errorf("logs: %q", to.Logs)
-	}
-
-	// get takes a result back, with the plugin's own extra.
-	var gto struct {
-		OK     bool           `json:"ok"`
-		Result map[string]any `json:"result"`
-	}
-	if msg := call(t, cs, "test_plugin", map[string]any{"id": "com.example.mine", "call": "get", "item": to.Result.Items[0]}, &gto); msg != "" {
-		t.Fatal(msg)
-	}
-	if gto.Result["description"] != "About First 1" {
-		t.Errorf("get: %+v", gto)
 	}
 
 	// The script's errors come back with their kind and stack.
 	to.Error, to.OK = nil, false
-	call(t, cs, "test_plugin", map[string]any{"id": "com.example.mine", "call": "search", "text": "boom"}, &to)
+	call(t, cs, "test_plugin", identify("boom"), &to)
 	if to.OK || to.Error == nil || to.Error.Kind != "unavailable" || !strings.Contains(to.Error.Message, "down") {
 		t.Errorf("thrown: %+v", to.Error)
 	}
 	to.Error = nil
-	call(t, cs, "test_plugin", map[string]any{"id": "com.example.mine", "call": "search", "text": "bug"}, &to)
+	call(t, cs, "test_plugin", identify("bug"), &to)
 	if to.Error == nil || to.Error.Kind != "script" || !strings.Contains(to.Error.Stack, "main.js") {
 		t.Errorf("a bug: %+v", to.Error)
 	}
 
 	// Mistakes in the call are the tool's errors.
 	for args, want := range map[*map[string]any]string{
-		{"id": "com.example.mine", "call": "identify"}:                                          "not a metadata source",
-		{"id": "com.example.mine", "call": "get"}:                                               "needs item",
-		{"id": "com.example.mine", "call": "fly"}:                                               "no call",
-		{"id": "com.example.mine", "call": "search", "filters": map[string]string{"sort": "x"}}: "no filter",
-		{"id": "com.example.other", "call": "search"}:                                           "add_plugin",
+		{"id": "com.example.mine", "call": "search"}:    "not a book source",
+		{"id": "com.example.mine", "call": "identify"}:  "needs book",
+		{"id": "com.example.mine", "call": "fly"}:       "no call",
+		{"id": "com.example.other", "call": "identify"}: "add_plugin",
 	} {
 		if msg := call(t, cs, "test_plugin", *args, nil); !strings.Contains(msg, want) {
 			t.Errorf("%v: %q, want %q", *args, msg, want)
@@ -125,8 +108,8 @@ func TestPluginTools(t *testing.T) {
 	if msg := call(t, cs, "reload_plugins", map[string]any{}, &lo); msg != "" || len(lo.Plugins) != 1 {
 		t.Fatalf("reload: %q %+v", msg, lo)
 	}
-	call(t, cs, "test_plugin", map[string]any{"id": "com.example.mine", "call": "search", "text": "dune"}, &to)
-	if to.Result.Items[0]["title"] != "Second" {
+	call(t, cs, "test_plugin", identify("dune"), &to)
+	if len(to.Result) != 1 || to.Result[0]["title"] != "Second" {
 		t.Errorf("after the edit: %+v", to.Result)
 	}
 
@@ -135,7 +118,7 @@ func TestPluginTools(t *testing.T) {
 	if po.Plugins[0].State != PluginDisabled {
 		t.Errorf("turned off: %+v", po)
 	}
-	if msg := call(t, cs, "test_plugin", map[string]any{"id": "com.example.mine", "call": "search"}, nil); !strings.Contains(msg, "it is disabled") {
+	if msg := call(t, cs, "test_plugin", identify("dune"), nil); !strings.Contains(msg, "it is disabled") {
 		t.Errorf("testing one turned off: %q", msg)
 	}
 	call(t, cs, "enable_plugin", map[string]any{"id": "com.example.mine"}, &po)

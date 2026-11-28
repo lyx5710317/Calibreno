@@ -6,7 +6,7 @@
     "features": [
       "可打开现有的 calibre 书库",
       "编辑元数据，并从在线来源获取",
-      "从目录和 OPDS 服务器获取书籍",
+      "浏览自己添加的 OPDS 目录",
       "通过 OPDS 把书发送到电子阅读器",
       "沙盒化的 JavaScript 插件",
       "插件市场：移植自 calibre 最常用的插件",
@@ -68,15 +68,15 @@
       "done": "完成：3 本书已标记为“Hard SF”，《沙丘》已可用于你的 Kindle。"
     },
     "extend": {
-      "ask": "我想从 Standard Ebooks 获取书籍。",
+      "ask": "我想用 Open Library 补全书籍信息。",
       "steps": [
         "阅读了 Dalibre 的插件指南",
-        "为 Standard Ebooks 编写了一个插件",
-        "请你允许访问 standardebooks.org",
-        "试着搜索“Dune”，并修复了一个错误",
-        "再试一次：找到 3 本书"
+        "为 Open Library 编写了一个元数据插件",
+        "请你允许访问 openlibrary.org",
+        "测试了按 ISBN 查询",
+        "找到了封面和出版信息"
       ],
-      "done": "搞定。Standard Ebooks 已经出现在“Get books”里了。"
+      "done": "现在可以在“获取元数据”中使用 Open Library。"
     }
   },
   "light": {
@@ -120,7 +120,7 @@
         "把我下载文件夹里的所有电子书都加进来。",
         "补全缺失的封面和出版社。",
         "为《沙丘》做一份 Kindle 版本。",
-        "帮我做一个从 Standard Ebooks 获取书籍的功能。"
+        "帮我做一个从 Open Library 查询书籍信息的插件。"
       ]
     }
   },
@@ -165,17 +165,15 @@
     "lead": "Dalibre 通过插件不断成长。你可以从插件市场安装移植自 calibre 的常用插件，也可以让你的 AI 编写你需要的插件：它会编写插件、试用，并修复失败的地方。你只需决定它可以访问什么。",
     "dialog": {
       "label": "Dalibre 询问你",
-      "title": "添加“Standard Ebooks”？",
+      "title": "添加“Open Library 元数据”？",
       "lead": "这个插件要访问一个网站：",
-      "note": "它无法访问其他任何地方，也无法读取你的文件。",
+      "note": "它还会请求读取书库中的元数据。",
       "deny": "不允许",
       "allow": "允许"
     },
     "builtIn": "内置",
-    "kindSource": "书源",
     "kindMetadata": "元数据",
     "builtins": [
-      "搜索和浏览超过 70,000 本免费公版电子书，可按语言筛选。提供最受欢迎和最近添加的列表。",
       "来自开放书目的书名、作者、系列、标签、出版社、日期、ISBN、封面和简介，关联豆瓣、Goodreads 等。无需账号。",
       "来自 Google Books 的书名、作者、标签、出版社、日期、ISBN、封面和简介。可添加你自己的 API 密钥，使用专属额度。"
     ],
@@ -216,7 +214,7 @@
     "items": [
       {
         "q": "Dalibre 是 calibre 的替代品吗？",
-        "a": "是的，用来管理你的电子书库。Dalibre 负责 calibre 的日常功能（浏览、搜索、编辑元数据、获取书籍并发送到电子阅读器），并且是一个小 {ratio}× 的原生应用。格式转换功能正在开发中；calibre 的电子书编辑器不在计划范围内。"
+        "a": "是的，用来管理你的电子书库。Dalibre 负责 calibre 的日常功能（浏览、搜索、编辑元数据、添加本地书籍并发送到电子阅读器），并且是一个小 {ratio}× 的原生应用。格式转换功能正在开发中；calibre 的电子书编辑器不在计划范围内。"
       },
       {
         "q": "我需要迁移我的 calibre 书库吗？",

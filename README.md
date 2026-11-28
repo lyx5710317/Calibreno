@@ -12,6 +12,8 @@ Calibreno 是面向个人书库的开源电子书管理桌面应用。它基于 
 - **全库查重**。按格式和文件内容分组，找出书名或作者不同的相同文件。桌面程序当前提供只读扫描与结果查看，按组确认移除的流程处于原型阶段。
 - **格式转换**。Windows x64 支持 EPUB、Kindle 格式、TXT、FB2 和 PDF 转换。PDF 可以选页试转、对照原页、重跑识别和恢复进度。 [格式与使用说明](docs/conversion.md)
 - **传书**。支持 Kindle USB 和邮件发送、BOOXDrop 局域网传书，以及微信读书网页辅助导入。 [阅读设备说明](docs/devices.md)
+- **OPDS 书目**。在「设置 → OPDS」添加自己的目录，在书库侧栏浏览并导入选中的书。添加可搜索的目录后，侧栏会显示「获取书籍」。
+- **插件市场**。精选中文简繁转换、ISBN 提取、EPUB 工具和「在网上搜书」。后者从库内书籍的菜单打开浏览器搜索。 [市场说明](marketplace/README.md)
 - **简体中文**。支持简体中文桌面界面，覆盖批次整理流程和常用内置插件交互。
 
 ## 开发与运行
@@ -48,6 +50,7 @@ go tool mygo build ./cmd/dalibre
 ## 文档
 
 - [首版开发文档](docs/calibreno-v1-development.md)
+- [下一阶段更新文档](docs/calibreno-next-update.md)
 - [变更记录](CHANGELOG.md)
 - [插件开发](docs/plugins/README.md)
 - [MCP 接入](docs/mcp/README.md)

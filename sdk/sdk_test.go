@@ -6,6 +6,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"dalibre/internal/plugin"
 )
 
 func TestInit(t *testing.T) {
@@ -27,6 +29,14 @@ func TestInit(t *testing.T) {
 	readme, _ := os.ReadFile(filepath.Join(dir, "README.md"))
 	if !strings.HasPrefix(string(readme), "# Example Books\n") || strings.Contains(string(readme), "{{") {
 		t.Errorf("README not filled in:\n%s", readme)
+	}
+	p, err := plugin.Load(dir, plugin.Options{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer p.Close()
+	if !p.Manifest.IsMetadataSource() || p.Manifest.IsBookSource() || !p.Defines("identify") {
+		t.Fatalf("unexpected starter capabilities: %v", p.Manifest.Capabilities.Names())
 	}
 	if _, err := Init(dir, "com.example.books", "x"); err == nil {
 		t.Error("init over a plugin")

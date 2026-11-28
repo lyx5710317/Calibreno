@@ -172,9 +172,17 @@ func (a *App) checkCatalog(p *plugin.Plugin) {
 			searchable = t != ""
 		}
 		a.post(func() {
+			if a.catalogStatus[id] != st {
+				return
+			}
 			st.checking, st.err, st.searchable = false, err, searchable
 			if f != nil {
 				st.title = f.Title
+			}
+			// A newly detected search template makes this catalog available
+			// to the current search, even if its check finished after the view opened.
+			if searchable && !a.settings.OPDS.NotInGetBooks && a.page == pageGetBooks {
+				a.openGetBooks()
 			}
 		})
 	})

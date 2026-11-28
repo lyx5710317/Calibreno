@@ -269,16 +269,6 @@ func (msgs Messages) MarketEpub() string {
 	return Catalog.Format(msgs.locale, "marketEpub", nil)
 }
 
-// MarketSources says "Book sources"
-// in the language the app shows.
-func MarketSources() string { return In(i18n.Locale()).MarketSources() }
-
-// MarketSources says "Book sources"
-// in the language of msgs.
-func (msgs Messages) MarketSources() string {
-	return Catalog.Format(msgs.locale, "marketSources", nil)
-}
-
 // BatchSwitchBusy says "Wait for the current batch operation to finish before switching libraries."
 // in the language the app shows.
 func BatchSwitchBusy() string { return In(i18n.Locale()).BatchSwitchBusy() }
@@ -2425,16 +2415,6 @@ func (msgs Messages) GetBooksSearchLabel() string {
 	return Catalog.Format(msgs.locale, "getBooksSearchLabel", nil)
 }
 
-// GetBooksLoadingPlugins says "Loading plugins"
-// in the language the app shows.
-func GetBooksLoadingPlugins() string { return In(i18n.Locale()).GetBooksLoadingPlugins() }
-
-// GetBooksLoadingPlugins says "Loading plugins"
-// in the language of msgs.
-func (msgs Messages) GetBooksLoadingPlugins() string {
-	return Catalog.Format(msgs.locale, "getBooksLoadingPlugins", nil)
-}
-
 // GetBooksSourceLabel says "Source: {source}"
 // in the language the app shows.
 func GetBooksSourceLabel(source string) string { return In(i18n.Locale()).GetBooksSourceLabel(source) }
@@ -2465,34 +2445,14 @@ func (msgs Messages) GetBooksSetUp() string {
 	return Catalog.Format(msgs.locale, "getBooksSetUp", nil)
 }
 
-// GetBooksWaitingPermission says "Waiting for your permission"
+// GetBooksAddOPDS says "Add OPDS catalog…"
 // in the language the app shows.
-func GetBooksWaitingPermission() string { return In(i18n.Locale()).GetBooksWaitingPermission() }
+func GetBooksAddOPDS() string { return In(i18n.Locale()).GetBooksAddOPDS() }
 
-// GetBooksWaitingPermission says "Waiting for your permission"
+// GetBooksAddOPDS says "Add OPDS catalog…"
 // in the language of msgs.
-func (msgs Messages) GetBooksWaitingPermission() string {
-	return Catalog.Format(msgs.locale, "getBooksWaitingPermission", nil)
-}
-
-// GetBooksReview says "Review"
-// in the language the app shows.
-func GetBooksReview() string { return In(i18n.Locale()).GetBooksReview() }
-
-// GetBooksReview says "Review"
-// in the language of msgs.
-func (msgs Messages) GetBooksReview() string {
-	return Catalog.Format(msgs.locale, "getBooksReview", nil)
-}
-
-// GetBooksGetMoreSources says "Get more sources…"
-// in the language the app shows.
-func GetBooksGetMoreSources() string { return In(i18n.Locale()).GetBooksGetMoreSources() }
-
-// GetBooksGetMoreSources says "Get more sources…"
-// in the language of msgs.
-func (msgs Messages) GetBooksGetMoreSources() string {
-	return Catalog.Format(msgs.locale, "getBooksGetMoreSources", nil)
+func (msgs Messages) GetBooksAddOPDS() string {
+	return Catalog.Format(msgs.locale, "getBooksAddOPDS", nil)
 }
 
 // GetBooksSourcesAnswered says "{answered} of {total, plural, one {# source} other {# sources}} answered"
@@ -2895,16 +2855,6 @@ func (msgs Messages) GetBooksPluginFailed(name string) string {
 	return Catalog.Format(msgs.locale, "getBooksPluginFailed", map[string]any{"name": name})
 }
 
-// GetBooksOpenPluginSettings says "Open plugin settings"
-// in the language the app shows.
-func GetBooksOpenPluginSettings() string { return In(i18n.Locale()).GetBooksOpenPluginSettings() }
-
-// GetBooksOpenPluginSettings says "Open plugin settings"
-// in the language of msgs.
-func (msgs Messages) GetBooksOpenPluginSettings() string {
-	return Catalog.Format(msgs.locale, "getBooksOpenPluginSettings", nil)
-}
-
 // GetBooksNoMatch says "No books match “{query}”"
 // in the language the app shows.
 func GetBooksNoMatch(query string) string { return In(i18n.Locale()).GetBooksNoMatch(query) }
@@ -2935,34 +2885,34 @@ func (msgs Messages) GetBooksSearchAllSources() string {
 	return Catalog.Format(msgs.locale, "getBooksSearchAllSources", nil)
 }
 
-// GetBooksNoSourcesTitle says "No book sources are on"
+// GetBooksOpenPluginSettings says "Open plugin settings"
+// in the language the app shows.
+func GetBooksOpenPluginSettings() string { return In(i18n.Locale()).GetBooksOpenPluginSettings() }
+
+// GetBooksOpenPluginSettings says "Open plugin settings"
+// in the language of msgs.
+func (msgs Messages) GetBooksOpenPluginSettings() string {
+	return Catalog.Format(msgs.locale, "getBooksOpenPluginSettings", nil)
+}
+
+// GetBooksNoSourcesTitle says "No searchable OPDS catalogs"
 // in the language the app shows.
 func GetBooksNoSourcesTitle() string { return In(i18n.Locale()).GetBooksNoSourcesTitle() }
 
-// GetBooksNoSourcesTitle says "No book sources are on"
+// GetBooksNoSourcesTitle says "No searchable OPDS catalogs"
 // in the language of msgs.
 func (msgs Messages) GetBooksNoSourcesTitle() string {
 	return Catalog.Format(msgs.locale, "getBooksNoSourcesTitle", nil)
 }
 
-// GetBooksNoSourcesBody says "Book sources are plugins. Turn one on, or install one from a file."
+// GetBooksNoSourcesBody says "Add an OPDS catalog to search for books."
 // in the language the app shows.
 func GetBooksNoSourcesBody() string { return In(i18n.Locale()).GetBooksNoSourcesBody() }
 
-// GetBooksNoSourcesBody says "Book sources are plugins. Turn one on, or install one from a file."
+// GetBooksNoSourcesBody says "Add an OPDS catalog to search for books."
 // in the language of msgs.
 func (msgs Messages) GetBooksNoSourcesBody() string {
 	return Catalog.Format(msgs.locale, "getBooksNoSourcesBody", nil)
-}
-
-// GetBooksManagePlugins says "Manage plugins"
-// in the language the app shows.
-func GetBooksManagePlugins() string { return In(i18n.Locale()).GetBooksManagePlugins() }
-
-// GetBooksManagePlugins says "Manage plugins"
-// in the language of msgs.
-func (msgs Messages) GetBooksManagePlugins() string {
-	return Catalog.Format(msgs.locale, "getBooksManagePlugins", nil)
 }
 
 // GetBooksSelectBook says "Select a book to see its details"
@@ -4249,6 +4199,18 @@ func (msgs Messages) PluginsStatusFailed() string {
 	return Catalog.Format(msgs.locale, "pluginsStatusFailed", nil)
 }
 
+// PluginsStatusDownloadUnsupported says "Book download plugins are no longer supported"
+// in the language the app shows.
+func PluginsStatusDownloadUnsupported() string {
+	return In(i18n.Locale()).PluginsStatusDownloadUnsupported()
+}
+
+// PluginsStatusDownloadUnsupported says "Book download plugins are no longer supported"
+// in the language of msgs.
+func (msgs Messages) PluginsStatusDownloadUnsupported() string {
+	return Catalog.Format(msgs.locale, "pluginsStatusDownloadUnsupported", nil)
+}
+
 // PluginsEmpty says "No plugins yet. Install one from GitHub or from a file."
 // in the language the app shows.
 func PluginsEmpty() string { return In(i18n.Locale()).PluginsEmpty() }
@@ -4477,16 +4439,6 @@ func PluginsAddsToTitle() string { return In(i18n.Locale()).PluginsAddsToTitle()
 // in the language of msgs.
 func (msgs Messages) PluginsAddsToTitle() string {
 	return Catalog.Format(msgs.locale, "pluginsAddsToTitle", nil)
-}
-
-// PluginsGetBooksNote says "Get books: search, browse and download from {name}."
-// in the language the app shows.
-func PluginsGetBooksNote(name string) string { return In(i18n.Locale()).PluginsGetBooksNote(name) }
-
-// PluginsGetBooksNote says "Get books: search, browse and download from {name}."
-// in the language of msgs.
-func (msgs Messages) PluginsGetBooksNote(name string) string {
-	return Catalog.Format(msgs.locale, "pluginsGetBooksNote", map[string]any{"name": name})
 }
 
 // PluginsFetchMetadataNote says "Fetch metadata: look up a book’s details on {name}, in Edit metadata."
@@ -7717,21 +7669,21 @@ func (msgs Messages) McpToolRemoveBooks() string {
 	return Catalog.Format(msgs.locale, "mcpToolRemoveBooks", nil)
 }
 
-// McpToolFindBooks says "Search Get books’ sources."
+// McpToolFindBooks says "Search your configured OPDS catalogs."
 // in the language the app shows.
 func McpToolFindBooks() string { return In(i18n.Locale()).McpToolFindBooks() }
 
-// McpToolFindBooks says "Search Get books’ sources."
+// McpToolFindBooks says "Search your configured OPDS catalogs."
 // in the language of msgs.
 func (msgs Messages) McpToolFindBooks() string {
 	return Catalog.Format(msgs.locale, "mcpToolFindBooks", nil)
 }
 
-// McpToolDownloadBook says "Add a book from Get books to the library."
+// McpToolDownloadBook says "Add a book to the library from a configured OPDS catalog."
 // in the language the app shows.
 func McpToolDownloadBook() string { return In(i18n.Locale()).McpToolDownloadBook() }
 
-// McpToolDownloadBook says "Add a book from Get books to the library."
+// McpToolDownloadBook says "Add a book to the library from a configured OPDS catalog."
 // in the language of msgs.
 func (msgs Messages) McpToolDownloadBook() string {
 	return Catalog.Format(msgs.locale, "mcpToolDownloadBook", nil)
@@ -8877,6 +8829,18 @@ func (msgs Messages) MarketVersionInstalled(installed string, available string) 
 	return Catalog.Format(msgs.locale, "marketVersionInstalled", map[string]any{"installed": installed, "available": available})
 }
 
+// MarketVersionMismatch says "The marketplace lists version {expected}, but the package contains {actual}."
+// in the language the app shows.
+func MarketVersionMismatch(expected string, actual string) string {
+	return In(i18n.Locale()).MarketVersionMismatch(expected, actual)
+}
+
+// MarketVersionMismatch says "The marketplace lists version {expected}, but the package contains {actual}."
+// in the language of msgs.
+func (msgs Messages) MarketVersionMismatch(expected string, actual string) string {
+	return Catalog.Format(msgs.locale, "marketVersionMismatch", map[string]any{"expected": expected, "actual": actual})
+}
+
 // MarketNoInternet says "No internet access"
 // in the language the app shows.
 func MarketNoInternet() string { return In(i18n.Locale()).MarketNoInternet() }
@@ -8905,6 +8869,26 @@ func MarketCommunity() string { return In(i18n.Locale()).MarketCommunity() }
 // in the language of msgs.
 func (msgs Messages) MarketCommunity() string {
 	return Catalog.Format(msgs.locale, "marketCommunity", nil)
+}
+
+// MarketUpstream says "Upstream port"
+// in the language the app shows.
+func MarketUpstream() string { return In(i18n.Locale()).MarketUpstream() }
+
+// MarketUpstream says "Upstream port"
+// in the language of msgs.
+func (msgs Messages) MarketUpstream() string {
+	return Catalog.Format(msgs.locale, "marketUpstream", nil)
+}
+
+// MarketCalibreno says "Calibreno plugin"
+// in the language the app shows.
+func MarketCalibreno() string { return In(i18n.Locale()).MarketCalibreno() }
+
+// MarketCalibreno says "Calibreno plugin"
+// in the language of msgs.
+func (msgs Messages) MarketCalibreno() string {
+	return Catalog.Format(msgs.locale, "marketCalibreno", nil)
 }
 
 // MarketCommunityNote says "Made by the community, in {repo}"

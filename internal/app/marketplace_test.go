@@ -6,11 +6,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"testing"
 
+	"github.com/egoist/mygo/i18n"
 	"github.com/egoist/mygo/ui"
 
+	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/plugin"
 	"dalibre/internal/settings"
 )
@@ -81,6 +84,7 @@ func TestMarketplaceInstallAndUpdate(t *testing.T) {
 	mk := newFakeMarketplace(t)
 	mk.publish("org.example.dupes", "Find Duplicates", "1.0.0", "library", 11688, "")
 	mk.publish("org.example.wiki", "Wikidata", "1.0.0", "metadata", 2542, `"www.wikidata.org"`)
+	mk.listings[0]["origin"] = "upstream"
 	a.marketURL = mk.srv.URL + "/marketplace.json"
 	tt := ui.NewTester(a.View, 1440, 900)
 
@@ -91,7 +95,7 @@ func TestMarketplaceInstallAndUpdate(t *testing.T) {
 	}
 	tt.Frame()
 	for _, s := range []string{"Find Duplicates", "Wikidata", "Find duplicates…", "Tools", "Version 1.0.0 · Randy",
-		"No internet access", "2 plugins", "GPL-3.0-or-later"} {
+		"No internet access", "2 plugins", "GPL-3.0-or-later", "Upstream port"} {
 		if !tt.HasText(s) {
 			t.Fatalf("marketplace misses %q: %q", s, tt.Texts())
 		}
@@ -160,6 +164,7 @@ func TestMarketplaceInstallAndUpdate(t *testing.T) {
 	// Marketplace: those releases are Dalibre's, not the plugin's.
 	st.Source = &settings.PluginSource{Repo: plugin.MarketplaceRepo, Ref: "v0.6.3", Auto: true}
 	mk.publish("org.example.dupes", "Find Duplicates", "2.1.0", "library", 11688, `"api.example.com"`)
+	mk.listings[0]["origin"] = "upstream"
 	a.checkUpdates(true)
 	tt.Frame()
 	if !st.Source.Marketplace || st.Source.Ref != "2.1.0" || a.pluginByID("org.example.dupes").Manifest.Version != "2.1.0" {
@@ -203,5 +208,116 @@ func TestParseMarketplace(t *testing.T) {
 		if got := plugin.NewerVersion(c.a, c.b); got != c.want {
 			t.Errorf("NewerVersion(%s, %s) = %v", c.a, c.b, got)
 		}
+	}
+}
+
+func TestMarketplaceChineseRanking(t *testing.T) {
+	const (
+		chinese = "org.randynamic.dalibre.chinese-convert"
+		isbn    = "org.randynamic.dalibre.extract-isbn"
+		search  = "org.randynamic.dalibre.search-internet"
+		merge   = "org.randynamic.dalibre.epub-merge"
+		brasil  = "io.github.bellussi1.isbn-brasil"
+	)
+	locale := "en"
+	i18n.SetLocaleFunc(func() string { return locale })
+	t.Cleanup(func() { i18n.SetLocaleFunc(nil) })
+	a := &App{mk: marketState{index: &plugin.Marketplace{Plugins: []plugin.Listing{
+		{ID: brasil, Downloads: 500},
+		{ID: isbn, Downloads: 50},
+		{ID: chinese, Downloads: 10},
+		{ID: merge, Downloads: 100},
+		{ID: search, Downloads: 200},
+	}}}}
+	check := func(want []string) {
+		t.Helper()
+		var got []string
+		for _, l := range a.marketListings() {
+			got = append(got, l.ID)
+		}
+		if !slices.Equal(got, want) {
+			t.Fatalf("ranking in %s: got %v, want %v", locale, got, want)
+		}
+	}
+	check([]string{brasil, search, merge, isbn, chinese})
+	locale = "zh-Hans"
+	check([]string{search, chinese, isbn, merge, brasil})
+	locale = "en"
+	a.mk.index.Featured = []string{search, chinese}
+	check([]string{search, chinese, brasil, merge, isbn})
+	locale = "zh-Hans"
+	a.mk.query = "ISBN"
+	check([]string{isbn, brasil})
+}
+
+func TestMarketplaceRejectsChangedRepository(t *testing.T) {
+	const id = "org.example.tool"
+	listing := plugin.Listing{ID: id, Repo: "example/other-owner", Version: "2.0.0", Package: "https://example.test/tool"}
+	index := &plugin.Marketplace{Plugins: []plugin.Listing{listing}}
+	if u := marketUpdate(index, id, "1.0.0", "example/first-owner"); u != nil {
+		t.Fatalf("offered an update from another repository: %+v", u)
+	}
+	if u := marketUpdate(index, id, "1.0.0", "Example/Other-owner"); u == nil {
+		t.Fatal("missed an update from the same repository")
+	}
+	index.Plugins[0].Repo = plugin.MarketplaceRepo
+	index.Plugins[0].Origin = plugin.MarketOriginUpstream
+	if u := marketUpdate(index, id, "1.0.0", "djyde/dalibre"); u == nil {
+		t.Fatal("missed the approved transition from the upstream index")
+	}
+}
+
+func TestMarketplaceRejectsWrongPackageVersion(t *testing.T) {
+	const id = "org.example.tool"
+	a := newTestApp(t)
+	useTestPluginDir(t, a)
+	mk := newFakeMarketplace(t)
+	mk.publish(id, "Example tool", "1.0.0", "library", 0, "")
+	mk.listings[0]["version"] = "2.0.0"
+	a.marketURL = mk.srv.URL + "/marketplace.json"
+	a.loadMarketplace(true)
+	a.installListing(a.mk.index.Find(id))
+	if a.consent != nil || a.knownManifest(id) != nil || a.mk.installing != "" {
+		t.Fatal("a package for the wrong version reached installation")
+	}
+	if len(a.toasts) == 0 || !strings.Contains(a.toasts[len(a.toasts)-1].text, locales.MarketVersionMismatch("2.0.0", "1.0.0")) {
+		t.Fatalf("the mismatch was not reported: %+v", a.toasts)
+	}
+}
+
+func TestMarketplaceRejectsUndeclaredDownloadPlugin(t *testing.T) {
+	const id = "org.example.tool"
+	a := newTestApp(t)
+	useTestPluginDir(t, a)
+	mk := newFakeMarketplace(t)
+	mk.publish(id, "Example tool", "1.0.0", "library", 0, "")
+	// The listing doesn't declare bookSource, but the package does.
+	var buf bytes.Buffer
+	zw := zip.NewWriter(&buf)
+	for name, contents := range map[string]string{
+		"plugin.json": `{"id":"org.example.tool","name":"Example tool","version":"1.0.0","api":1,
+			"capabilities":{"bookSource":{}},"permissions":{"hosts":["books.example"]}}`,
+		"main.js": `export function search() { return {items: []} }`,
+	} {
+		w, err := zw.Create(name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if _, err := w.Write([]byte(contents)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := zw.Close(); err != nil {
+		t.Fatal(err)
+	}
+	mk.packages[id+"-1.0.0"] = buf.Bytes()
+	a.marketURL = mk.srv.URL + "/marketplace.json"
+	a.loadMarketplace(true)
+	a.installListing(a.mk.index.Find(id))
+	if a.consent != nil || a.knownManifest(id) != nil || a.mk.installing != "" {
+		t.Fatal("a download plugin reached installation")
+	}
+	if len(a.toasts) == 0 || !strings.Contains(a.toasts[len(a.toasts)-1].text, locales.PluginsStatusDownloadUnsupported()) {
+		t.Fatalf("the unsupported capability was not reported: %+v", a.toasts)
 	}
 }

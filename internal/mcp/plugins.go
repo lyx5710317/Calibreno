@@ -30,6 +30,7 @@ const PluginDocs = "https://dalibre.randynamic.org/docs/plugins/"
 const (
 	PluginLoaded        = "loaded"
 	PluginDisabled      = "disabled"
+	PluginUnsupported   = "unsupported"
 	PluginNeedsApproval = "needs_approval" // the user hasn't allowed what it asks for
 	PluginFailed        = "failed"         // it didn't load; the list's errors say why
 )
@@ -41,7 +42,7 @@ type PluginInfo struct {
 	Version      string   `json:"version"`
 	Description  string   `json:"description,omitempty"`
 	Capabilities []string `json:"capabilities" jsonschema:"bookSource, metadata, fileType, actions"`
-	State        string   `json:"state" jsonschema:"loaded, disabled, needs_approval (the user must allow it in Dalibre) or failed (see errors)"`
+	State        string   `json:"state" jsonschema:"loaded, disabled, unsupported, needs_approval (the user must allow it in Dalibre) or failed (see errors)"`
 	Builtin      bool     `json:"builtin,omitempty" jsonschema:"ships inside Dalibre"`
 	Folder       string   `json:"folder,omitempty" jsonschema:"the folder it loads from, when added from one"`
 	Exports      []string `json:"exports,omitempty" jsonschema:"the functions its script exports, when loaded"`
@@ -91,7 +92,7 @@ func (s *Server) addPluginTools() {
 	sdk.AddTool(s.srv, writeTool("create_plugin", "Starts a new plugin in an empty folder from Dalibre's template: plugin.json, main.js, and dalibre.d.ts, which describes the API. "+
 		"Read "+PluginDocs+" before writing one. Then edit the files, add the folder with add_plugin and try it with test_plugin.", false, false), s.createPlugin)
 	sdk.AddTool(s.srv, writeTool("add_plugin", "Adds the plugin in a folder to Dalibre, which loads it from there and reloads it when its files change. "+
-		"Calibreno asks the user to allow what plugin.json's permissions ask for; this waits for their answer.", false, true), s.addPlugin)
+		"Calibreno supports metadata, book file processing and actions. It asks the user to allow what plugin.json's permissions ask for; this waits for their answer.", false, true), s.addPlugin)
 	sdk.AddTool(s.srv, writeTool("reload_plugins", "Loads the plugins again, as after editing one, and lists them. An edit that asks for new permissions waits for the user.", false, true), s.reloadPlugins)
 	sdk.AddTool(s.srv, &sdk.Tool{Name: "test_plugin", Description: "Calls a function of a loaded plugin as Dalibre does, with the user's settings, and returns what it returned, what it logged, and its error with the script's stack. " +
 		"Nothing is added to the library.", Annotations: &sdk.ToolAnnotations{DestructiveHint: boolp(false), OpenWorldHint: boolp(true)}}, s.testPlugin)
@@ -169,7 +170,7 @@ func (s *Server) createPlugin(_ context.Context, _ *sdk.CallToolRequest, in crea
 		return nil, createOut{}, err
 	}
 	return nil, createOut{Folder: dir, Files: files, Docs: PluginDocs,
-		Next: "The template is a book source that searches example.com: rewrite main.js and plugin.json (capabilities, permissions.hosts, settings) for what the plugin is to do, " +
+		Next: "The template looks up book metadata. Edit main.js and plugin.json (capabilities, permissions.hosts, settings) for what the plugin is to do, " +
 			"then add_plugin this folder and try it with test_plugin."}, nil
 }
 
