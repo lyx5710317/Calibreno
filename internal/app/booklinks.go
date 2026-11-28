@@ -11,6 +11,7 @@ import (
 
 	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/calibre"
+	"dalibre/internal/localhandoff"
 )
 
 // Book links, dalibre://book/{library}/{book}, bring Dalibre forward with
@@ -66,6 +67,10 @@ func (a *App) OpenLink(raw string) {
 }
 
 func (a *App) openLink(raw string) {
+	if raw == LinkScheme+"://inbox" || raw == LinkScheme+"://inbox/" {
+		a.openZlibraryInboxLink()
+		return
+	}
 	ref, ok := parseBookLink(raw)
 	if !ok {
 		a.toasts = append(a.toasts, toastMsg{text: locales.LinkNotBook(raw), error: true})
@@ -84,6 +89,24 @@ func (a *App) openLink(raw string) {
 	if !a.loading || a.loadingRoot != root {
 		a.openLibrary(root)
 	}
+}
+
+func (a *App) openZlibraryInboxLink() {
+	if a.loading {
+		a.inboxLinkWait = true
+		return
+	}
+	if a.lib == nil {
+		a.chooseLibraryFor(bookRef{}, true)
+		return
+	}
+	root, err := localhandoff.DefaultRoot()
+	if err != nil {
+		a.toastError(err)
+		return
+	}
+	a.page = pageBatch
+	a.chooseImportAt(true, root)
 }
 
 // linkedLibraryOpened chooses the book of the link waiting for the
@@ -113,7 +136,7 @@ func (a *App) showLinked(id int64) {
 // to pick its folder and try the link again.
 func (a *App) linkNoLibrary(ref bookRef) {
 	a.toasts = append(a.toasts, toastMsg{text: locales.LinkNoLibrary(), error: true,
-		action: locales.LinkOpenLibrary(), onAction: func() { a.chooseLibraryFor(ref) }})
+		action: locales.LinkOpenLibrary(), onAction: func() { a.chooseLibraryFor(ref, false) }})
 }
 
 // copyText puts text on the clipboard; tests replace it.

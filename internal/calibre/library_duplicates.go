@@ -5,6 +5,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -36,6 +38,43 @@ type libraryScanFile struct {
 type libraryScanSize struct {
 	format string
 	size   int64
+}
+
+// BookWithFormatFingerprint checks bytes even for a title whose metadata was edited.
+func (l *Library) BookWithFormatFingerprint(ctx context.Context, format, digest string, bytes int64) (*Book, error) {
+	files, _, err := l.libraryScanFiles(ctx)
+	if err != nil {
+		return nil, err
+	}
+	root, err := os.OpenRoot(l.Root)
+	if err != nil {
+		return nil, err
+	}
+	defer root.Close()
+	for _, file := range files {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if file.format != format || file.path == "" {
+			continue
+		}
+		info, err := root.Stat(file.path)
+		if errors.Is(err, os.ErrNotExist) || (err == nil && (!info.Mode().IsRegular() || info.Size() != bytes)) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		file.info = info
+		sum, err := scanLibraryFile(ctx, root, file, true)
+		if err != nil {
+			return nil, err
+		}
+		if hex.EncodeToString(sum[:]) == digest {
+			return l.Book(file.bookID)
+		}
+	}
+	return nil, nil
 }
 
 // ScanDuplicates reads the current format records. It groups equal digests

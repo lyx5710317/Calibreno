@@ -24,6 +24,7 @@ import (
 	"dalibre/internal/calibre"
 	"dalibre/internal/catalog"
 	"dalibre/internal/kindleconvert"
+	"dalibre/internal/localhandoff"
 	"dalibre/internal/plugin"
 	"dalibre/internal/settings"
 )
@@ -53,7 +54,8 @@ type App struct {
 	libID   string // lib's id, as in its book links
 	loading bool
 	// linkWait is the book link waiting for its library to open.
-	linkWait bookRef
+	linkWait      bookRef
+	inboxLinkWait bool
 	// links are book links that came before the window.
 	links []string
 	// loadingRoot is the library being opened; loadGen tells an open the
@@ -445,6 +447,7 @@ func (a *App) openLibrary(root string) {
 					return
 				}
 				a.loading, a.linkWait = false, bookRef{}
+				a.inboxLinkWait = false
 				a.loadErr = func() string { return locales.AppCouldntOpenLibrary(filepath.Base(root)) }
 				a.loadErrDetail = func() string { return locales.AppLibraryGone(abbreviateHome(root)) }
 			})
@@ -472,6 +475,7 @@ func (a *App) openLibrary(root string) {
 			a.loading = false
 			if err != nil {
 				a.linkWait = bookRef{}
+				a.inboxLinkWait = false
 				if lib != nil {
 					lib.Close()
 				}
@@ -506,6 +510,10 @@ func (a *App) openLibrary(root string) {
 				a.win.SetTitle(locales.AppWindowTitle(filepath.Base(root)))
 			}
 			a.linkedLibraryOpened(uuid)
+			if a.inboxLinkWait {
+				a.inboxLinkWait = false
+				a.openZlibraryInboxLink()
+			}
 		})
 	})
 }
@@ -514,6 +522,7 @@ func (a *App) openLibrary(root string) {
 func (a *App) cancelOpen() {
 	a.loadGen++
 	a.loading, a.linkWait = false, bookRef{}
+	a.inboxLinkWait = false
 }
 
 func (a *App) createLibrary(root string) {
@@ -669,22 +678,63 @@ func (a *App) chooseBooks() {
 }
 
 func (a *App) chooseImport(folders bool) {
+	a.chooseImportAt(folders, "")
+}
+
+func (a *App) chooseImportAt(folders bool, defaultPath string) {
 	lib := a.lib
 	options := mygo.OpenDialogOptions{Parent: a.win, Title: locales.CommonAddBooks(), Multiple: true, Filters: ebookFilter()}
 	if folders {
 		options.Title, options.Directory, options.Filters = locales.BatchAddFolders(), true, nil
+		if defaultPath != "" {
+			options.DefaultPath, options.Multiple = defaultPath, false
+			options.Title += " · " + filepath.Base(lib.Root)
+		}
 	}
 	a.run(func() {
 		paths, err := mygo.Dialog.Open(options)
 		if err != nil || len(paths) == 0 {
 			return
 		}
+		ordinary, inboxes := paths, []string(nil)
+		if folders {
+			ordinary, inboxes = splitHandoffFolders(paths)
+		}
 		a.post(func() {
-			if a.lib == lib {
-				a.importFiles(paths)
+			if a.lib != lib {
+				return
 			}
+			for _, inbox := range inboxes {
+				a.receiveZlibraryInbox(inbox)
+			}
+			a.importFiles(ordinary)
 		})
 	})
+}
+
+func splitHandoffFolders(paths []string) (ordinary, inboxes []string) {
+	current, _ := localhandoff.DefaultRoot()
+	legacy, _ := localhandoff.LegacyRoot()
+	for _, selected := range paths {
+		// The picker can return a path with different casing on Windows.
+		known := ""
+		for _, root := range []string{current, legacy} {
+			if root != "" {
+				if rel, err := filepath.Rel(root, selected); err == nil && rel == "." {
+					known = root
+					break
+				}
+			}
+		}
+		if known != "" {
+			inboxes = append(inboxes, known)
+		} else if localhandoff.RecognizesInbox(selected) {
+			inboxes = append(inboxes, selected)
+		} else if !localhandoff.IsPacketDirectory(selected) {
+			ordinary = append(ordinary, selected)
+		}
+	}
+	return ordinary, inboxes
 }
 
 func plural(n int, one, many string) string {
@@ -881,11 +931,10 @@ func (a *App) revealBook(b *calibre.Book) {
 	}
 }
 
-func (a *App) chooseLibrary() { a.chooseLibraryFor(bookRef{}) }
+func (a *App) chooseLibrary() { a.chooseLibraryFor(bookRef{}, false) }
 
-// chooseLibraryFor asks for a library to open, then chooses the book of
-// link in it, if link names one.
-func (a *App) chooseLibraryFor(link bookRef) {
+// chooseLibraryFor asks for a library to open on behalf of a book link or inbox action.
+func (a *App) chooseLibraryFor(link bookRef, receiveInbox bool) {
 	a.run(func() {
 		dirs, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Parent: a.win, Title: locales.AppOpenCalibreLibraryTitle(), Directory: true, CreateDirectories: true})
 		if err != nil || len(dirs) == 0 {
@@ -893,6 +942,7 @@ func (a *App) chooseLibraryFor(link bookRef) {
 		}
 		a.post(func() {
 			a.linkWait = link
+			a.inboxLinkWait = receiveInbox
 			a.openLibrary(dirs[0])
 		})
 	})

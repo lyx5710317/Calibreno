@@ -8,6 +8,7 @@ import (
 	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/batch"
 	"dalibre/internal/calibre"
+	"dalibre/internal/localhandoff"
 )
 
 type batchPage int
@@ -137,7 +138,16 @@ func (a *App) selectBatch(id string) {
 	a.run(func() {
 		b, err := a.batchStore.Load(key, id)
 		if err == nil {
-			err = a.batchStore.Recover(b, lib)
+			err = a.withHandoff(b, lib, func() error { return a.batchStore.Recover(b, lib) })
+			// Previously processed batches remain visible if their inbox is unavailable
+			// or another receiver owns a legacy delivery.
+			if err != nil && b.Handoff != nil && len(b.Items) == 1 && b.Items[0].Intent == nil {
+				if !errors.Is(err, localhandoff.ErrClaimed) && !errors.Is(err, localhandoff.ErrBusy) {
+					receiptErr := err
+					a.post(func() { a.toastError(receiptErr) })
+				}
+				err = nil
+			}
 		}
 		if err == nil {
 			err = a.recoverBatchMetadata(b, lib)
@@ -240,7 +250,7 @@ func (a *App) recheckBatchItem() {
 	a.run(func() {
 		b, err := a.batchStore.Load(old.Library, old.ID)
 		if err == nil {
-			err = a.batchStore.Recheck(b, b.Item(id), lib)
+			err = a.withHandoff(b, lib, func() error { return a.batchStore.Recheck(b, b.Item(id), lib) })
 		}
 		a.post(func() {
 			a.showBatchWork(lib, b, err)
@@ -273,16 +283,17 @@ func (a *App) applyBatchDecision(act batch.Action) {
 	a.run(func() {
 		b, err := a.batchStore.Load(old.Library, old.ID)
 		if err == nil {
-			item := b.Item(id)
-			if item == nil {
-				err = errors.New("missing batch item")
-			} else {
-				var result *calibre.Book
-				result, err = a.batchStore.Apply(b, item, lib, act, target, before)
+			err = a.withHandoff(b, lib, func() error {
+				item := b.Item(id)
+				if item == nil {
+					return errors.New("missing batch item")
+				}
+				result, err := a.batchStore.Apply(b, item, lib, act, target, before)
 				if err == nil && result != nil {
 					afterAdd(context.Background(), lib, after, result.ID, item.Format, act == batch.AddBook)
 				}
-			}
+				return err
+			})
 		}
 		a.post(func() {
 			a.showBatchWork(lib, b, err)

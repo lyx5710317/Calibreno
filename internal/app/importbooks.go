@@ -12,19 +12,21 @@ import (
 	"dalibre/cmd/dalibre/locales"
 	"dalibre/internal/batch"
 	"dalibre/internal/calibre"
+	"dalibre/internal/localhandoff"
 	"dalibre/internal/plugin"
 )
 
 type importRequest struct {
 	key   string
 	paths []string
+	inbox string
 }
 
 func (a *App) importFiles(paths []string) {
 	if a.lib == nil || a.loading || len(paths) == 0 {
 		return
 	}
-	a.imports = append(a.imports, importRequest{a.batchKey, paths})
+	a.imports = append(a.imports, importRequest{key: a.batchKey, paths: paths})
 	a.drainImports()
 }
 
@@ -42,14 +44,20 @@ func (a *App) drainImports() {
 	a.busy, a.busyDone, a.busyTotal = locales.BatchImporting(), 0, 0
 	a.batch.work = true
 	a.run(func() {
-		b := batch.New(request.key, filepath.Base(request.paths[0]))
-		if len(request.paths) > 1 {
-			b.Source = ""
-		}
-		b.Items = scanImport(request.paths)
-		err := store.Save(b)
-		if err == nil {
-			err = a.runImport(b, lib, hooks, after, "")
+		var b *batch.Batch
+		var err error
+		if request.inbox != "" {
+			b, err = a.runZlibraryInbox(request, lib, hooks, after)
+		} else {
+			b = batch.New(request.key, filepath.Base(request.paths[0]))
+			if len(request.paths) > 1 {
+				b.Source = ""
+			}
+			b.Items = scanImport(request.paths)
+			err = store.Save(b)
+			if err == nil {
+				err = a.runImport(b, lib, hooks, after, "")
+			}
 		}
 		a.post(func() {
 			a.endBatchWork()
@@ -58,7 +66,9 @@ func (a *App) drainImports() {
 			}
 			if a.lib == lib {
 				a.page = pageBatch
-				a.batch = batchView{active: b, history: a.batch.history}
+				if b != nil {
+					a.batch = batchView{active: b, history: a.batch.history}
+				}
 				a.refreshBatchHistory()
 				a.reload(nil)
 			}
@@ -94,6 +104,8 @@ func scanImport(paths []string) []batch.Item {
 			switch {
 			case err != nil:
 				add(path, batch.Failed, err)
+			case d.IsDir() && localhandoff.IsPacketDirectory(path):
+				return filepath.SkipDir
 			case d.IsDir():
 			case isEbook(path):
 				add(path, batch.Waiting, nil)
@@ -113,6 +125,10 @@ func (a *App) runImport(b *batch.Batch, lib *calibre.Library, hooks, after []*pl
 	}
 	index, err := lib.Duplicates()
 	if err != nil {
+		if b.Handoff != nil && len(b.Items) == 1 && b.Items[0].Intent == nil &&
+			(b.Items[0].State == batch.Waiting || b.Items[0].State == batch.Failed) {
+			return store.RecordError(b, &b.Items[0], batch.Failed, "compare", err)
+		}
 		return err
 	}
 	ctx := context.Background()
@@ -128,6 +144,32 @@ func (a *App) runImport(b *batch.Batch, lib *calibre.Library, hooks, after []*pl
 			continue
 		}
 		path := item.Path
+		if source := b.Handoff; source != nil {
+			var cleanup func()
+			path, cleanup, err = localhandoff.Snapshot(source.Inbox, source.Manifest)
+			if err != nil {
+				if storeErr := store.RecordError(b, item, batch.Failed, "handoff", err); storeErr != nil {
+					return storeErr
+				}
+				continue
+			}
+			defer cleanup()
+			book, err := lib.BookWithFormatFingerprint(ctx, item.Format, source.Manifest.SHA256, source.Manifest.Bytes)
+			if err != nil {
+				if storeErr := store.RecordError(b, item, batch.Failed, "compare", err); storeErr != nil {
+					return storeErr
+				}
+				continue
+			}
+			if book != nil {
+				item.Book, item.State, item.Problem, item.Detail = batch.Ref(book), batch.Duplicate, "", ""
+				if err := store.Save(b); err != nil {
+					return err
+				}
+				store.Clean(b, item)
+				continue
+			}
+		}
 		if info, err := os.Stat(path); err != nil || !info.Mode().IsRegular() {
 			if err == nil {
 				err = fs.ErrInvalid
@@ -173,11 +215,13 @@ func (a *App) retryImport(id string) {
 	hooks, after := a.importPlugins(), a.hookPlugins()
 	a.run(func() {
 		work, err := a.batchStore.Load(b.Library, b.ID)
-		if err == nil && id != "" && work.Item(id) == nil {
-			err = errors.New("missing batch item")
-		}
 		if err == nil {
-			err = a.runImport(work, lib, hooks, after, id)
+			err = a.withHandoff(work, lib, func() error {
+				if id != "" && work.Item(id) == nil {
+					return errors.New("missing batch item")
+				}
+				return a.runImport(work, lib, hooks, after, id)
+			})
 		}
 		a.post(func() {
 			a.showBatchWork(lib, work, err)

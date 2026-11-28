@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"dalibre/internal/calibre"
+	"dalibre/internal/localhandoff"
 	_ "modernc.org/sqlite"
 )
 
@@ -109,6 +110,13 @@ type Batch struct {
 	Source  string
 	Created time.Time
 	Items   []Item
+	Handoff *Handoff `json:",omitempty"`
+}
+
+// Handoff persists the source and expected bytes alongside the destination library.
+type Handoff struct {
+	Inbox    string
+	Manifest localhandoff.Manifest
 }
 
 type Summary struct {
@@ -213,6 +221,22 @@ func (s *Store) init() error {
 	return s.err
 }
 
+// ReceiverID distinguishes independent batch stores without exposing their paths.
+func (s *Store) ReceiverID() (string, error) {
+	if err := s.init(); err != nil {
+		return "", err
+	}
+	if _, err := s.db.Exec(`CREATE TABLE IF NOT EXISTS handoff_receiver (singleton INTEGER PRIMARY KEY, id TEXT NOT NULL)`); err != nil {
+		return "", err
+	}
+	if _, err := s.db.Exec(`INSERT OR IGNORE INTO handoff_receiver VALUES (1, ?)`, rand.Text()); err != nil {
+		return "", err
+	}
+	var id string
+	err := s.db.QueryRow(`SELECT id FROM handoff_receiver WHERE singleton = 1`).Scan(&id)
+	return id, err
+}
+
 func (s *Store) Close() {
 	if s.db != nil {
 		_ = s.db.Close()
@@ -268,11 +292,20 @@ func (s *Store) List(library string) ([]Summary, error) {
 }
 
 func (s *Store) Load(library, id string) (*Batch, error) {
+	return s.load("SELECT payload FROM batches WHERE library = ? AND id = ?", library, id)
+}
+
+// LoadHandoff finds a delivery regardless of which library originally collected it.
+func (s *Store) LoadHandoff(id string) (*Batch, error) {
+	return s.load("SELECT payload FROM batches WHERE id = ?", "zlibrary-"+id)
+}
+
+func (s *Store) load(query string, args ...any) (*Batch, error) {
 	if err := s.init(); err != nil {
 		return nil, err
 	}
 	var payload []byte
-	if err := s.db.QueryRow("SELECT payload FROM batches WHERE library = ? AND id = ?", library, id).Scan(&payload); err != nil {
+	if err := s.db.QueryRow(query, args...).Scan(&payload); err != nil {
 		return nil, err
 	}
 	var b Batch
